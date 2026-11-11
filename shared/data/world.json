@@ -1,0 +1,169 @@
+{
+  "_doc": "Single source of truth for world layout, buildings, interiors, furniture, activities and economy. Read by the Godot client (shared/scripts/WorldData.gd), the Python server (server_python/world.py) and tools/generate_world.py. See docs/BUILDINGS.md.",
+  "grid": {"cmin": -12, "cmax": 12, "rmin": -10, "rmax": 8},
+  "spawn": {"x": 0.0, "y": 40.0},
+  "interior_base": [6000, 0],
+  "interior_step": 2400,
+  "floor_step": 1600,
+  "props": [
+    ["lamp", -9, -1], ["lamp", -3, -1], ["lamp", 4, -1], ["lamp", 10, -1],
+    ["lamp", -9, 3], ["lamp", -3, 3], ["lamp", 4, 3], ["lamp", 10, 3],
+    ["tree", -10, 6], ["tree", -5, 6], ["tree", 1, 6], ["tree", 6, 6], ["tree", 11, 6], ["tree", -3, -8], ["tree", 4, -8],
+    ["bench", -6, 3], ["bench", 7, 3],
+    ["bush", -6, -2], ["bush", -4, -2], ["bush", 5, -2], ["bush", 9, -2], ["bush", 12, -2]
+  ],
+  "prop_rules": {"lamp": {"blocks": true}, "tree": {"blocks": true}, "bush": {"blocks": true},
+                 "bench": {"blocks": true, "actions": ["rest_bench"]}},
+  "building_types": {
+    "residential": {"label": "Residência", "private": true, "furniture": ["cama", "sofa", "mesa", "cadeira", "estante", "planta", "fogao", "chuveiro"]},
+    "shop": {"label": "Comércio", "private": false, "furniture": ["balcao", "estante", "planta", "mesa", "cadeira", "sofa"]},
+    "office": {"label": "Serviços", "private": false, "furniture": ["secretaria", "mesa", "cadeira", "sofa", "estante", "planta", "balcao"]},
+    "restaurant": {"label": "Alimentação", "private": false, "furniture": ["balcao", "mesa", "cadeira", "fogao", "planta", "estante"]}
+  },
+  "furniture": {
+    "cama": {"name": "Cama", "w": 1, "h": 2, "tex": "pack_original/furniture_cama"},
+    "sofa": {"name": "Sofá", "w": 2, "h": 1, "tex": "pack_original/furniture_sofa"},
+    "mesa": {"name": "Mesa", "w": 2, "h": 1, "tex": "pack_original/furniture_mesa"},
+    "secretaria": {"name": "Secretária", "w": 2, "h": 1, "tex": "pack_original/furniture_mesa"},
+    "cadeira": {"name": "Cadeira", "w": 1, "h": 1, "tex": "pack_original/furniture_cadeira"},
+    "estante": {"name": "Estante", "w": 1, "h": 1, "tex": "pack_original/furniture_estante"},
+    "planta": {"name": "Planta", "w": 1, "h": 1, "tex": "pack_original/furniture_planta"},
+    "fogao": {"name": "Fogão", "w": 1, "h": 1, "tex": "furniture/fogao"},
+    "chuveiro": {"name": "Chuveiro", "w": 1, "h": 1, "tex": "furniture/chuveiro"},
+    "balcao": {"name": "Balcão", "w": 2, "h": 1, "tex": "furniture/balcao"}
+  },
+  "items": {
+    "pao": {"name": "Pão", "price": 300, "sell": 100, "eat": {"hunger": 18}},
+    "agua": {"name": "Água", "price": 150, "sell": 50, "eat": {"hunger": 3, "health": 3}},
+    "banana": {"name": "Bananas", "price": 250, "sell": 80, "eat": {"hunger": 12, "health": 2}},
+    "ingredientes": {"name": "Ingredientes", "price": 900, "sell": 300},
+    "refeicao": {"name": "Refeição para levar", "price": 1200, "sell": 0, "eat": {"hunger": 45}},
+    "sabonete": {"name": "Sabonete", "price": 250, "sell": 80}
+  },
+  "activities": {
+    "sleep": {"label": "Dormir", "secs": 8, "effects": {"energy": 70}, "requires": "housing", "status": "A dormir"},
+    "rest": {"label": "Descansar", "secs": 4, "effects": {"energy": 12}, "status": "A descansar"},
+    "rest_bench": {"label": "Sentar no banco", "secs": 4, "effects": {"energy": 6}, "status": "A descansar"},
+    "shower": {"label": "Tomar banho", "secs": 4, "effects": {"hygiene": 100}, "requires": "housing", "status": "No banho"},
+    "cook": {"label": "Cozinhar", "secs": 5, "consumes": "ingredientes", "effects": {"hunger": 45}, "requires": "housing", "status": "A cozinhar"},
+    "buy": {"label": "Comprar", "shop": ["pao", "agua", "banana", "ingredientes", "sabonete"]},
+    "takeaway": {"label": "Comprar para levar", "shop": ["refeicao", "agua"]},
+    "sell": {"label": "Vender"},
+    "dine": {"label": "Comer refeição", "secs": 5, "cost": 1500, "effects": {"hunger": 60}, "status": "A comer"},
+    "work": {"label": "Trabalhar", "secs": 8, "requires": "job", "effects": {"energy": -15, "hunger": -8, "hygiene": -6}, "status": "A trabalhar"}
+  },
+  "jobs": {
+    "assistente": {"name": "Assistente administrativo", "building": "escritorio", "pay": 3000},
+    "cozinheiro": {"name": "Ajudante de cozinha", "building": "restaurante", "pay": 2200}
+  },
+  "rentals": {
+    "casa": {"name": "Quarto na Casa Mussulo", "price_per_day": 2000, "options": [1, 7], "discount_7": 0.85}
+  },
+  "needs": {
+    "start": {"hunger": 80, "energy": 80, "hygiene": 80, "health": 100},
+    "decay_per_game_hour": {"hunger": 3.0, "energy": 2.0, "hygiene": 2.5},
+    "health_per_game_hour": {"starving": -4.0, "exhausted": -3.0, "dirty": -1.0, "regen": 1.0}
+  },
+  "clock": {"start_hour": 8, "time_scale": 4.0},
+  "buildings": [
+    {
+      "id": "mercearia", "name": "Mercearia Girassol", "type": "shop", "scene": "Mercearia.tscn", "palette": "yellow", "shopfront": true,
+      "c0": -12, "r0": -6, "w": 5, "d": 4,
+      "entrances": [{"id": "frente", "face": "front", "i": 3, "edge": "h:7:8"}, {"id": "lado", "face": "side", "i": 2, "edge": "v:10:5"}],
+      "floors": [
+        {"w": 10, "l": 8, "name": "Loja",
+         "walls": [["v", 5, 0, 8]],
+         "openings": [["v", 5, 5, "door"], ["h", 2, 0, "window"], ["h", 7, 0, "window"], ["v", 10, 2, "window"], ["h", 2, 8, "window"], ["h", 9, 8, "window"], ["v", 0, 6, "window"]],
+         "furniture": [
+           {"id": "balcao", "x": 7, "y": 3, "r": 0, "actions": ["buy", "sell"]},
+           {"id": "estante", "x": 6, "y": 0, "r": 0}, {"id": "estante", "x": 8, "y": 0, "r": 0}, {"id": "estante", "x": 9, "y": 0, "r": 0},
+           {"id": "planta", "x": 9, "y": 7, "r": 0}, {"id": "estante", "x": 4, "y": 0, "r": 0}, {"id": "planta", "x": 4, "y": 7, "r": 0}
+         ]},
+        {"w": 10, "l": 8, "name": "Armazém e sala do pessoal",
+         "walls": [["h", 4, 0, 10], ["v", 5, 4, 8]],
+         "openings": [["h", 6, 4, "door"], ["v", 5, 6, "door"], ["h", 3, 0, "window"], ["h", 7, 0, "window"], ["v", 10, 1, "window"], ["v", 10, 6, "window"], ["h", 2, 8, "window"], ["h", 7, 8, "window"]],
+         "furniture": [
+           {"id": "sofa", "x": 6, "y": 7, "r": 0, "actions": ["rest"]}, {"id": "planta", "x": 9, "y": 7, "r": 0},
+           {"id": "mesa", "x": 1, "y": 6, "r": 0}, {"id": "cadeira", "x": 3, "y": 6, "r": 0},
+           {"id": "estante", "x": 9, "y": 0, "r": 0}, {"id": "estante", "x": 8, "y": 0, "r": 0}, {"id": "estante", "x": 5, "y": 0, "r": 0}
+         ]}
+      ],
+      "stairs": [{"lo": 0, "x": 0, "y": 3, "len": 2}]
+    },
+    {
+      "id": "casa", "name": "Casa Mussulo", "type": "residential", "scene": "Casa.tscn", "palette": "pink", "shopfront": false,
+      "c0": -6, "r0": -6, "w": 3, "d": 4,
+      "entrances": [{"id": "frente", "face": "front", "i": 1, "edge": "h:2:8"}],
+      "floors": [
+        {"w": 6, "l": 8, "name": "Rés-do-chão",
+         "walls": [["h", 4, 0, 6], ["v", 3, 0, 4]],
+         "openings": [["h", 1, 4, "door"], ["h", 4, 4, "door"], ["h", 1, 0, "window"], ["h", 4, 0, "window"], ["v", 0, 2, "window"], ["v", 0, 6, "window"], ["v", 6, 6, "window"], ["h", 4, 8, "window"]],
+         "rooms": [{"name": "Quarto", "x": 0, "y": 0, "w": 3, "h": 4}, {"name": "Casa de banho", "x": 3, "y": 0, "w": 3, "h": 4}, {"name": "Sala e cozinha", "x": 0, "y": 4, "w": 6, "h": 4}],
+         "furniture": [
+           {"id": "cama", "x": 0, "y": 0, "r": 0, "actions": ["sleep"]}, {"id": "estante", "x": 2, "y": 0, "r": 0},
+           {"id": "chuveiro", "x": 5, "y": 0, "r": 0, "actions": ["shower"]}, {"id": "planta", "x": 3, "y": 0, "r": 0},
+           {"id": "fogao", "x": 5, "y": 4, "r": 0, "actions": ["cook"]}, {"id": "mesa", "x": 4, "y": 6, "r": 0},
+           {"id": "cadeira", "x": 3, "y": 6, "r": 0}, {"id": "sofa", "x": 0, "y": 7, "r": 0, "actions": ["rest"]}
+         ]}
+      ],
+      "stairs": []
+    },
+    {
+      "id": "escritorio", "name": "Escritório Atlântico", "type": "office", "scene": "Escritorio.tscn", "palette": "blue", "shopfront": false,
+      "c0": 5, "r0": -7, "w": 4, "d": 5,
+      "entrances": [{"id": "frente", "face": "front", "i": 2, "edge": "h:5:10"}],
+      "floors": [
+        {"w": 8, "l": 10, "name": "Receção",
+         "walls": [["h", 6, 0, 8], ["v", 4, 0, 6]],
+         "openings": [["h", 5, 6, "door"], ["v", 4, 3, "door"], ["h", 1, 0, "window"], ["h", 6, 0, "window"], ["v", 8, 2, "window"], ["v", 8, 8, "window"], ["h", 2, 10, "window"], ["h", 7, 10, "window"]],
+         "furniture": [
+           {"id": "balcao", "x": 1, "y": 7, "r": 0}, {"id": "sofa", "x": 6, "y": 9, "r": 0, "actions": ["rest"]},
+           {"id": "planta", "x": 0, "y": 9, "r": 0}, {"id": "planta", "x": 7, "y": 6, "r": 0},
+           {"id": "estante", "x": 3, "y": 0, "r": 0}, {"id": "estante", "x": 7, "y": 0, "r": 0}, {"id": "mesa", "x": 5, "y": 2, "r": 0}
+         ]},
+        {"w": 8, "l": 10, "name": "Escritórios",
+         "walls": [["v", 4, 0, 10]],
+         "openings": [["v", 4, 3, "door"], ["v", 4, 7, "door"], ["h", 1, 0, "window"], ["h", 6, 0, "window"], ["v", 8, 4, "window"], ["h", 2, 10, "window"], ["h", 6, 10, "window"], ["v", 0, 6, "window"]],
+         "furniture": [
+           {"id": "secretaria", "x": 1, "y": 5, "r": 0, "actions": ["work"]}, {"id": "secretaria", "x": 1, "y": 8, "r": 0, "actions": ["work"]},
+           {"id": "secretaria", "x": 5, "y": 6, "r": 0, "actions": ["work"]}, {"id": "estante", "x": 3, "y": 0, "r": 0},
+           {"id": "planta", "x": 7, "y": 9, "r": 0}, {"id": "estante", "x": 5, "y": 0, "r": 0}
+         ]},
+        {"w": 8, "l": 6, "name": "Direção (terraço à frente)",
+         "walls": [["v", 3, 0, 6]],
+         "openings": [["v", 3, 3, "door"], ["h", 1, 0, "window"], ["h", 5, 0, "window"], ["v", 8, 2, "window"], ["h", 1, 6, "window"], ["h", 5, 6, "window"]],
+         "furniture": [
+           {"id": "mesa", "x": 4, "y": 3, "r": 0}, {"id": "cadeira", "x": 6, "y": 3, "r": 0}, {"id": "sofa", "x": 0, "y": 5, "r": 0, "actions": ["rest"]},
+           {"id": "estante", "x": 0, "y": 0, "r": 0}, {"id": "planta", "x": 2, "y": 0, "r": 0}, {"id": "planta", "x": 7, "y": 5, "r": 0}
+         ]}
+      ],
+      "stairs": [{"lo": 0, "x": 0, "y": 3, "len": 2}, {"lo": 1, "x": 7, "y": 3, "len": 2}]
+    },
+    {
+      "id": "restaurante", "name": "Restaurante Maianga", "type": "restaurant", "scene": "Loja.tscn", "palette": "cream", "shopfront": true,
+      "c0": 10, "r0": -6, "w": 3, "d": 4,
+      "entrances": [{"id": "frente", "face": "front", "i": 1, "edge": "h:3:8"}],
+      "floors": [
+        {"w": 6, "l": 8, "name": "Sala de refeições",
+         "walls": [["h", 3, 0, 6]],
+         "openings": [["h", 4, 3, "door"], ["h", 1, 0, "window"], ["h", 4, 0, "window"], ["v", 6, 1, "window"], ["v", 6, 5, "window"], ["h", 1, 8, "window"], ["h", 5, 8, "window"]],
+         "rooms": [{"name": "Cozinha", "x": 0, "y": 0, "w": 6, "h": 3}, {"name": "Sala", "x": 0, "y": 3, "w": 6, "h": 5}],
+         "furniture": [
+           {"id": "fogao", "x": 2, "y": 0, "r": 0, "actions": ["work"]}, {"id": "fogao", "x": 3, "y": 0, "r": 0},
+           {"id": "estante", "x": 5, "y": 0, "r": 0},
+           {"id": "balcao", "x": 2, "y": 4, "r": 0, "actions": ["takeaway"]},
+           {"id": "mesa", "x": 4, "y": 6, "r": 0, "actions": ["dine"]}, {"id": "cadeira", "x": 5, "y": 5, "r": 0},
+           {"id": "planta", "x": 5, "y": 7, "r": 0}
+         ]},
+        {"w": 6, "l": 8, "name": "Esplanada coberta",
+         "walls": [],
+         "openings": [["h", 1, 0, "window"], ["h", 4, 0, "window"], ["v", 6, 2, "window"], ["v", 6, 6, "window"], ["h", 2, 8, "window"], ["h", 4, 8, "window"]],
+         "furniture": [
+           {"id": "mesa", "x": 2, "y": 2, "r": 0, "actions": ["dine"]}, {"id": "mesa", "x": 3, "y": 6, "r": 0, "actions": ["dine"]},
+           {"id": "planta", "x": 5, "y": 0, "r": 0}, {"id": "planta", "x": 5, "y": 7, "r": 0}, {"id": "cadeira", "x": 4, "y": 2, "r": 0}
+         ]}
+      ],
+      "stairs": [{"lo": 0, "x": 0, "y": 6, "len": 2}]
+    }
+  ]
+}

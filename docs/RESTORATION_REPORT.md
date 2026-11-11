@@ -1,0 +1,46 @@
+# Restoration report — gameplay, world systems, buildings & UI (M2)
+
+Brief: bring back the gameplay depth of the original prototype (`simulador-vida` v0.6) without reverting the
+current architecture. The inventory written before any change is in **`docs/COMPARISON.md`**.
+
+## What changed, by area
+
+| Area | Result |
+|---|---|
+| **Single source of truth** | New `shared/data/world.json`: grid, props, 4 buildings (floors, rooms, edge walls, doors, windows, stairs, entrances), furniture, activities, items, jobs, rentals, needs, clock. Read by the client (`shared/scripts/WorldData.gd`), the server (`server_python/world.py`) and the scene generator (`tools/generate_world.py`). The server validates the file at start-up (furniture overlaps, furniture allowed per building type, stairs in bounds, entrances not blocked, **every floor fully connected**). |
+| **Buildings** | Original architecture restored as data, in the original's edge-key format (`h:x:y` / `v:x:y`), same 1 world tile = 2×2 interior cells convention: Casa Mussulo (1 floor, bedroom / bathroom / living-kitchen), Mercearia Girassol (2 floors, 2 entrances, different layout per floor), Escritório Atlântico (3 floors, shorter top floor, two staircases), Restaurante Maianga (kitchen + dining, covered terrace). Exterior footprints and floor counts now match the interiors. |
+| **Wall system** | **Preserved.** Interiors instance the same `WallPieceL/R.tscn` pieces (one per grid edge) with interior textures: back walls full height (with windows), front walls and partitions as low cut-away pieces so the player is never hidden; doors are low leaves when closed and an empty gap when open. |
+| **Floor tiling** | Exterior: current tiling kept (it is less repetitive than the original's checkerboard). Interior: original approach adopted — pack `floor.png` with alternating tint, red mat at exits, dark stair opening with guard rail on the upper floor. |
+| **Click / tap to move** | One pipeline for mouse and touch (`World._on_tap`): tile → A* path (4-way, with body clearance and line-of-sight smoothing, `WorldData.find_path`); building → the reachable entrance with the shortest path, then enter; furniture / door / stairs / exit → walk to the best approach cell, then act. Keyboard (WASD/arrows) still works and cancels a path. Hover highlight on desktop, animated target marker, stuck detection. |
+| **Interiors** | Entering/leaving, stairs (tap the stairs or use the floor picker; multi-floor goals chain automatically), doors open/close **synced for everyone** (closed doors block movement and paths; you cannot close a door on someone standing in it). |
+| **Zoom** | Wheel, `+`/`-`, pinch, on-screen buttons. Integer default zoom by screen size. On phones the world uses 1 UI px = 1 CSS px (as the original did), so text stays readable. |
+| **Phone** | Original 6 apps restored with real data: Banco (balance + last transactions), Mensagens (chat log + write), Emprego (jobs: apply / quit), Imóveis (homeless status, rent a room 1 or 7 days), Negócios ("Em breve", as in the original), Governo (ID card + life story — the story could previously only be read once). Plus Definições: log out and toggle debug (for touch screens). |
+| **Character interactions** | Proximity chat relayed by the server (same zone; outdoors ≤ 600 px), speech bubbles over heads, log in Mensagens. Other players show their current activity ("A dormir", "A trabalhar"…). |
+| **Needs, clock, activities** | Server clock (4× speed, as the original). Hunger, energy, hygiene decay server-side; health drops when starving/exhausted/dirty and recovers otherwise. Activities per building type: sleep / shower / cook (rented home), rest (sofas, street benches), buy / sell (grocery counter), dine / take-away (restaurant), work (office desks, restaurant stove; needs the job). Timed activities have a progress bar and Cancel; moving cancels them. |
+| **Economy** | Inventory (buy, eat, sell), salaries, rent, all recorded in the bank history. Starting homeless (from the existing life-story generator) now has consequences: the house is private until you rent. |
+| **Player HUD** | `client/scripts/Hud.gd`: avatar, name, location, mood/activity, 4 need bars, clock, money, context action button, floor picker, toasts, chat, backpack, phone. Compact layout under 760 px width; all touch targets ≥ 44–56 px. No technical data. |
+| **Debug** | `client/scripts/DebugOverlay.gd`, independent from the HUD. Hidden by default, **F3** toggles (also in Telemóvel → Definições). Sections: Desempenho, Rede (server, peer, latency via ping/pong, message counts), Jogador (zone, px, cell, velocity, input mode, collisions), Navegação e colisão (waypoints, pending interaction, floor goal, blocked cells, closed doors), Entidades, Estado do servidor. World-space overlay: blocked cells (red), approach cells (green), path (yellow), player cell (blue), closed doors. New sections: `debug.register_section("Name", callable)`. |
+| **Depth sorting fix** | Buildings were y-sorted by their front corner, hiding the player standing at their doors. The sort origin is now `min(left, right corner) + 8`, correct for all buildings (|width − depth| ≤ 1). |
+| **Mobile menu** | Login/onboarding uses a 640×640 base on narrow screens (was ~30 % scale on portrait phones). |
+
+## Multiplayer / authority
+* Zones: `"w"` or `"b:<building>:<floor>"`. Interiors live in separate pixel regions (so positions are unambiguous); every client receives all players with their zone and shows only its own zone.
+* Server rejects and corrects (`position_correction`): moving into blocked cells, through interior walls/closed doors, or teleport-sized jumps.
+* Every action is validated server-side: distance to the door/exit/stairs/object (same cell geometry as the client), building privacy, job/rent requirements, money, inventory, object occupancy (two players cannot use the same bed or desk), rate-limited chat.
+* Private state (money, needs, inventory, job, housing, transactions) is sent only to its owner (`self_state`); others only see name, appearance, position, zone, current activity.
+* Persisted: zone, needs, inventory, job, housing, transactions per character; clock and door states in `data/world_state.json`. Old characters migrate automatically; saved positions that became invalid (bigger buildings) are moved to the spawn.
+
+New protocol messages: client → `enter_building, exit_building, use_stairs, door_toggle, interact, use_item, cancel_activity, chat, job_apply, job_quit, rent, profile_request, self_request, ping`; server → `self_state, zone_change, zone_state, door_state, position_correction, notice, activity_started, activity_done, player_activity, chat, profile, pong`. `position` and `spawn_player` now carry `zone`.
+
+## Tests actually run
+1. **Server integration** — `python tests/run_integration.py`: **79/79 pass** (the 46 previous + 33 new): entering only at a door; walking into a building rejected; wall and closed-door crossing rejected; both Mercearia entrances; stairs up/down and limits; door sync, doorway-occupied rule; buy/sell/unsellable items; private house denied → rent → enter; cooking consumes ingredients and restores hunger; bed occupied by another player; chat delivered in-zone and not across zones; profile only own data; job → work pays and logs a transaction; moving cancels work without pay; interior zone persists across reconnect. (Stand-in websocket library as before — no network here.)
+2. **The real Godot client, in a browser** — this sandbox has no Godot editor, but the original's web build ships the Godot 4.4.1 runtime. `tools/web_test/` packs this project into it and drives it with Playwright against the real server. Everything listed in the table above was exercised that way (login, click-to-building, entering, floor picker incl. 2→0 chains, shop, backpack, phone apps, renting, cooking, keyboard, doors, bench, two simultaneous clients with zone isolation and chat bubbles, phone-sized portrait viewport with real touch taps). Screenshots: **`docs/screenshots/`** — these are real engine renders.
+
+## Not done / limits (honest list)
+* The project targets Godot 4.3; it was run on the 4.4.1 runtime. Open it in your editor once to re-import and check for warnings.
+* Typing accented characters through Playwright's synthetic keyboard dropped them (harness limitation; the server path keeps them).
+* Not restored: the in-game decorate/architecture editor (needs ownership in multiplayer; the brief keeps the newer wall system), window open/close (purely visual), wandering NPCs in gameplay (client-only NPCs would differ per client).
+* Interiors are "bigger on the inside" relative to the street view (same 2× convention as the original), and floors are shown one at a time instead of the original's stacked translucent view.
+* Hygiene was added as a 4th need so showers mean something; health never kills (no death/hospital loop yet).
+* `ANGOLA_DEV_START_MONEY` (fixed starting money) and `ANGOLA_ACTIVITY_SCALE` exist for tests/playtesting only.
+* The client still connects to `ws://127.0.0.1:7777` by default; a hosted web build needs `wss://` and a configurable address (see the hosting notes from the earlier conversation).

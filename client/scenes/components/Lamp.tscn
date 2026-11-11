@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/props/lamp.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/art/props/glow.png" id="2"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_1"]
+blend_mode = 1
+
+[node name="Lamp" type="Sprite2D"]
+texture = ExtResource("1")
+centered = false
+offset = Vector2(-8, -62)
+
+[node name="Glow" type="Sprite2D" parent="."]
+texture = ExtResource("2")
+position = Vector2(0, -56)
+modulate = Color(1, 1, 1, 0.6)
+material = SubResource("CanvasItemMaterial_1")

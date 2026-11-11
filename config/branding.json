@@ -1,0 +1,8 @@
+{
+  "_comment": "Nome/branding PROVISÓRIO. Altera aqui (e substitui assets/art/ui/logo.png) — nenhum script contém o nome do jogo.",
+  "title": "Angola Life Simulator",
+  "title_line1": "Angola",
+  "title_line2": "Life Simulator",
+  "window_title": "Angola Life Simulator",
+  "logo": "res://assets/art/ui/logo.png"
+}

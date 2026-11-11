@@ -1,0 +1,2091 @@
+[gd_scene load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://client/scripts/World.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/art/tiles/grass.png" id="2"]
+[ext_resource type="PackedScene" path="res://client/scenes/components/GroundTile.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://assets/art/tiles/grass_b.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/art/tiles/sidewalk.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/art/tiles/road.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/art/tiles/road_line_r.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/art/tiles/road_line_c.png" id="8"]
+[ext_resource type="PackedScene" path="res://client/scenes/buildings/Mercearia.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://client/scenes/buildings/Casa.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://client/scenes/buildings/Escritorio.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://client/scenes/buildings/Loja.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://client/scenes/components/Lamp.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://client/scenes/components/Tree.tscn" id="14"]
+[ext_resource type="PackedScene" path="res://client/scenes/components/Bench.tscn" id="15"]
+[ext_resource type="PackedScene" path="res://client/scenes/components/Bush.tscn" id="16"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_1"]
+a = Vector2(-64, -352)
+b = Vector2(736, 48)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_2"]
+a = Vector2(736, 48)
+b = Vector2(128, 352)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_3"]
+a = Vector2(128, 352)
+b = Vector2(-672, -48)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_4"]
+a = Vector2(-672, -48)
+b = Vector2(-64, -352)
+
+[node name="World" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Ground" type="Node2D" parent="."]
+
+[node name="Grass" type="Node2D" parent="Ground"]
+
+[node name="Sidewalk" type="Node2D" parent="Ground"]
+
+[node name="Road" type="Node2D" parent="Ground"]
+
+[node name="T_m12_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, -352)
+texture = ExtResource("2")
+
+[node name="T_m11_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, -336)
+texture = ExtResource("2")
+
+[node name="T_m10_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, -320)
+texture = ExtResource("4")
+
+[node name="T_m9_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, -304)
+texture = ExtResource("2")
+
+[node name="T_m8_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, -288)
+texture = ExtResource("2")
+
+[node name="T_m7_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, -272)
+texture = ExtResource("2")
+
+[node name="T_m6_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, -256)
+texture = ExtResource("2")
+
+[node name="T_m5_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(160, -240)
+texture = ExtResource("4")
+
+[node name="T_m4_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(192, -224)
+texture = ExtResource("2")
+
+[node name="T_m3_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(224, -208)
+texture = ExtResource("2")
+
+[node name="T_m2_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(256, -192)
+texture = ExtResource("2")
+
+[node name="T_m1_m10" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(288, -176)
+texture = ExtResource("5")
+
+[node name="T_0_m10" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(320, -160)
+texture = ExtResource("6")
+
+[node name="T_1_m10" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(352, -144)
+texture = ExtResource("7")
+
+[node name="T_2_m10" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(384, -128)
+texture = ExtResource("6")
+
+[node name="T_3_m10" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(416, -112)
+texture = ExtResource("5")
+
+[node name="T_4_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(448, -96)
+texture = ExtResource("2")
+
+[node name="T_5_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(480, -80)
+texture = ExtResource("4")
+
+[node name="T_6_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(512, -64)
+texture = ExtResource("2")
+
+[node name="T_7_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(544, -48)
+texture = ExtResource("2")
+
+[node name="T_8_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(576, -32)
+texture = ExtResource("2")
+
+[node name="T_9_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(608, -16)
+texture = ExtResource("2")
+
+[node name="T_10_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(640, 0)
+texture = ExtResource("4")
+
+[node name="T_11_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(672, 16)
+texture = ExtResource("2")
+
+[node name="T_12_m10" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(704, 32)
+texture = ExtResource("2")
+
+[node name="T_m12_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, -336)
+texture = ExtResource("2")
+
+[node name="T_m11_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, -320)
+texture = ExtResource("2")
+
+[node name="T_m10_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, -304)
+texture = ExtResource("2")
+
+[node name="T_m9_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, -288)
+texture = ExtResource("4")
+
+[node name="T_m8_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, -272)
+texture = ExtResource("2")
+
+[node name="T_m7_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, -256)
+texture = ExtResource("2")
+
+[node name="T_m6_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, -240)
+texture = ExtResource("2")
+
+[node name="T_m5_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, -224)
+texture = ExtResource("2")
+
+[node name="T_m4_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(160, -208)
+texture = ExtResource("4")
+
+[node name="T_m3_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(192, -192)
+texture = ExtResource("2")
+
+[node name="T_m2_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(224, -176)
+texture = ExtResource("2")
+
+[node name="T_m1_m9" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(256, -160)
+texture = ExtResource("5")
+
+[node name="T_0_m9" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(288, -144)
+texture = ExtResource("6")
+
+[node name="T_1_m9" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(320, -128)
+texture = ExtResource("7")
+
+[node name="T_2_m9" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(352, -112)
+texture = ExtResource("6")
+
+[node name="T_3_m9" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(384, -96)
+texture = ExtResource("5")
+
+[node name="T_4_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(416, -80)
+texture = ExtResource("2")
+
+[node name="T_5_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(448, -64)
+texture = ExtResource("2")
+
+[node name="T_6_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(480, -48)
+texture = ExtResource("4")
+
+[node name="T_7_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(512, -32)
+texture = ExtResource("2")
+
+[node name="T_8_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(544, -16)
+texture = ExtResource("2")
+
+[node name="T_9_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(576, 0)
+texture = ExtResource("2")
+
+[node name="T_10_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(608, 16)
+texture = ExtResource("2")
+
+[node name="T_11_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(640, 32)
+texture = ExtResource("4")
+
+[node name="T_12_m9" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(672, 48)
+texture = ExtResource("2")
+
+[node name="T_m12_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, -320)
+texture = ExtResource("2")
+
+[node name="T_m11_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, -304)
+texture = ExtResource("2")
+
+[node name="T_m10_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, -288)
+texture = ExtResource("2")
+
+[node name="T_m9_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, -272)
+texture = ExtResource("2")
+
+[node name="T_m8_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, -256)
+texture = ExtResource("4")
+
+[node name="T_m7_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, -240)
+texture = ExtResource("2")
+
+[node name="T_m6_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, -224)
+texture = ExtResource("2")
+
+[node name="T_m5_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, -208)
+texture = ExtResource("2")
+
+[node name="T_m4_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, -192)
+texture = ExtResource("2")
+
+[node name="T_m3_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(160, -176)
+texture = ExtResource("4")
+
+[node name="T_m2_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(192, -160)
+texture = ExtResource("2")
+
+[node name="T_m1_m8" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(224, -144)
+texture = ExtResource("5")
+
+[node name="T_0_m8" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(256, -128)
+texture = ExtResource("6")
+
+[node name="T_1_m8" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(288, -112)
+texture = ExtResource("7")
+
+[node name="T_2_m8" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(320, -96)
+texture = ExtResource("6")
+
+[node name="T_3_m8" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(352, -80)
+texture = ExtResource("5")
+
+[node name="T_4_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(384, -64)
+texture = ExtResource("2")
+
+[node name="T_5_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(416, -48)
+texture = ExtResource("2")
+
+[node name="T_6_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(448, -32)
+texture = ExtResource("2")
+
+[node name="T_7_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(480, -16)
+texture = ExtResource("4")
+
+[node name="T_8_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(512, 0)
+texture = ExtResource("2")
+
+[node name="T_9_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(544, 16)
+texture = ExtResource("2")
+
+[node name="T_10_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(576, 32)
+texture = ExtResource("2")
+
+[node name="T_11_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(608, 48)
+texture = ExtResource("2")
+
+[node name="T_12_m8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(640, 64)
+texture = ExtResource("4")
+
+[node name="T_m12_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, -304)
+texture = ExtResource("4")
+
+[node name="T_m11_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, -288)
+texture = ExtResource("2")
+
+[node name="T_m10_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, -272)
+texture = ExtResource("2")
+
+[node name="T_m9_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, -256)
+texture = ExtResource("2")
+
+[node name="T_m8_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, -240)
+texture = ExtResource("2")
+
+[node name="T_m7_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, -224)
+texture = ExtResource("4")
+
+[node name="T_m6_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, -208)
+texture = ExtResource("2")
+
+[node name="T_m5_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, -192)
+texture = ExtResource("2")
+
+[node name="T_m4_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, -176)
+texture = ExtResource("2")
+
+[node name="T_m3_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, -160)
+texture = ExtResource("2")
+
+[node name="T_m2_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(160, -144)
+texture = ExtResource("4")
+
+[node name="T_m1_m7" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(192, -128)
+texture = ExtResource("5")
+
+[node name="T_0_m7" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(224, -112)
+texture = ExtResource("6")
+
+[node name="T_1_m7" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(256, -96)
+texture = ExtResource("7")
+
+[node name="T_2_m7" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(288, -80)
+texture = ExtResource("6")
+
+[node name="T_3_m7" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(320, -64)
+texture = ExtResource("5")
+
+[node name="T_4_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(352, -48)
+texture = ExtResource("2")
+
+[node name="T_5_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(384, -32)
+texture = ExtResource("2")
+
+[node name="T_6_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(416, -16)
+texture = ExtResource("2")
+
+[node name="T_7_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(448, 0)
+texture = ExtResource("2")
+
+[node name="T_8_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(480, 16)
+texture = ExtResource("4")
+
+[node name="T_9_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(512, 32)
+texture = ExtResource("2")
+
+[node name="T_10_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(544, 48)
+texture = ExtResource("2")
+
+[node name="T_11_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(576, 64)
+texture = ExtResource("2")
+
+[node name="T_12_m7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(608, 80)
+texture = ExtResource("2")
+
+[node name="T_m12_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, -288)
+texture = ExtResource("2")
+
+[node name="T_m11_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, -272)
+texture = ExtResource("4")
+
+[node name="T_m10_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, -256)
+texture = ExtResource("2")
+
+[node name="T_m9_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, -240)
+texture = ExtResource("2")
+
+[node name="T_m8_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, -224)
+texture = ExtResource("2")
+
+[node name="T_m7_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, -208)
+texture = ExtResource("2")
+
+[node name="T_m6_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, -192)
+texture = ExtResource("4")
+
+[node name="T_m5_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, -176)
+texture = ExtResource("2")
+
+[node name="T_m4_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, -160)
+texture = ExtResource("2")
+
+[node name="T_m3_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, -144)
+texture = ExtResource("2")
+
+[node name="T_m2_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, -128)
+texture = ExtResource("2")
+
+[node name="T_m1_m6" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(160, -112)
+texture = ExtResource("5")
+
+[node name="T_0_m6" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(192, -96)
+texture = ExtResource("6")
+
+[node name="T_1_m6" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(224, -80)
+texture = ExtResource("7")
+
+[node name="T_2_m6" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(256, -64)
+texture = ExtResource("6")
+
+[node name="T_3_m6" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(288, -48)
+texture = ExtResource("5")
+
+[node name="T_4_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(320, -32)
+texture = ExtResource("4")
+
+[node name="T_5_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(352, -16)
+texture = ExtResource("2")
+
+[node name="T_6_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(384, 0)
+texture = ExtResource("2")
+
+[node name="T_7_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(416, 16)
+texture = ExtResource("2")
+
+[node name="T_8_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(448, 32)
+texture = ExtResource("2")
+
+[node name="T_9_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(480, 48)
+texture = ExtResource("4")
+
+[node name="T_10_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(512, 64)
+texture = ExtResource("2")
+
+[node name="T_11_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(544, 80)
+texture = ExtResource("2")
+
+[node name="T_12_m6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(576, 96)
+texture = ExtResource("2")
+
+[node name="T_m12_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-224, -272)
+texture = ExtResource("2")
+
+[node name="T_m11_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, -256)
+texture = ExtResource("2")
+
+[node name="T_m10_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, -240)
+texture = ExtResource("4")
+
+[node name="T_m9_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, -224)
+texture = ExtResource("2")
+
+[node name="T_m8_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, -208)
+texture = ExtResource("2")
+
+[node name="T_m7_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, -192)
+texture = ExtResource("2")
+
+[node name="T_m6_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, -176)
+texture = ExtResource("2")
+
+[node name="T_m5_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, -160)
+texture = ExtResource("4")
+
+[node name="T_m4_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, -144)
+texture = ExtResource("2")
+
+[node name="T_m3_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, -128)
+texture = ExtResource("2")
+
+[node name="T_m2_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, -112)
+texture = ExtResource("2")
+
+[node name="T_m1_m5" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(128, -96)
+texture = ExtResource("5")
+
+[node name="T_0_m5" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(160, -80)
+texture = ExtResource("6")
+
+[node name="T_1_m5" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(192, -64)
+texture = ExtResource("7")
+
+[node name="T_2_m5" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(224, -48)
+texture = ExtResource("6")
+
+[node name="T_3_m5" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(256, -32)
+texture = ExtResource("5")
+
+[node name="T_4_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(288, -16)
+texture = ExtResource("2")
+
+[node name="T_5_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(320, 0)
+texture = ExtResource("4")
+
+[node name="T_6_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(352, 16)
+texture = ExtResource("2")
+
+[node name="T_7_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(384, 32)
+texture = ExtResource("2")
+
+[node name="T_8_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(416, 48)
+texture = ExtResource("2")
+
+[node name="T_9_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(448, 64)
+texture = ExtResource("2")
+
+[node name="T_10_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(480, 80)
+texture = ExtResource("4")
+
+[node name="T_11_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(512, 96)
+texture = ExtResource("2")
+
+[node name="T_12_m5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(544, 112)
+texture = ExtResource("2")
+
+[node name="T_m12_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-256, -256)
+texture = ExtResource("2")
+
+[node name="T_m11_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-224, -240)
+texture = ExtResource("2")
+
+[node name="T_m10_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, -224)
+texture = ExtResource("2")
+
+[node name="T_m9_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, -208)
+texture = ExtResource("4")
+
+[node name="T_m8_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, -192)
+texture = ExtResource("2")
+
+[node name="T_m7_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, -176)
+texture = ExtResource("2")
+
+[node name="T_m6_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, -160)
+texture = ExtResource("2")
+
+[node name="T_m5_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, -144)
+texture = ExtResource("2")
+
+[node name="T_m4_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, -128)
+texture = ExtResource("4")
+
+[node name="T_m3_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, -112)
+texture = ExtResource("2")
+
+[node name="T_m2_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, -96)
+texture = ExtResource("2")
+
+[node name="T_m1_m4" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(96, -80)
+texture = ExtResource("5")
+
+[node name="T_0_m4" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(128, -64)
+texture = ExtResource("6")
+
+[node name="T_1_m4" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(160, -48)
+texture = ExtResource("7")
+
+[node name="T_2_m4" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(192, -32)
+texture = ExtResource("6")
+
+[node name="T_3_m4" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(224, -16)
+texture = ExtResource("5")
+
+[node name="T_4_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(256, 0)
+texture = ExtResource("2")
+
+[node name="T_5_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(288, 16)
+texture = ExtResource("2")
+
+[node name="T_6_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(320, 32)
+texture = ExtResource("4")
+
+[node name="T_7_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(352, 48)
+texture = ExtResource("2")
+
+[node name="T_8_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(384, 64)
+texture = ExtResource("2")
+
+[node name="T_9_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(416, 80)
+texture = ExtResource("2")
+
+[node name="T_10_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(448, 96)
+texture = ExtResource("2")
+
+[node name="T_11_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(480, 112)
+texture = ExtResource("4")
+
+[node name="T_12_m4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(512, 128)
+texture = ExtResource("2")
+
+[node name="T_m12_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-288, -240)
+texture = ExtResource("2")
+
+[node name="T_m11_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-256, -224)
+texture = ExtResource("2")
+
+[node name="T_m10_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-224, -208)
+texture = ExtResource("2")
+
+[node name="T_m9_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, -192)
+texture = ExtResource("2")
+
+[node name="T_m8_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, -176)
+texture = ExtResource("4")
+
+[node name="T_m7_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, -160)
+texture = ExtResource("2")
+
+[node name="T_m6_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, -144)
+texture = ExtResource("2")
+
+[node name="T_m5_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, -128)
+texture = ExtResource("2")
+
+[node name="T_m4_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, -112)
+texture = ExtResource("2")
+
+[node name="T_m3_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, -96)
+texture = ExtResource("4")
+
+[node name="T_m2_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, -80)
+texture = ExtResource("2")
+
+[node name="T_m1_m3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(64, -64)
+texture = ExtResource("5")
+
+[node name="T_0_m3" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(96, -48)
+texture = ExtResource("6")
+
+[node name="T_1_m3" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(128, -32)
+texture = ExtResource("7")
+
+[node name="T_2_m3" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(160, -16)
+texture = ExtResource("6")
+
+[node name="T_3_m3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(192, 0)
+texture = ExtResource("5")
+
+[node name="T_4_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(224, 16)
+texture = ExtResource("2")
+
+[node name="T_5_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(256, 32)
+texture = ExtResource("2")
+
+[node name="T_6_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(288, 48)
+texture = ExtResource("2")
+
+[node name="T_7_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(320, 64)
+texture = ExtResource("4")
+
+[node name="T_8_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(352, 80)
+texture = ExtResource("2")
+
+[node name="T_9_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(384, 96)
+texture = ExtResource("2")
+
+[node name="T_10_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(416, 112)
+texture = ExtResource("2")
+
+[node name="T_11_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(448, 128)
+texture = ExtResource("2")
+
+[node name="T_12_m3" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(480, 144)
+texture = ExtResource("4")
+
+[node name="T_m12_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-320, -224)
+texture = ExtResource("4")
+
+[node name="T_m11_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-288, -208)
+texture = ExtResource("2")
+
+[node name="T_m10_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-256, -192)
+texture = ExtResource("2")
+
+[node name="T_m9_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-224, -176)
+texture = ExtResource("2")
+
+[node name="T_m8_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, -160)
+texture = ExtResource("2")
+
+[node name="T_m7_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, -144)
+texture = ExtResource("4")
+
+[node name="T_m6_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, -128)
+texture = ExtResource("2")
+
+[node name="T_m5_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, -112)
+texture = ExtResource("2")
+
+[node name="T_m4_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, -96)
+texture = ExtResource("2")
+
+[node name="T_m3_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, -80)
+texture = ExtResource("2")
+
+[node name="T_m2_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, -64)
+texture = ExtResource("4")
+
+[node name="T_m1_m2" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(32, -48)
+texture = ExtResource("5")
+
+[node name="T_0_m2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(64, -32)
+texture = ExtResource("6")
+
+[node name="T_1_m2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(96, -16)
+texture = ExtResource("7")
+
+[node name="T_2_m2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(128, 0)
+texture = ExtResource("6")
+
+[node name="T_3_m2" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(160, 16)
+texture = ExtResource("5")
+
+[node name="T_4_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(192, 32)
+texture = ExtResource("2")
+
+[node name="T_5_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(224, 48)
+texture = ExtResource("2")
+
+[node name="T_6_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(256, 64)
+texture = ExtResource("2")
+
+[node name="T_7_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(288, 80)
+texture = ExtResource("2")
+
+[node name="T_8_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(320, 96)
+texture = ExtResource("4")
+
+[node name="T_9_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(352, 112)
+texture = ExtResource("2")
+
+[node name="T_10_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(384, 128)
+texture = ExtResource("2")
+
+[node name="T_11_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(416, 144)
+texture = ExtResource("2")
+
+[node name="T_12_m2" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(448, 160)
+texture = ExtResource("2")
+
+[node name="T_m12_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-352, -208)
+texture = ExtResource("5")
+
+[node name="T_m11_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-320, -192)
+texture = ExtResource("5")
+
+[node name="T_m10_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-288, -176)
+texture = ExtResource("5")
+
+[node name="T_m9_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-256, -160)
+texture = ExtResource("5")
+
+[node name="T_m8_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-224, -144)
+texture = ExtResource("5")
+
+[node name="T_m7_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-192, -128)
+texture = ExtResource("5")
+
+[node name="T_m6_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-160, -112)
+texture = ExtResource("5")
+
+[node name="T_m5_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-128, -96)
+texture = ExtResource("5")
+
+[node name="T_m4_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-96, -80)
+texture = ExtResource("5")
+
+[node name="T_m3_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-64, -64)
+texture = ExtResource("5")
+
+[node name="T_m2_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-32, -48)
+texture = ExtResource("5")
+
+[node name="T_m1_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(0, -32)
+texture = ExtResource("5")
+
+[node name="T_0_m1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(32, -16)
+texture = ExtResource("6")
+
+[node name="T_1_m1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(64, 0)
+texture = ExtResource("6")
+
+[node name="T_2_m1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(96, 16)
+texture = ExtResource("6")
+
+[node name="T_3_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(128, 32)
+texture = ExtResource("5")
+
+[node name="T_4_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(160, 48)
+texture = ExtResource("5")
+
+[node name="T_5_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(192, 64)
+texture = ExtResource("5")
+
+[node name="T_6_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(224, 80)
+texture = ExtResource("5")
+
+[node name="T_7_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(256, 96)
+texture = ExtResource("5")
+
+[node name="T_8_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(288, 112)
+texture = ExtResource("5")
+
+[node name="T_9_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(320, 128)
+texture = ExtResource("5")
+
+[node name="T_10_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(352, 144)
+texture = ExtResource("5")
+
+[node name="T_11_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(384, 160)
+texture = ExtResource("5")
+
+[node name="T_12_m1" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(416, 176)
+texture = ExtResource("5")
+
+[node name="T_m12_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-384, -192)
+texture = ExtResource("6")
+
+[node name="T_m11_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-352, -176)
+texture = ExtResource("6")
+
+[node name="T_m10_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-320, -160)
+texture = ExtResource("6")
+
+[node name="T_m9_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-288, -144)
+texture = ExtResource("6")
+
+[node name="T_m8_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-256, -128)
+texture = ExtResource("6")
+
+[node name="T_m7_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-224, -112)
+texture = ExtResource("6")
+
+[node name="T_m6_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-192, -96)
+texture = ExtResource("6")
+
+[node name="T_m5_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-160, -80)
+texture = ExtResource("6")
+
+[node name="T_m4_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-128, -64)
+texture = ExtResource("6")
+
+[node name="T_m3_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-96, -48)
+texture = ExtResource("6")
+
+[node name="T_m2_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-64, -32)
+texture = ExtResource("6")
+
+[node name="T_m1_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-32, -16)
+texture = ExtResource("6")
+
+[node name="T_0_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(0, 0)
+texture = ExtResource("6")
+
+[node name="T_1_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(32, 16)
+texture = ExtResource("6")
+
+[node name="T_2_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(64, 32)
+texture = ExtResource("6")
+
+[node name="T_3_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(96, 48)
+texture = ExtResource("6")
+
+[node name="T_4_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(128, 64)
+texture = ExtResource("6")
+
+[node name="T_5_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(160, 80)
+texture = ExtResource("6")
+
+[node name="T_6_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(192, 96)
+texture = ExtResource("6")
+
+[node name="T_7_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(224, 112)
+texture = ExtResource("6")
+
+[node name="T_8_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(256, 128)
+texture = ExtResource("6")
+
+[node name="T_9_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(288, 144)
+texture = ExtResource("6")
+
+[node name="T_10_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(320, 160)
+texture = ExtResource("6")
+
+[node name="T_11_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(352, 176)
+texture = ExtResource("6")
+
+[node name="T_12_0" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(384, 192)
+texture = ExtResource("6")
+
+[node name="T_m12_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-416, -176)
+texture = ExtResource("8")
+
+[node name="T_m11_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-384, -160)
+texture = ExtResource("8")
+
+[node name="T_m10_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-352, -144)
+texture = ExtResource("8")
+
+[node name="T_m9_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-320, -128)
+texture = ExtResource("8")
+
+[node name="T_m8_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-288, -112)
+texture = ExtResource("8")
+
+[node name="T_m7_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-256, -96)
+texture = ExtResource("8")
+
+[node name="T_m6_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-224, -80)
+texture = ExtResource("8")
+
+[node name="T_m5_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-192, -64)
+texture = ExtResource("8")
+
+[node name="T_m4_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-160, -48)
+texture = ExtResource("8")
+
+[node name="T_m3_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-128, -32)
+texture = ExtResource("8")
+
+[node name="T_m2_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-96, -16)
+texture = ExtResource("8")
+
+[node name="T_m1_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-64, 0)
+texture = ExtResource("8")
+
+[node name="T_0_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-32, 16)
+texture = ExtResource("8")
+
+[node name="T_1_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(0, 32)
+texture = ExtResource("8")
+
+[node name="T_2_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(32, 48)
+texture = ExtResource("8")
+
+[node name="T_3_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(64, 64)
+texture = ExtResource("8")
+
+[node name="T_4_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(96, 80)
+texture = ExtResource("8")
+
+[node name="T_5_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(128, 96)
+texture = ExtResource("8")
+
+[node name="T_6_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(160, 112)
+texture = ExtResource("8")
+
+[node name="T_7_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(192, 128)
+texture = ExtResource("8")
+
+[node name="T_8_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(224, 144)
+texture = ExtResource("8")
+
+[node name="T_9_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(256, 160)
+texture = ExtResource("8")
+
+[node name="T_10_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(288, 176)
+texture = ExtResource("8")
+
+[node name="T_11_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(320, 192)
+texture = ExtResource("8")
+
+[node name="T_12_1" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(352, 208)
+texture = ExtResource("8")
+
+[node name="T_m12_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-448, -160)
+texture = ExtResource("6")
+
+[node name="T_m11_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-416, -144)
+texture = ExtResource("6")
+
+[node name="T_m10_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-384, -128)
+texture = ExtResource("6")
+
+[node name="T_m9_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-352, -112)
+texture = ExtResource("6")
+
+[node name="T_m8_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-320, -96)
+texture = ExtResource("6")
+
+[node name="T_m7_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-288, -80)
+texture = ExtResource("6")
+
+[node name="T_m6_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-256, -64)
+texture = ExtResource("6")
+
+[node name="T_m5_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-224, -48)
+texture = ExtResource("6")
+
+[node name="T_m4_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-192, -32)
+texture = ExtResource("6")
+
+[node name="T_m3_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-160, -16)
+texture = ExtResource("6")
+
+[node name="T_m2_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-128, 0)
+texture = ExtResource("6")
+
+[node name="T_m1_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-96, 16)
+texture = ExtResource("6")
+
+[node name="T_0_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-64, 32)
+texture = ExtResource("6")
+
+[node name="T_1_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(-32, 48)
+texture = ExtResource("6")
+
+[node name="T_2_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(0, 64)
+texture = ExtResource("6")
+
+[node name="T_3_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(32, 80)
+texture = ExtResource("6")
+
+[node name="T_4_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(64, 96)
+texture = ExtResource("6")
+
+[node name="T_5_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(96, 112)
+texture = ExtResource("6")
+
+[node name="T_6_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(128, 128)
+texture = ExtResource("6")
+
+[node name="T_7_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(160, 144)
+texture = ExtResource("6")
+
+[node name="T_8_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(192, 160)
+texture = ExtResource("6")
+
+[node name="T_9_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(224, 176)
+texture = ExtResource("6")
+
+[node name="T_10_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(256, 192)
+texture = ExtResource("6")
+
+[node name="T_11_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(288, 208)
+texture = ExtResource("6")
+
+[node name="T_12_2" parent="Ground/Road" instance=ExtResource("3")]
+position = Vector2(320, 224)
+texture = ExtResource("6")
+
+[node name="T_m12_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-480, -144)
+texture = ExtResource("5")
+
+[node name="T_m11_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-448, -128)
+texture = ExtResource("5")
+
+[node name="T_m10_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-416, -112)
+texture = ExtResource("5")
+
+[node name="T_m9_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-384, -96)
+texture = ExtResource("5")
+
+[node name="T_m8_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-352, -80)
+texture = ExtResource("5")
+
+[node name="T_m7_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-320, -64)
+texture = ExtResource("5")
+
+[node name="T_m6_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-288, -48)
+texture = ExtResource("5")
+
+[node name="T_m5_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-256, -32)
+texture = ExtResource("5")
+
+[node name="T_m4_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-224, -16)
+texture = ExtResource("5")
+
+[node name="T_m3_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-192, 0)
+texture = ExtResource("5")
+
+[node name="T_m2_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-160, 16)
+texture = ExtResource("5")
+
+[node name="T_m1_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-128, 32)
+texture = ExtResource("5")
+
+[node name="T_0_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-96, 48)
+texture = ExtResource("5")
+
+[node name="T_1_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-64, 64)
+texture = ExtResource("5")
+
+[node name="T_2_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(-32, 80)
+texture = ExtResource("5")
+
+[node name="T_3_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(0, 96)
+texture = ExtResource("5")
+
+[node name="T_4_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(32, 112)
+texture = ExtResource("5")
+
+[node name="T_5_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(64, 128)
+texture = ExtResource("5")
+
+[node name="T_6_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(96, 144)
+texture = ExtResource("5")
+
+[node name="T_7_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(128, 160)
+texture = ExtResource("5")
+
+[node name="T_8_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(160, 176)
+texture = ExtResource("5")
+
+[node name="T_9_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(192, 192)
+texture = ExtResource("5")
+
+[node name="T_10_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(224, 208)
+texture = ExtResource("5")
+
+[node name="T_11_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(256, 224)
+texture = ExtResource("5")
+
+[node name="T_12_3" parent="Ground/Sidewalk" instance=ExtResource("3")]
+position = Vector2(288, 240)
+texture = ExtResource("5")
+
+[node name="T_m12_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-512, -128)
+texture = ExtResource("2")
+
+[node name="T_m11_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-480, -112)
+texture = ExtResource("4")
+
+[node name="T_m10_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-448, -96)
+texture = ExtResource("2")
+
+[node name="T_m9_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-416, -80)
+texture = ExtResource("2")
+
+[node name="T_m8_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-384, -64)
+texture = ExtResource("2")
+
+[node name="T_m7_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-352, -48)
+texture = ExtResource("2")
+
+[node name="T_m6_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-320, -32)
+texture = ExtResource("4")
+
+[node name="T_m5_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-288, -16)
+texture = ExtResource("2")
+
+[node name="T_m4_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-256, 0)
+texture = ExtResource("2")
+
+[node name="T_m3_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-224, 16)
+texture = ExtResource("2")
+
+[node name="T_m2_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, 32)
+texture = ExtResource("2")
+
+[node name="T_m1_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, 48)
+texture = ExtResource("4")
+
+[node name="T_0_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, 64)
+texture = ExtResource("2")
+
+[node name="T_1_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, 80)
+texture = ExtResource("2")
+
+[node name="T_2_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, 96)
+texture = ExtResource("2")
+
+[node name="T_3_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, 112)
+texture = ExtResource("2")
+
+[node name="T_4_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, 128)
+texture = ExtResource("4")
+
+[node name="T_5_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, 144)
+texture = ExtResource("2")
+
+[node name="T_6_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, 160)
+texture = ExtResource("2")
+
+[node name="T_7_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, 176)
+texture = ExtResource("2")
+
+[node name="T_8_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, 192)
+texture = ExtResource("2")
+
+[node name="T_9_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(160, 208)
+texture = ExtResource("4")
+
+[node name="T_10_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(192, 224)
+texture = ExtResource("2")
+
+[node name="T_11_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(224, 240)
+texture = ExtResource("2")
+
+[node name="T_12_4" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(256, 256)
+texture = ExtResource("2")
+
+[node name="T_m12_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-544, -112)
+texture = ExtResource("2")
+
+[node name="T_m11_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-512, -96)
+texture = ExtResource("2")
+
+[node name="T_m10_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-480, -80)
+texture = ExtResource("4")
+
+[node name="T_m9_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-448, -64)
+texture = ExtResource("2")
+
+[node name="T_m8_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-416, -48)
+texture = ExtResource("2")
+
+[node name="T_m7_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-384, -32)
+texture = ExtResource("2")
+
+[node name="T_m6_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-352, -16)
+texture = ExtResource("2")
+
+[node name="T_m5_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-320, 0)
+texture = ExtResource("4")
+
+[node name="T_m4_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-288, 16)
+texture = ExtResource("2")
+
+[node name="T_m3_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-256, 32)
+texture = ExtResource("2")
+
+[node name="T_m2_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-224, 48)
+texture = ExtResource("2")
+
+[node name="T_m1_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, 64)
+texture = ExtResource("2")
+
+[node name="T_0_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, 80)
+texture = ExtResource("4")
+
+[node name="T_1_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, 96)
+texture = ExtResource("2")
+
+[node name="T_2_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, 112)
+texture = ExtResource("2")
+
+[node name="T_3_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, 128)
+texture = ExtResource("2")
+
+[node name="T_4_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, 144)
+texture = ExtResource("2")
+
+[node name="T_5_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, 160)
+texture = ExtResource("4")
+
+[node name="T_6_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, 176)
+texture = ExtResource("2")
+
+[node name="T_7_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, 192)
+texture = ExtResource("2")
+
+[node name="T_8_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, 208)
+texture = ExtResource("2")
+
+[node name="T_9_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, 224)
+texture = ExtResource("2")
+
+[node name="T_10_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(160, 240)
+texture = ExtResource("4")
+
+[node name="T_11_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(192, 256)
+texture = ExtResource("2")
+
+[node name="T_12_5" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(224, 272)
+texture = ExtResource("2")
+
+[node name="T_m12_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-576, -96)
+texture = ExtResource("2")
+
+[node name="T_m11_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-544, -80)
+texture = ExtResource("2")
+
+[node name="T_m10_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-512, -64)
+texture = ExtResource("2")
+
+[node name="T_m9_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-480, -48)
+texture = ExtResource("4")
+
+[node name="T_m8_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-448, -32)
+texture = ExtResource("2")
+
+[node name="T_m7_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-416, -16)
+texture = ExtResource("2")
+
+[node name="T_m6_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-384, 0)
+texture = ExtResource("2")
+
+[node name="T_m5_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-352, 16)
+texture = ExtResource("2")
+
+[node name="T_m4_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-320, 32)
+texture = ExtResource("4")
+
+[node name="T_m3_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-288, 48)
+texture = ExtResource("2")
+
+[node name="T_m2_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-256, 64)
+texture = ExtResource("2")
+
+[node name="T_m1_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-224, 80)
+texture = ExtResource("2")
+
+[node name="T_0_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, 96)
+texture = ExtResource("2")
+
+[node name="T_1_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, 112)
+texture = ExtResource("4")
+
+[node name="T_2_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, 128)
+texture = ExtResource("2")
+
+[node name="T_3_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, 144)
+texture = ExtResource("2")
+
+[node name="T_4_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, 160)
+texture = ExtResource("2")
+
+[node name="T_5_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, 176)
+texture = ExtResource("2")
+
+[node name="T_6_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, 192)
+texture = ExtResource("4")
+
+[node name="T_7_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, 208)
+texture = ExtResource("2")
+
+[node name="T_8_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, 224)
+texture = ExtResource("2")
+
+[node name="T_9_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, 240)
+texture = ExtResource("2")
+
+[node name="T_10_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, 256)
+texture = ExtResource("2")
+
+[node name="T_11_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(160, 272)
+texture = ExtResource("4")
+
+[node name="T_12_6" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(192, 288)
+texture = ExtResource("2")
+
+[node name="T_m12_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-608, -80)
+texture = ExtResource("2")
+
+[node name="T_m11_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-576, -64)
+texture = ExtResource("2")
+
+[node name="T_m10_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-544, -48)
+texture = ExtResource("2")
+
+[node name="T_m9_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-512, -32)
+texture = ExtResource("2")
+
+[node name="T_m8_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-480, -16)
+texture = ExtResource("4")
+
+[node name="T_m7_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-448, 0)
+texture = ExtResource("2")
+
+[node name="T_m6_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-416, 16)
+texture = ExtResource("2")
+
+[node name="T_m5_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-384, 32)
+texture = ExtResource("2")
+
+[node name="T_m4_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-352, 48)
+texture = ExtResource("2")
+
+[node name="T_m3_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-320, 64)
+texture = ExtResource("4")
+
+[node name="T_m2_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-288, 80)
+texture = ExtResource("2")
+
+[node name="T_m1_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-256, 96)
+texture = ExtResource("2")
+
+[node name="T_0_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-224, 112)
+texture = ExtResource("2")
+
+[node name="T_1_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, 128)
+texture = ExtResource("2")
+
+[node name="T_2_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, 144)
+texture = ExtResource("4")
+
+[node name="T_3_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, 160)
+texture = ExtResource("2")
+
+[node name="T_4_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, 176)
+texture = ExtResource("2")
+
+[node name="T_5_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, 192)
+texture = ExtResource("2")
+
+[node name="T_6_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, 208)
+texture = ExtResource("2")
+
+[node name="T_7_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, 224)
+texture = ExtResource("4")
+
+[node name="T_8_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, 240)
+texture = ExtResource("2")
+
+[node name="T_9_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, 256)
+texture = ExtResource("2")
+
+[node name="T_10_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, 272)
+texture = ExtResource("2")
+
+[node name="T_11_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, 288)
+texture = ExtResource("2")
+
+[node name="T_12_7" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(160, 304)
+texture = ExtResource("4")
+
+[node name="T_m12_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-640, -64)
+texture = ExtResource("4")
+
+[node name="T_m11_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-608, -48)
+texture = ExtResource("2")
+
+[node name="T_m10_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-576, -32)
+texture = ExtResource("2")
+
+[node name="T_m9_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-544, -16)
+texture = ExtResource("2")
+
+[node name="T_m8_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-512, 0)
+texture = ExtResource("2")
+
+[node name="T_m7_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-480, 16)
+texture = ExtResource("4")
+
+[node name="T_m6_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-448, 32)
+texture = ExtResource("2")
+
+[node name="T_m5_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-416, 48)
+texture = ExtResource("2")
+
+[node name="T_m4_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-384, 64)
+texture = ExtResource("2")
+
+[node name="T_m3_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-352, 80)
+texture = ExtResource("2")
+
+[node name="T_m2_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-320, 96)
+texture = ExtResource("4")
+
+[node name="T_m1_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-288, 112)
+texture = ExtResource("2")
+
+[node name="T_0_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-256, 128)
+texture = ExtResource("2")
+
+[node name="T_1_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-224, 144)
+texture = ExtResource("2")
+
+[node name="T_2_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-192, 160)
+texture = ExtResource("2")
+
+[node name="T_3_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-160, 176)
+texture = ExtResource("4")
+
+[node name="T_4_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-128, 192)
+texture = ExtResource("2")
+
+[node name="T_5_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-96, 208)
+texture = ExtResource("2")
+
+[node name="T_6_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-64, 224)
+texture = ExtResource("2")
+
+[node name="T_7_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(-32, 240)
+texture = ExtResource("2")
+
+[node name="T_8_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(0, 256)
+texture = ExtResource("4")
+
+[node name="T_9_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(32, 272)
+texture = ExtResource("2")
+
+[node name="T_10_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(64, 288)
+texture = ExtResource("2")
+
+[node name="T_11_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(96, 304)
+texture = ExtResource("2")
+
+[node name="T_12_8" parent="Ground/Grass" instance=ExtResource("3")]
+position = Vector2(128, 320)
+texture = ExtResource("2")
+
+[node name="Entities" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Buildings" type="Node2D" parent="Entities"]
+y_sort_enabled = true
+
+[node name="Mercearia" parent="Entities" instance=ExtResource("9")]
+position = Vector2(-160, -216)
+
+[node name="Casa" parent="Entities" instance=ExtResource("10")]
+position = Vector2(-32, -136)
+
+[node name="Escritorio" parent="Entities" instance=ExtResource("11")]
+position = Vector2(352, 40)
+
+[node name="Loja" parent="Entities" instance=ExtResource("12")]
+position = Vector2(480, 120)
+
+[node name="Lamp0" parent="Entities" instance=ExtResource("13")]
+position = Vector2(-256, -144)
+
+[node name="Lamp1" parent="Entities" instance=ExtResource("13")]
+position = Vector2(-64, -48)
+
+[node name="Lamp2" parent="Entities" instance=ExtResource("13")]
+position = Vector2(160, 64)
+
+[node name="Lamp3" parent="Entities" instance=ExtResource("13")]
+position = Vector2(352, 160)
+
+[node name="Lamp4" parent="Entities" instance=ExtResource("13")]
+position = Vector2(-384, -80)
+
+[node name="Lamp5" parent="Entities" instance=ExtResource("13")]
+position = Vector2(-192, 16)
+
+[node name="Lamp6" parent="Entities" instance=ExtResource("13")]
+position = Vector2(32, 128)
+
+[node name="Lamp7" parent="Entities" instance=ExtResource("13")]
+position = Vector2(224, 224)
+
+[node name="Tree8" parent="Entities" instance=ExtResource("14")]
+position = Vector2(-512, -48)
+
+[node name="Tree9" parent="Entities" instance=ExtResource("14")]
+position = Vector2(-352, 32)
+
+[node name="Tree10" parent="Entities" instance=ExtResource("14")]
+position = Vector2(-160, 128)
+
+[node name="Tree11" parent="Entities" instance=ExtResource("14")]
+position = Vector2(0, 208)
+
+[node name="Tree12" parent="Entities" instance=ExtResource("14")]
+position = Vector2(160, 288)
+
+[node name="Tree13" parent="Entities" instance=ExtResource("14")]
+position = Vector2(160, -160)
+
+[node name="Tree14" parent="Entities" instance=ExtResource("14")]
+position = Vector2(384, -48)
+
+[node name="Bench15" parent="Entities" instance=ExtResource("15")]
+position = Vector2(-288, -32)
+
+[node name="Bench16" parent="Entities" instance=ExtResource("15")]
+position = Vector2(128, 176)
+
+[node name="Bush17" parent="Entities" instance=ExtResource("16")]
+position = Vector2(-128, -112)
+
+[node name="Bush18" parent="Entities" instance=ExtResource("16")]
+position = Vector2(-64, -80)
+
+[node name="Bush19" parent="Entities" instance=ExtResource("16")]
+position = Vector2(224, 64)
+
+[node name="Bush20" parent="Entities" instance=ExtResource("16")]
+position = Vector2(352, 128)
+
+[node name="Bush21" parent="Entities" instance=ExtResource("16")]
+position = Vector2(448, 176)
+
+[node name="AmbientRoutes" type="Node2D" parent="."]
+
+[node name="WalkA" type="Node2D" parent="AmbientRoutes"]
+
+[node name="P0" type="Marker2D" parent="AmbientRoutes/WalkA"]
+position = Vector2(-320, -176)
+
+[node name="P1" type="Marker2D" parent="AmbientRoutes/WalkA"]
+position = Vector2(352, 160)
+
+[node name="WalkB" type="Node2D" parent="AmbientRoutes"]
+
+[node name="P0" type="Marker2D" parent="AmbientRoutes/WalkB"]
+position = Vector2(224, 224)
+
+[node name="P1" type="Marker2D" parent="AmbientRoutes/WalkB"]
+position = Vector2(-448, -112)
+
+[node name="WalkC" type="Node2D" parent="AmbientRoutes"]
+
+[node name="P0" type="Marker2D" parent="AmbientRoutes/WalkC"]
+position = Vector2(256, -144)
+
+[node name="P1" type="Marker2D" parent="AmbientRoutes/WalkC"]
+position = Vector2(32, -32)
+
+[node name="P2" type="Marker2D" parent="AmbientRoutes/WalkC"]
+position = Vector2(288, 128)
+
+[node name="CarA" type="Node2D" parent="AmbientRoutes"]
+
+[node name="P0" type="Marker2D" parent="AmbientRoutes/CarA"]
+position = Vector2(-416, -128)
+
+[node name="P1" type="Marker2D" parent="AmbientRoutes/CarA"]
+position = Vector2(288, 224)
+
+[node name="CarB" type="Node2D" parent="AmbientRoutes"]
+
+[node name="P0" type="Marker2D" parent="AmbientRoutes/CarB"]
+position = Vector2(352, 192)
+
+[node name="P1" type="Marker2D" parent="AmbientRoutes/CarB"]
+position = Vector2(-352, -160)
+
+[node name="SpawnPoint" type="Marker2D" parent="."]
+position = Vector2(0.0, 40.0)
+
+[node name="WorldBounds" type="StaticBody2D" parent="."]
+
+[node name="Edge0" type="CollisionShape2D" parent="WorldBounds"]
+shape = SubResource("SegmentShape2D_1")
+
+[node name="Edge1" type="CollisionShape2D" parent="WorldBounds"]
+shape = SubResource("SegmentShape2D_2")
+
+[node name="Edge2" type="CollisionShape2D" parent="WorldBounds"]
+shape = SubResource("SegmentShape2D_3")
+
+[node name="Edge3" type="CollisionShape2D" parent="WorldBounds"]
+shape = SubResource("SegmentShape2D_4")

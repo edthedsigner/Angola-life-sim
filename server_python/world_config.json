@@ -1,0 +1,5 @@
+{
+  "_doc": "Server limits only. Spawn, map, buildings and gameplay data live in shared/data/world.json.",
+  "max_players": 64,
+  "story_steps": 4
+}

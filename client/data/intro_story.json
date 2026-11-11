@@ -1,0 +1,9 @@
+{
+  "_comment": "Introdução (texto provisório, editável). O nº de páginas deve coincidir com story_steps em server_python/world_config.json.",
+  "pages": [
+    {"title": "Luanda, madrugada", "text": "O sol ainda nem nasceu e a cidade já respira: candongueiros a buzinar, vendedoras a montar bancas, o cheiro do mar misturado com fumo de lenha.\n\nÉs mais um rosto entre milhões. Mas esta vida é tua."},
+    {"title": "De onde vens", "text": "Cada pessoa nasce numa família, num bairro, com oportunidades e dificuldades que não escolheu. A tua origem será definida pelo destino, não por ti.\n\nPais, profissões, estudos, contactos: tudo isso já está à tua espera."},
+    {"title": "Começar do zero", "text": "A tua família pode ter bens, mas ninguém te oferece uma casa. Começas a vida independente sem abrigo, com pouco dinheiro e o que levas contigo.\n\nO resto — trabalho, amigos, negócios, sonhos — vais construir tu."},
+    {"title": "Um mundo partilhado", "text": "A cidade é viva e partilhada: outras pessoas reais caminham pelas mesmas ruas. O que fizeres afeta o mundo.\n\nAntes de saíres à rua, escolhe quem és."}
+  ]
+}

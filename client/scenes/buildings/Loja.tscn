@@ -1,0 +1,147 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://client/scripts/Building.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/art/buildings/cream_wall_l_shop.png" id="2"]
+[ext_resource type="PackedScene" path="res://client/scenes/components/WallPieceL.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://assets/art/buildings/cream_wall_l_door.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/art/buildings/cream_wall_r_window.png" id="5"]
+[ext_resource type="PackedScene" path="res://client/scenes/components/WallPieceR.tscn" id="6"]
+[ext_resource type="Texture2D" path="res://assets/art/buildings/cream_wall_r_plain.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/art/buildings/cream_wall_l_window.png" id="8"]
+[ext_resource type="Texture2D" path="res://assets/art/buildings/cream_roof.png" id="9"]
+[ext_resource type="PackedScene" path="res://client/scenes/components/RoofPiece.tscn" id="10"]
+
+[node name="Loja" type="Node2D"]
+script = ExtResource("1")
+building_id = "restaurante"
+building_name = "Restaurante Maianga"
+floors = 2
+footprint_w = 3
+footprint_d = 4
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="L0_0" parent="Walls" instance=ExtResource("3")]
+position = Vector2(-96, 8)
+texture = ExtResource("2")
+
+[node name="L0_1" parent="Walls" instance=ExtResource("3")]
+position = Vector2(-64, 24)
+texture = ExtResource("4")
+
+[node name="L0_2" parent="Walls" instance=ExtResource("3")]
+position = Vector2(-32, 40)
+texture = ExtResource("2")
+
+[node name="R0_0" parent="Walls" instance=ExtResource("6")]
+position = Vector2(0, 56)
+texture = ExtResource("5")
+
+[node name="R0_1" parent="Walls" instance=ExtResource("6")]
+position = Vector2(32, 40)
+texture = ExtResource("7")
+
+[node name="R0_2" parent="Walls" instance=ExtResource("6")]
+position = Vector2(64, 24)
+texture = ExtResource("5")
+
+[node name="R0_3" parent="Walls" instance=ExtResource("6")]
+position = Vector2(96, 8)
+texture = ExtResource("7")
+
+[node name="L1_0" parent="Walls" instance=ExtResource("3")]
+position = Vector2(-96, -40)
+texture = ExtResource("8")
+
+[node name="L1_1" parent="Walls" instance=ExtResource("3")]
+position = Vector2(-64, -24)
+texture = ExtResource("8")
+
+[node name="L1_2" parent="Walls" instance=ExtResource("3")]
+position = Vector2(-32, -8)
+texture = ExtResource("8")
+
+[node name="R1_0" parent="Walls" instance=ExtResource("6")]
+position = Vector2(0, 8)
+texture = ExtResource("5")
+
+[node name="R1_1" parent="Walls" instance=ExtResource("6")]
+position = Vector2(32, -8)
+texture = ExtResource("5")
+
+[node name="R1_2" parent="Walls" instance=ExtResource("6")]
+position = Vector2(64, -24)
+texture = ExtResource("5")
+
+[node name="R1_3" parent="Walls" instance=ExtResource("6")]
+position = Vector2(96, -40)
+texture = ExtResource("5")
+
+[node name="Roof" type="Node2D" parent="."]
+
+[node name="Roof_0_0" parent="Roof" instance=ExtResource("10")]
+position = Vector2(32, -152)
+texture = ExtResource("9")
+
+[node name="Roof_0_1" parent="Roof" instance=ExtResource("10")]
+position = Vector2(0, -136)
+texture = ExtResource("9")
+
+[node name="Roof_1_0" parent="Roof" instance=ExtResource("10")]
+position = Vector2(64, -136)
+texture = ExtResource("9")
+
+[node name="Roof_0_2" parent="Roof" instance=ExtResource("10")]
+position = Vector2(-32, -120)
+texture = ExtResource("9")
+
+[node name="Roof_1_1" parent="Roof" instance=ExtResource("10")]
+position = Vector2(32, -120)
+texture = ExtResource("9")
+
+[node name="Roof_2_0" parent="Roof" instance=ExtResource("10")]
+position = Vector2(96, -120)
+texture = ExtResource("9")
+
+[node name="Roof_0_3" parent="Roof" instance=ExtResource("10")]
+position = Vector2(-64, -104)
+texture = ExtResource("9")
+
+[node name="Roof_1_2" parent="Roof" instance=ExtResource("10")]
+position = Vector2(0, -104)
+texture = ExtResource("9")
+
+[node name="Roof_2_1" parent="Roof" instance=ExtResource("10")]
+position = Vector2(64, -104)
+texture = ExtResource("9")
+
+[node name="Roof_1_3" parent="Roof" instance=ExtResource("10")]
+position = Vector2(-32, -88)
+texture = ExtResource("9")
+
+[node name="Roof_2_2" parent="Roof" instance=ExtResource("10")]
+position = Vector2(32, -88)
+texture = ExtResource("9")
+
+[node name="Roof_2_3" parent="Roof" instance=ExtResource("10")]
+position = Vector2(0, -72)
+texture = ExtResource("9")
+
+[node name="Body" type="StaticBody2D" parent="."]
+
+[node name="Footprint" type="CollisionPolygon2D" parent="Body"]
+polygon = PackedVector2Array(32, -56, 128, -8, 0, 56, -96, 8)
+
+[node name="Entrance_frente" type="Marker2D" parent="."]
+position = Vector2(-64, 40)
+
+[node name="SignLabel" type="Label" parent="."]
+offset_left = -110
+offset_right = 110
+offset_top = -110
+offset_bottom = -94
+horizontal_alignment = 1
+text = "Restaurante Maianga"
+theme_override_font_sizes/font_size = 10
+theme_override_constants/outline_size = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
