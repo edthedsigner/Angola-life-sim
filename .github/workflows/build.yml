@@ -2,8 +2,9 @@
 # (sem threads => funciona no Safari do iPhone sem cabeçalhos especiais), testa o export num browser e publica-o no
 # ramo `web-build`, que o Render (site estático) serve. Ver docs/DEPLOY.md.
 #
-# Variáveis do repositório (Settings → Secrets and variables → Actions → Variables):
-#   ANGOLA_SERVER_URL   wss://<o-teu-servidor>.onrender.com   (obrigatória para publicar)
+# Endereço do servidor (obrigatório para publicar), por esta ordem:
+#   variável do repositório ANGOLA_SERVER_URL (Settings → Secrets and variables → Actions → Variables)
+#   ficheiro deploy/server_url.txt (ex.: wss://angola-life-sim-server.onrender.com — é público, não é segredo)
 name: Build
 
 on:
@@ -57,6 +58,8 @@ jobs:
   web:
     name: Export web + smoke test
     runs-on: ubuntu-latest
+    outputs:
+      server_url: ${{ steps.cfg.outputs.server_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -89,9 +92,15 @@ jobs:
           godot --version
 
       - name: Servidor configurado no build
+        id: cfg
         env:
           ANGOLA_SERVER_URL: ${{ vars.ANGOLA_SERVER_URL }}
         run: |
+          if [ -z "$ANGOLA_SERVER_URL" ] && [ -f deploy/server_url.txt ]; then
+            ANGOLA_SERVER_URL=$(tr -d ' \r\n' < deploy/server_url.txt)
+          fi
+          echo "server_url=$ANGOLA_SERVER_URL" >> "$GITHUB_OUTPUT"
+          echo "ANGOLA_SERVER_URL=$ANGOLA_SERVER_URL" >> "$GITHUB_ENV"
           mkdir -p config
           if [ -n "$ANGOLA_SERVER_URL" ]; then
             printf '{"url": "%s", "allow_override": false}\n' "$ANGOLA_SERVER_URL" > config/server.json
@@ -128,7 +137,6 @@ jobs:
       - name: Smoke test do export num browser (2 clientes, um iPhone emulado)
         env:
           BUILD_DIR: ${{ github.workspace }}/build/web
-          ANGOLA_SERVER_URL: ${{ vars.ANGOLA_SERVER_URL }}
         run: |
           set -e
           pip install -r server_python/requirements.txt
@@ -159,7 +167,7 @@ jobs:
   publish:
     name: Publicar no ramo web-build
     needs: [server-tests, web]
-    if: github.event_name != 'pull_request' && vars.ANGOLA_SERVER_URL != ''
+    if: github.event_name != 'pull_request' && needs.web.outputs.server_url != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4

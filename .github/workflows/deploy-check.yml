@@ -1,9 +1,14 @@
 # Verifica o deploy PÚBLICO a partir da internet: cliente web, health check, duas ligações wss simultâneas e
 # (opcional) dois jogadores no mesmo mundo. Corre à mão: Actions → "Deploy check" → Run workflow.
-# Usa as variáveis do repositório ANGOLA_SERVER_URL (wss://…) e ANGOLA_CLIENT_URL (https://…).
+# Usa as variáveis do repositório ANGOLA_SERVER_URL / ANGOLA_CLIENT_URL, ou deploy/server_url.txt / deploy/client_url.txt.
+# Também corre sozinho depois de cada publicação (workflow_run), para verificar o deploy real.
 name: Deploy check
 
 on:
+  workflow_run:
+    workflows: [Build]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       players:
@@ -17,6 +22,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,8 +34,11 @@ jobs:
           SERVER: ${{ vars.ANGOLA_SERVER_URL }}
           CLIENT: ${{ vars.ANGOLA_CLIENT_URL }}
         run: |
-          test -n "$SERVER" || { echo "::error::define a variável ANGOLA_SERVER_URL"; exit 1; }
+          [ -z "$SERVER" ] && [ -f deploy/server_url.txt ] && SERVER=$(tr -d ' \r\n' < deploy/server_url.txt)
+          [ -z "$CLIENT" ] && [ -f deploy/client_url.txt ] && CLIENT=$(tr -d ' \r\n' < deploy/client_url.txt)
+          test -n "$SERVER" || { echo "::error::define ANGOLA_SERVER_URL ou deploy/server_url.txt"; exit 1; }
           args="--server $SERVER"
           [ -n "$CLIENT" ] && args="$args --client $CLIENT"
-          [ "${{ inputs.players }}" = "true" ] && args="$args --players"
+          [ "${{ inputs.players }}" != "false" ] && args="$args --players"      # automático: também testa 2 jogadores
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then echo "à espera que o Render publique (2 min)…"; sleep 120; fi
           python tools/deploy_check.py $args
