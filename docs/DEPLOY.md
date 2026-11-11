@@ -58,7 +58,9 @@ collect their passwords. Development builds without that file accept `?server=` 
    the URL shown on the service page.)
 
 ### 4. Connect client and server
-1. GitHub repo → **Settings → Secrets and variables → Actions → Variables → New repository variable**:
+1. Put the server address in `deploy/server_url.txt` (and later the page address in `deploy/client_url.txt`).
+   Both are public addresses, not secrets. Or use repository variables instead, which take priority over the files:
+   GitHub repo → **Settings → Secrets and variables → Actions → Variables → New repository variable**:
    * `ANGOLA_SERVER_URL` = `wss://angola-life-sim-server.onrender.com`
    * `ANGOLA_CLIENT_URL` = `https://angola-life-sim.onrender.com`
 2. **Actions → Build → Run workflow**. When it's green, the `web-build` branch exists and Render deploys the static site
