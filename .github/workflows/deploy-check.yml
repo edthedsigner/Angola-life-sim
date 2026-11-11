@@ -1,0 +1,35 @@
+# Verifica o deploy PÚBLICO a partir da internet: cliente web, health check, duas ligações wss simultâneas e
+# (opcional) dois jogadores no mesmo mundo. Corre à mão: Actions → "Deploy check" → Run workflow.
+# Usa as variáveis do repositório ANGOLA_SERVER_URL (wss://…) e ANGOLA_CLIENT_URL (https://…).
+name: Deploy check
+
+on:
+  workflow_dispatch:
+    inputs:
+      players:
+        description: "Criar duas contas de teste (smoke_a_xxxx / smoke_b_xxxx) e testar o mundo partilhado"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r server_python/requirements.txt
+      - name: Verificar
+        env:
+          SERVER: ${{ vars.ANGOLA_SERVER_URL }}
+          CLIENT: ${{ vars.ANGOLA_CLIENT_URL }}
+        run: |
+          test -n "$SERVER" || { echo "::error::define a variável ANGOLA_SERVER_URL"; exit 1; }
+          args="--server $SERVER"
+          [ -n "$CLIENT" ] && args="$args --client $CLIENT"
+          [ "${{ inputs.players }}" = "true" ] && args="$args --players"
+          python tools/deploy_check.py $args

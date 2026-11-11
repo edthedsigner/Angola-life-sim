@@ -65,4 +65,4 @@ class _Connect:
         w.write(f"GET / HTTP/1.1\r\nHost: {hp}\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: {base64.b64encode(os.urandom(16)).decode()}\r\nSec-WebSocket-Version: 13\r\n\r\n".encode()); await w.drain()
         await r.readuntil(b"\r\n\r\n"); self.c = Conn(r, w, True); return self.c
     async def __aexit__(self, *a): await self.c.close()
-def connect(uri): return _Connect(uri)
+def connect(uri, **kw): return _Connect(uri)

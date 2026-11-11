@@ -1,0 +1,181 @@
+# Build na nuvem: testa o servidor (ficheiros, SQLite e PostgreSQL reais), exporta o cliente web com o Godot oficial
+# (sem threads => funciona no Safari do iPhone sem cabeçalhos especiais), testa o export num browser e publica-o no
+# ramo `web-build`, que o Render (site estático) serve. Ver docs/DEPLOY.md.
+#
+# Variáveis do repositório (Settings → Secrets and variables → Actions → Variables):
+#   ANGOLA_SERVER_URL   wss://<o-teu-servidor>.onrender.com   (obrigatória para publicar)
+name: Build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: "4.4.1"
+
+jobs:
+  server-tests:
+    name: Servidor (${{ matrix.storage }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        storage: [file, sqlite, postgres]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r server_python/requirements.txt pillow
+      - name: Testes de integração (websockets real)
+        env:
+          ANGOLA_TEST_STORAGE: >-
+            ${{ matrix.storage == 'sqlite' && 'sqlite:{tmp}/db.sqlite'
+             || matrix.storage == 'postgres' && 'postgresql://postgres:ci@localhost:5432/postgres'
+             || '' }}
+        run: python tests/run_integration.py
+      - name: Validação estática do mundo
+        run: python tools/validate_and_preview.py
+
+  web:
+    name: Export web + smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache do Godot
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-stable
+
+      - name: Descarregar Godot ${{ env.GODOT_VERSION }} (releases oficiais)
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          set -e
+          mkdir -p ~/godot && cd ~/godot
+          base=https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable
+          curl -fsSL -o godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fsSL -o templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -q godot.zip && mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 godot && rm godot.zip
+          unzip -q templates.tpz && rm templates.tpz
+
+      - name: Instalar Godot e modelos de exportação
+        run: |
+          set -e
+          dest=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          mkdir -p "$dest"
+          cp ~/godot/templates/* "$dest/"
+          ls "$dest" | grep web
+          sudo ln -sf ~/godot/godot /usr/local/bin/godot
+          godot --version
+
+      - name: Servidor configurado no build
+        env:
+          ANGOLA_SERVER_URL: ${{ vars.ANGOLA_SERVER_URL }}
+        run: |
+          mkdir -p config
+          if [ -n "$ANGOLA_SERVER_URL" ]; then
+            printf '{"url": "%s", "allow_override": false}\n' "$ANGOLA_SERVER_URL" > config/server.json
+            echo "Build de produção -> $ANGOLA_SERVER_URL"
+          else
+            echo "::notice::ANGOLA_SERVER_URL não definida: build de teste (não é publicado). Ver docs/DEPLOY.md"
+          fi
+
+      - name: Importar recursos
+        run: |
+          if godot --help | grep -q -- "--import"; then
+            timeout 600 godot --headless --path . --import
+          else
+            timeout 600 godot --headless --path . --editor --quit-after 300 || true
+          fi
+
+      - name: Exportar (preset "Web")
+        run: |
+          set -e
+          mkdir -p build/web
+          timeout 900 godot --headless --path . --export-release "Web" build/web/index.html 2>&1 | tee export.log
+          for f in index.html index.js index.wasm index.pck; do test -s build/web/$f || { echo "::error::falta build/web/$f"; exit 1; }; done
+          grep -q "GODOT_THREADS_ENABLED = false" build/web/index.html || { echo "::error::export com threads (não funciona no iPhone sem cabeçalhos)"; exit 1; }
+          if grep -E "^(ERROR|SCRIPT ERROR)" export.log; then echo "::warning::erros no log do export (ver acima)"; fi
+          ls -la build/web
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Smoke test do export num browser (2 clientes, um iPhone emulado)
+        env:
+          BUILD_DIR: ${{ github.workspace }}/build/web
+          ANGOLA_SERVER_URL: ${{ vars.ANGOLA_SERVER_URL }}
+        run: |
+          set -e
+          pip install -r server_python/requirements.txt
+          npm install --no-save --prefix /tmp/pw playwright@1.48.2
+          (cd /tmp/pw && npx playwright install --with-deps chromium)
+          (cd build/web && python -m http.server 8060 >/tmp/http.log 2>&1 &)
+          ANGOLA_STORAGE="sqlite:/tmp/smoke.sqlite" ANGOLA_PORT=7777 python server_python/server.py >/tmp/server.log 2>&1 &
+          sleep 3
+          NODE_PATH=/tmp/pw/node_modules node tools/web_test/smoke.js http://localhost:8060 ws://127.0.0.1:7777 smoke_shots "$ANGOLA_SERVER_URL"
+          n=$(grep -c "Conectado" /tmp/server.log || true)
+          echo "ligações recebidas pelo servidor local: $n"
+          test "$n" -ge 2
+
+      - name: Logs
+        if: always()
+        run: tail -n 40 /tmp/server.log || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-build-and-screenshots
+          path: |
+            build/web
+            smoke_shots
+            export.log
+          retention-days: 7
+
+  publish:
+    name: Publicar no ramo web-build
+    needs: [server-tests, web]
+    if: github.event_name != 'pull_request' && vars.ANGOLA_SERVER_URL != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-build-and-screenshots
+          path: out
+      - name: Enviar build para o ramo web-build (só este ramo gerado é substituído)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          cd out/build/web
+          touch .nojekyll
+          git init -q -b web-build
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -qm "Web build ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" web-build
+          echo "Publicado: ramo web-build @ ${GITHUB_SHA::7}" >> "$GITHUB_STEP_SUMMARY"

@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 try:
     import websockets
-    SHIM = False
+    SHIM = "STAND-IN" in (websockets.__doc__ or "")      # o stand-in também pode vir pelo PYTHONPATH
 except ImportError:
     sys.path.insert(0, str(ROOT / "tests" / "shim")); import websockets; SHIM = True
 PORT = 7791; URI = f"ws://127.0.0.1:{PORT}"
@@ -155,27 +155,27 @@ async def main():
     check("A: conta nova => onboarding 'new' sem personagem", r["data"]["onboarding"]["state"] == "new" and r["data"]["character"] is None and r["data"]["session_token"])
     tokN = r["data"]["session_token"]
     await b.send(type="onboarding_progress", state="character_customization", step=0); s = await b.get("onboarding_state"); check("A: não pode saltar a história", s["state"] != "character_customization")
-    await b.send(type="onboarding_progress", state="story_in_progress", step=1); await b.get("onboarding_state"); await b.cm.__aexit__()
+    await b.send(type="onboarding_progress", state="story_in_progress", step=1); await b.get("onboarding_state"); await b.cm.__aexit__(None, None, None)
     # C) onboarding interrompido -> retoma no passo certo
     b = await open_bot(); r = await login(b, "novo")
     check("C: retoma em story_in_progress passo 1", r["data"]["onboarding"]["state"] == "story_in_progress" and r["data"]["onboarding"]["story_step"] == 1)
     await b.send(type="onboarding_progress", state="story_in_progress", step=0); s = await b.get("onboarding_state"); check("C: passo nunca recua", s["story_step"] == 1)
     await b.send(type="onboarding_progress", state="story_in_progress", step=3); await b.get("onboarding_state")
-    await b.send(type="onboarding_progress", state="character_customization", step=3); await b.get("onboarding_state"); await b.cm.__aexit__()
+    await b.send(type="onboarding_progress", state="character_customization", step=3); await b.get("onboarding_state"); await b.cm.__aexit__(None, None, None)
     b = await open_bot(); r = await login(b, "novo"); check("C: retoma em character_customization", r["data"]["onboarding"]["state"] == "character_customization")
     await b.send(type="create_character", name="Novo Jogador", appearance={"skin_tone": 1, "hair_style": 2}); r = await b.get("character_created")
-    check("A: criação conclui onboarding", r["success"]); await b.cm.__aexit__()
+    check("A: criação conclui onboarding", r["success"]); await b.cm.__aexit__(None, None, None)
     # B) jogador com regresso: login devolve tudo e estado completed (cliente vai direto ao mundo)
     b = await open_bot(); r = await login(b, "novo")
     check("B: regresso => completed + personagem + aparência guardada", r["data"]["onboarding"]["state"] == "completed" and r["data"]["character"]["appearance"]["hair_style"] == 2 and r["data"]["character"]["background"])
-    await b.send(type="onboarding_progress", state="story_in_progress", step=0); s = await b.get("onboarding_state"); check("B: completed nunca regride", s["state"] == "completed"); await b.cm.__aexit__()
+    await b.send(type="onboarding_progress", state="story_in_progress", step=0); s = await b.get("onboarding_state"); check("B: completed nunca regride", s["state"] == "completed"); await b.cm.__aexit__(None, None, None)
     # D) sessão existente
     b = await open_bot(); await b.send(type="resume_session", token=tokN); r = await b.get("auth_response")
     check("D: sessão válida restaura perfil completo sem password", r and r["success"] and r.get("resumed") and r["data"]["onboarding"]["state"] == "completed")
     await b.send(type="enter_world", character_id=r["data"]["character"]["id"]); spw = await b.get("spawn_player"); check("D: entra no mundo diretamente", spw is not None)
-    await b.send(type="logout"); lo = await b.get("logged_out"); check("D: logout", lo is not None); await b.cm.__aexit__()
+    await b.send(type="logout"); lo = await b.get("logged_out"); check("D: logout", lo is not None); await b.cm.__aexit__(None, None, None)
     b = await open_bot(); await b.send(type="resume_session", token=tokN); r = await b.get("session_invalid"); check("D: token revogado/inválido => session_invalid", r is not None)
-    await b.send(type="resume_session", token="lixo"); r = await b.get("session_invalid"); check("D: token falso rejeitado", r is not None); await b.cm.__aexit__()
+    await b.send(type="resume_session", token="lixo"); r = await b.get("session_invalid"); check("D: token falso rejeitado", r is not None); await b.cm.__aexit__(None, None, None)
     # Migração de contas antigas (sem campo onboarding)
     srv.terminate(); srv.wait()
     stm = storagemod.open_store(STORE_SPEC); accs = stm.load("accounts")
@@ -183,8 +183,8 @@ async def main():
     for a_ in accs.values(): a_.pop("onboarding", None)
     accs["legado_vazio"] = {"id": "legacy1", "username": "legado_vazio", "password_hash": accs["novo"]["password_hash"], "created_at": "x"}
     stm.write({"accounts": storagemod.dumps(accs)}); time.sleep(0.4); srv = start_server(sp)
-    b = await open_bot(); r = await login(b, "novo"); check("migração: conta antiga com personagem => completed (nada apagado)", r["data"]["onboarding"]["state"] == "completed" and r["data"]["character"]["name"] == "Novo Jogador"); await b.cm.__aexit__()
-    b = await open_bot(); r = await login(b, "legado_vazio"); check("migração: conta antiga sem personagem => new", r and r["data"]["onboarding"]["state"] == "new"); await b.cm.__aexit__()
+    b = await open_bot(); r = await login(b, "novo"); check("migração: conta antiga com personagem => completed (nada apagado)", r["data"]["onboarding"]["state"] == "completed" and r["data"]["character"]["name"] == "Novo Jogador"); await b.cm.__aexit__(None, None, None)
+    b = await open_bot(); r = await login(b, "legado_vazio"); check("migração: conta antiga sem personagem => new", r and r["data"]["onboarding"]["state"] == "new"); await b.cm.__aexit__(None, None, None)
     await gameplay_tests(open_bot)
     await social_tests(open_bot)
     srv.terminate(); shutil.rmtree(tmp, ignore_errors=True)
@@ -335,12 +335,12 @@ async def gameplay_tests(open_bot):
     a = W.cell_center(zone, desk["x"] + 2, desk["y"] - 1); await G.send(type="position", x=a[0], y=a[1])
     dn = await G.get("activity_done"); check("mexer-se interrompe a atividade (sem salário)", dn and dn["action"] is None)
     # persistência da zona + migração de inventário antigo
-    for bot in (G, H): await bot.cm.__aexit__()
+    for bot in (G, H): await bot.cm.__aexit__(None, None, None)
     await asyncio.sleep(0.3)
     G = await open_bot(); await G.send(type="login", username="gamer", password="pw1234"); r = await G.get("auth_response")
     await G.send(type="enter_world", character_id=r["data"]["character"]["id"]); sp_ = await G.get("spawn_player")
     check("reentrada repõe zona interior guardada", sp_ and sp_["data"]["zone"] == zone)
-    await G.cm.__aexit__()
+    await G.cm.__aexit__(None, None, None)
 
 
 
@@ -370,7 +370,7 @@ async def social_tests(open_bot):
     # 1. o que os outros recebem (spawn) não tem id interno nem dados privados
     D = await open_bot(); await D.send(type="login", username="soc_ana", password="pw1234")
     await B.drain()
-    await D.cm.__aexit__(); await asyncio.sleep(0.3)
+    await D.cm.__aexit__(None, None, None); await asyncio.sleep(0.3)
     A = await open_bot(); await A.send(type="login", username="soc_ana", password="pw1234"); r = await A.get("auth_response")
     await A.send(type="enter_world", character_id=r["data"]["character"]["id"]); await A.get("spawn_player")
     sp = await B.get("spawn_player", pred=lambda m: m["data"]["name"] == "Ana Social")
@@ -436,7 +436,7 @@ async def social_tests(open_bot):
     check("abrir a conversa limpa as não lidas", st["conversations"] and st["conversations"][0]["unread"] == 0 and st["conversations"][0]["pub"] == pa)
     await A.send(type="dm_send", target=pb, text="   "); s_ = await last_of(A, "dm_sent"); check("mensagem vazia rejeitada", s_ and not s_["ok"])
     # mensagem para alguém offline fica guardada
-    await B.cm.__aexit__(); await asyncio.sleep(0.4)
+    await B.cm.__aexit__(None, None, None); await asyncio.sleep(0.4)
     await A.send(type="dm_send", target=pb, text="Estás aí?"); s_ = await last_of(A, "dm_sent"); check("mensagem para jogador offline é aceite e guardada", s_ and s_["ok"])
     B = await open_bot(); await B.send(type="login", username="soc_beto", password="pw1234"); r = await B.get("auth_response")
     await B.send(type="enter_world", character_id=r["data"]["character"]["id"]); await B.get("spawn_player"); st = (await B.get("social_state"))["data"]
@@ -508,11 +508,11 @@ async def social_tests(open_bot):
     check("sem resposta: expira, avisa os dois e regista chamada perdida", e1 and e1["reason"] == "no_answer" and e2 and e2["reason"] == "missed" and nm)
     await asyncio.sleep(1.1)
     await A.send(type="call_start", target=pb); await A.get("call_outgoing"); await B.get("call_incoming")
-    await B.cm.__aexit__(); await asyncio.sleep(0.4); e = await A.get("call_ended", timeout=2)
+    await B.cm.__aexit__(None, None, None); await asyncio.sleep(0.4); e = await A.get("call_ended", timeout=2)
     check("se o outro se desliga, a chamada termina ('offline')", e and e["reason"] == "offline")
     await asyncio.sleep(1.1)
     await A.send(type="call_start", target=pb); r = await A.get("call_failed"); check("ligar a quem está offline falha", r and r["reason"] == "offline")
     for bot in (A, C):
-        await bot.cm.__aexit__()
+        await bot.cm.__aexit__(None, None, None)
 
 asyncio.run(main())
