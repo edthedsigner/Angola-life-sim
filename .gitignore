@@ -3,3 +3,4 @@ __pycache__/
 .godot/
 server_python/data/
 build/
+config/server.json

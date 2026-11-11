@@ -68,6 +68,16 @@ func _fit_menu() -> void:
 	get_window().content_scale_size = Vector2i(640, 640) if minf(logical.x, logical.y) < 600.0 else Vector2i(1280, 720)
 
 func _ready() -> void:
+	if "--selftest-net" in OS.get_cmdline_args():      # dev: regras de normalização do endereço do servidor
+		var cases := [["jogo.onrender.com", true, "wss://jogo.onrender.com"], ["https://jogo.onrender.com/", true, "wss://jogo.onrender.com"],
+			["ws://jogo.onrender.com", true, "wss://jogo.onrender.com"], ["wss://a.b:8443", false, "wss://a.b:8443"],
+			["192.168.1.20", false, "ws://192.168.1.20:7777"], ["192.168.1.20:9000", false, "ws://192.168.1.20:9000"],
+			["ws://localhost:7777", true, "ws://localhost:7777"], ["http://a.b", false, "ws://a.b"]]
+		for c in cases:
+			var got: String = NetworkManager.normalize_url(c[0], c[1])
+			print("[selftest] %s %s (https=%s) -> %s" % ["ok  " if got == c[2] else "FAIL", c[0], c[1], got])
+		print("[selftest] url=%s origem=%s" % [NetworkManager.server_url(), NetworkManager.url_source])
+		return
 	if "--check-scripts" in OS.get_cmdline_args():      # dev: compila cada script isoladamente e mostra erros com linha
 		for d in ["res://client/scripts/", "res://shared/scripts/"]:
 			for f in DirAccess.get_files_at(d):
