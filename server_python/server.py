@@ -21,6 +21,19 @@ import sys
 import time
 import uuid
 
+import logging
+
+
+class _QuietHandshakes(logging.Filter):
+    """O Render sonda a porta com HEAD (não é WebSocket): a biblioteca regista um traceback inteiro por cada sonda.
+    Esconde só esses "opening handshake failed"; tudo o resto continua visível."""
+    def filter(self, record: logging.LogRecord) -> bool:
+        return "opening handshake failed" not in record.getMessage()
+
+
+for _name in ("websockets", "websockets.server", "websockets.asyncio.server"):
+    logging.getLogger(_name).addFilter(_QuietHandshakes())
+
 try:   # logs linha a linha mesmo redirecionados para ficheiro/host (Render, CI) — senão ficam presos no buffer
     sys.stdout.reconfigure(line_buffering=True)
     sys.stderr.reconfigure(line_buffering=True)
