@@ -29,6 +29,7 @@ except ImportError:
     raise SystemExit(1)
 
 import game
+import social as socialmod
 import world as worldmod
 
 # ---------------------------------------------------------------------------
@@ -47,6 +48,8 @@ except Exception:
 W = worldmod.load()
 WORLD["spawn"] = dict(W.spawn)            # fonte única do spawn (antes duplicado em world_config.json e World.tscn)
 WORLD_STATE_FILE = DATA_DIR / "world_state.json"
+SOCIAL_FILE = DATA_DIR / "social.json"
+social: "socialmod.Social" = None  # type: ignore[assignment]
 clock: game.Clock = game.Clock(W.clock_cfg, None)
 door_states: dict[str, dict[str, bool]] = {}   # zone -> {edge_key: open}
 activities: dict[str, dict] = {}               # peer_id -> atividade em curso
@@ -119,6 +122,8 @@ def load_all() -> None:
     door_states = {z: {k: bool(v) for k, v in d.items()} for z, d in ws_state.get("doors", {}).items() if W.zone_valid(z)}
     for ch in characters.values():
         game.ensure_fields(ch, W)
+    global social
+    social = socialmod.Social(load_json(SOCIAL_FILE), characters, W, game)
 
 
 def save_all() -> None:
@@ -126,6 +131,8 @@ def save_all() -> None:
     save_json(CHARACTERS_FILE, characters)
     save_json(SESSIONS_FILE, sessions)
     save_json(WORLD_STATE_FILE, {"game_s": clock.now(), "doors": door_states})
+    if social is not None:
+        save_json(SOCIAL_FILE, social.dump())
 
 
 # ---------------------------------------------------------------------------
@@ -445,6 +452,7 @@ def create_character(account_id: str, appearance: dict, name: str) -> dict:
     }
     game.ensure_fields(character, W)
     characters[cid] = character
+    social.ensure(character)
     account_characters.setdefault(account_id, []).append(cid)
 
     bg = generate_background(cid)
@@ -485,7 +493,9 @@ dirty = False
 
 def public_view(peer_id: str, ch: dict) -> dict:
     """Só dados públicos — o background de vida, dinheiro, necessidades e inventário NUNCA vão para outros jogadores."""
-    return {"id": ch["id"], "peer_id": peer_id, "name": ch["name"], "appearance": ch.get("appearance", {}),
+    full = characters.get(ch.get("id", ""), ch)
+    # "pub" = identificador público opaco (o id interno da personagem nunca sai do servidor para outros jogadores)
+    return {"pub": full.get("pub", ""), "level": social.level_of(int(full.get("xp", 0)))[0], "peer_id": peer_id, "name": ch["name"], "appearance": ch.get("appearance", {}),
             "position": dict(ch.get("position", WORLD["spawn"])), "zone": ch.get("zone", "w"),
             "activity": (activities.get(peer_id) or {}).get("action"), "activity_fid": (activities.get(peer_id) or {}).get("fid")}
 
@@ -525,7 +535,10 @@ async def send_self(peer_id: str) -> None:
     ch = char_of(peer_id)
     ws = peers.get(peer_id)
     if ch and ws:
-        await send(ws, {"type": "self_state", "data": game.private_state(ch, W, clock, activities.get(peer_id))})
+        data = game.private_state(ch, W, clock, activities.get(peer_id))
+        lvl, into, need = social.level_of(int(ch.get("xp", 0)))
+        data["level"] = {"level": lvl, "into": into, "need": need}
+        await send(ws, {"type": "self_state", "data": data})
 
 
 async def notice(ws: Any, text: str, ok: bool = True) -> None:
@@ -576,6 +589,12 @@ async def run_activity(peer_id: str, act: dict) -> None:
         return
     ok, why = game.check_activity(ch, W, act["action"], act["building"], clock.now())
     msg = game.finish_activity(ch, W, act["action"], clock.now()) if ok or why == "Não estás cansado." else why
+    if ok:
+        lvl0 = social.level_of(int(ch.get("xp", 0)))[0]
+        social.award_xp(ch, act["action"])
+        lvl1 = social.level_of(int(ch.get("xp", 0)))[0]
+        if lvl1 > lvl0:
+            msg += f" Subiste para o nível {lvl1}!"
     global dirty
     dirty = True
     if ws:
@@ -612,7 +631,8 @@ async def handle_game(ws: Any, peer_id: str, mtype: str, msg: dict) -> bool:
             return await notice(ws, "Entrada inválida.", False) or True
         if not W.near_cell("w", x, y, W.entrance_tile(b, ent), 1.0):
             return await notice(ws, "Estás longe da porta.", False) or True
-        if W.data["building_types"][b["type"]].get("private") and not game.housing_active(ch, b["id"], now):
+        if W.data["building_types"][b["type"]].get("private") and not game.housing_active(ch, b["id"], now) \
+                and not social.guest_allowed(ch["id"], b["id"], now):
             return await notice(ws, f"{b['name']} é uma residência privada. Arrenda um quarto na app Imóveis.", False) or True
         fz = W.floor_zone(b["id"], 0)
         _, fl = W.parse_zone(fz)
@@ -748,6 +768,159 @@ async def handle_game(ws: Any, peer_id: str, mtype: str, msg: dict) -> bool:
     return True
 
 
+# ---------------------------------------------------------------------------
+# Social (regras em social.py; aqui só identificação, entrega e estado público)
+# ---------------------------------------------------------------------------
+SOCIAL_TYPES = {"social_profile", "social_state_request", "friend_request", "friend_accept", "friend_decline", "friend_cancel",
+                "friend_remove", "block", "unblock", "privacy_set", "invite", "invite_respond", "invite_cancel", "gift_money",
+                "gift_item", "dm_send", "dm_history", "dm_read", "call_start", "call_answer", "call_end", "rtc_signal", "notif_read"}
+
+
+def peer_of(cid: str) -> str | None:
+    for pid, p in players_in_world.items():
+        if p["id"] == cid:
+            return pid
+    return None
+
+
+def online_cids() -> set:
+    return {p["id"] for p in players_in_world.values()}
+
+
+async def deliver(items: list) -> None:
+    """Entrega cada (cid, mensagem) apenas ao próprio destinatário, se estiver online (nunca broadcast)."""
+    for cid, m in items:
+        pid = peer_of(cid)
+        if pid and peers.get(pid):
+            await send(peers[pid], m)
+
+
+async def send_social(peer_id: str) -> None:
+    ch = char_of(peer_id)
+    if ch and peers.get(peer_id):
+        await send(peers[peer_id], {"type": "social_state", "data": social.state_for(ch["id"], online_cids())})
+
+
+def public_status(cid: str) -> str:
+    pid = peer_of(cid)
+    act = activities.get(pid or "")
+    if act:
+        return W.activities[act["action"]].get("status", "Ocupado")
+    return "Disponível"
+
+
+async def handle_social(ws: Any, peer_id: str, mtype: str, msg: dict) -> bool:
+    global dirty
+    if mtype not in SOCIAL_TYPES:
+        return False
+    me_ch = char_of(peer_id)
+    if me_ch is None:
+        await send(ws, {"type": "error", "error": "Não estás no mundo"})
+        return True
+    me = me_ch["id"]
+    target = social.cid_of(msg.get("target", "")) if "target" in msg else None
+    now = clock.now()
+
+    async def result(ok: bool, text: str, out: list, extra: dict | None = None) -> None:
+        global dirty
+        dirty = True
+        await send(ws, {"type": "social_result", "action": mtype, "ok": ok, "text": text, **(extra or {})})
+        await deliver(out)
+        await send_social(peer_id)
+
+    if mtype in ("friend_request", "friend_accept", "friend_decline", "friend_cancel", "friend_remove", "block", "unblock",
+                 "invite", "gift_money", "gift_item", "dm_send", "dm_history", "dm_read", "call_start", "social_profile") and target is None:
+        await send(ws, {"type": "social_result", "action": mtype, "ok": False, "text": "Jogador inexistente."})
+        return True
+
+    if mtype == "social_profile":
+        prof = social.public_profile(target, me, public_status(target), target in online_cids())
+        await send(ws, {"type": "social_profile", "data": prof})
+    elif mtype == "social_state_request":
+        await send_social(peer_id)
+    elif mtype in ("friend_request", "friend_accept", "friend_decline", "friend_cancel", "friend_remove", "block", "unblock"):
+        ok, text, out = getattr(social, mtype)(me, target)
+        await result(ok, text, out, {"target": msg.get("target")})
+        if ok:      # a outra pessoa vê a nova relação no próximo perfil/estado
+            pid = peer_of(target)
+            if pid:
+                await send_social(pid)
+    elif mtype == "privacy_set":
+        ok, text, out = social.set_privacy(me, str(msg.get("calls", "")))
+        await result(ok, text, out)
+    elif mtype == "invite":
+        ok, text, out, iid = social.invite(me, target, str(msg.get("kind", "")), str(msg.get("place", "")), str(msg.get("game", "")), now)
+        await result(ok, text, out, {"iid": iid})
+    elif mtype == "invite_respond":
+        ok, text, out, inv = social.invite_respond(me, str(msg.get("iid", "")), bool(msg.get("accept", False)))
+        await result(ok, text, out, {"invite": inv})
+    elif mtype == "invite_cancel":
+        ok, text, out = social.invite_cancel(me, str(msg.get("iid", "")))
+        await result(ok, text, out)
+    elif mtype == "gift_money":
+        ok, text, out, dup = social.gift_money(me, target, msg.get("amount"), str(msg.get("req_id", "")), now)
+        await result(ok, text, out, {"duplicate": dup, "req_id": msg.get("req_id")})
+        await send_self(peer_id)
+        pid = peer_of(target)
+        if ok and not dup and pid:
+            await send_self(pid)
+    elif mtype == "gift_item":
+        ok, text, out, dup = social.gift_item(me, target, str(msg.get("item", "")), msg.get("qty"), str(msg.get("req_id", "")))
+        await result(ok, text, out, {"duplicate": dup, "req_id": msg.get("req_id")})
+        await send_self(peer_id)
+        pid = peer_of(target)
+        if ok and not dup and pid:
+            await send_self(pid)
+    elif mtype == "dm_send":
+        ok, text, out, mine = social.dm_send(me, target, str(msg.get("text", "")))
+        dirty = True
+        await send(ws, {"type": "dm_sent", "ok": ok, "text": text, "with": msg.get("target"), "data": mine})
+        await deliver(out)
+    elif mtype == "dm_history":
+        social.dm_read(me, target)
+        dirty = True
+        await send(ws, {"type": "dm_history", "with": msg.get("target"), "name": characters[target]["name"],
+                        "messages": social.dm_history(me, target), "can_message": not social.blocked_between(me, target)})
+    elif mtype == "dm_read":
+        social.dm_read(me, target)
+        dirty = True
+    elif mtype == "call_start":
+        ok, text, out, call_id, reason = social.call_start(me, target, target in online_cids())
+        await send(ws, {"type": "call_outgoing" if ok else "call_failed", "call_id": call_id, "text": text, "reason": reason,
+                        "peer": {"pub": characters[target]["pub"], "name": characters[target]["name"]}})
+        await deliver(out)
+    elif mtype == "call_answer":
+        ok, text, out = social.call_answer(me, str(msg.get("call_id", "")), bool(msg.get("accept", False)))
+        if ok and msg.get("accept"):
+            await send(ws, {"type": "call_accepted", "call_id": msg.get("call_id"), "role": "answerer", "ice_servers": ICE_SERVERS})
+            out = [(c, dict(m, ice_servers=ICE_SERVERS)) for c, m in out]
+        await deliver(out)
+    elif mtype == "call_end":
+        ok, text, out = social.call_end(me, str(msg.get("call_id", "")), str(msg.get("reason", "hangup")))
+        await deliver(out)
+    elif mtype == "rtc_signal":
+        await deliver(social.rtc_relay(me, str(msg.get("call_id", "")), msg.get("payload")))
+    elif mtype == "notif_read":
+        for n in social.notifs.get(me, []):
+            if msg.get("nid") in (None, n["nid"]):
+                n["read"] = True
+        dirty = True
+    return True
+
+
+# STUN público por omissão; para redes restritivas configura um TURN (ANGOLA_ICE_SERVERS = JSON).
+ICE_SERVERS = json.loads(os.environ.get("ANGOLA_ICE_SERVERS", '[{"urls": ["stun:stun.l.google.com:19302"]}]'))
+
+
+async def social_loop() -> None:
+    while True:
+        await asyncio.sleep(1.0)
+        if social is not None:
+            out = social.call_timeouts()
+            if out:
+                await deliver(out)
+
+
 async def handle_message(ws: Any, raw: str) -> None:
     global dirty
     try:
@@ -844,6 +1017,7 @@ async def handle_message(ws: Any, raw: str) -> None:
         if ch["zone"] != "w":
             await send(ws, {"type": "zone_state", "zone": ch["zone"], "doors": door_states.get(ch["zone"], {})})
         await send_self(peer_id)
+        await send_social(peer_id)
         print(f"[World] {ch['name']} entrou (peer {peer_id}); online: {len(players_in_world)}")
 
     elif mtype == "position":
@@ -870,6 +1044,9 @@ async def handle_message(ws: Any, raw: str) -> None:
         await broadcast_world({"type": "position", "peer_id": peer_id, "x": x, "y": y, "zone": zone}, exclude_peer=peer_id)
 
     elif await handle_game(ws, peer_id, mtype, msg):
+        pass
+
+    elif await handle_social(ws, peer_id, mtype, msg):
         pass
 
     else:
@@ -920,6 +1097,9 @@ async def handler(ws: Any) -> None:
     except websockets.exceptions.ConnectionClosed:
         pass
     finally:
+        info = clients.get(ws) or {}
+        if info.get("character_id") and social is not None:
+            await deliver(social.drop_calls(info["character_id"]))
         await leave_world(peer_id)
         peers.pop(peer_id, None)
         clients.pop(ws, None)
@@ -937,6 +1117,7 @@ async def main() -> None:
     print("Ctrl+C para parar.\n", flush=True)
     asyncio.create_task(autosave_loop())
     asyncio.create_task(needs_loop())
+    asyncio.create_task(social_loop())
     async with websockets.serve(handler, host, port, ping_interval=20, ping_timeout=20):
         await asyncio.Future()
 

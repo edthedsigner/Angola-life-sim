@@ -1737,5 +1737,20 @@
   "character_m": 1.75,
   "door_m": 2.1,
   "floor_m": 2.45
- }
+ },
+ "progression": {
+  "_doc": "Fundação de níveis: XP só por atividades já existentes concluídas; o nível ainda não desbloqueia nada (docs/SOCIAL.md).",
+  "level_base": 100,
+  "xp": {
+   "work": 25,
+   "cook": 8,
+   "dine": 4,
+   "sleep": 5,
+   "shower": 3,
+   "rest": 1,
+   "rest_bench": 1
+  }
+ },
+ "games": {},
+ "_games_doc": "Registo de jogos multijogador para convites 'Jogar'. Vazio de propósito: cada jogo regista-se aqui (id: {name, min_players, max_players}) e no servidor (social.GAME_HANDLERS)."
 }
