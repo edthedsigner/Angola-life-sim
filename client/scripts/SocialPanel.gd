@@ -105,6 +105,9 @@ func _l(t: String, size: int, col: Color = UIStyle.TEXT, wrap := false) -> Label
 	l.add_theme_color_override("font_color", col)
 	if wrap:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	else:                                   # nunca alarga o painel além do ecrã (telemóvel): corta com "…"
+		l.clip_text = true
+		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	return l
 
 func _b(t: String, cb: Callable, icon := "", primary := false, enabled := true, tip := "") -> Button:
@@ -114,6 +117,8 @@ func _b(t: String, cb: Callable, icon := "", primary := false, enabled := true, 
 		b.icon = Icons.tex(icon, Color(0.1, 0.06, 0.02) if primary else UIStyle.TEXT, 18)
 	b.custom_minimum_size = Vector2(0, 44)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.clip_text = true
+	b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	b.focus_mode = Control.FOCUS_NONE
 	b.disabled = not enabled
 	b.tooltip_text = tip
@@ -183,7 +188,7 @@ func _header() -> void:
 	hb.add_child(vb)
 	var right := VBoxContainer.new()
 	right.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	right.custom_minimum_size = Vector2(124, 0)
+	right.custom_minimum_size = Vector2(112, 0)
 	match str(prof.get("relation", "none")):
 		"none":
 			right.add_child(_b("Adicionar", func(): _send("friend_request"), "plus", true))
