@@ -73,7 +73,9 @@ func _ready() -> void:
 			for f in DirAccess.get_files_at(d):
 				if f.ends_with(".gd"):
 					var sc: Script = load(d + f)
-					print("[check] %s %s" % ["ok " if sc != null and sc.reload() == OK else "ERRO", f])
+					var err: int = sc.reload() if sc != null else FAILED
+					# ERR_ALREADY_IN_USE = já tem instâncias (autoloads, esta cena): compilou, logo está ok
+					print("[check] %s %s" % ["ok " if err == OK or err == ERR_ALREADY_IN_USE else "ERRO", f])
 		return
 	if "--scale-test" in OS.get_cmdline_args() or "--scale-test" in OS.get_cmdline_user_args():
 		get_tree().change_scene_to_file.call_deferred("res://client/scenes/tests/ScaleTest.tscn")   # laboratório de escala

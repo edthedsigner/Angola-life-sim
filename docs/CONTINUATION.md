@@ -1,6 +1,15 @@
 # Project continuation notes
 
-## 0. After M2 (gameplay restoration) — start here
+## 00. After M3 (scale + social) — start here
+* Read `docs/SCALE.md` and `docs/SOCIAL.md`. Run `python tests/run_integration.py` (141 checks).
+* Voice calls work in the **web export**. For native builds add the webrtc-native GDExtension. For players behind strict NATs
+  deploy a TURN server (coturn) and set `ANGOLA_ICE_SERVERS`. Test a call between two real machines/browsers on different networks.
+* Open design decisions: what levels unlock (XP is earned, nothing is unlocked yet); the first real entry in the `games` registry;
+  side-facing character sprites (characters face the camera only; sitting uses a mirrored 3/4 frame).
+* Dev helpers: `ANGOLA_DEV_START_MONEY`, `ANGOLA_ACTIVITY_SCALE` (server), `--check-scripts` (client: loads every script and
+  prints parse errors, useful with export templates that hide them), `--scale-test`.
+
+## 0. After M2 (gameplay restoration)
 * Open the project in Godot (4.3+) once so it imports the new art (`assets/art/interior`, `assets/art/furniture`) and check the Output panel.
   The client was run on the Godot 4.4.1 web runtime (see `tools/web_test/`), not in an editor.
 * Next candidates: hosted build (wss + server address setting), decorate mode for rented/owned homes (the original v0.6 editor,

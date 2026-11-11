@@ -1,7 +1,9 @@
-# Angola Life Simulator — M2 (gameplay restoration)
+# Angola Life Simulator — M3 (world scale + player social system)
 
 Persistent multiplayer life sim set in Luanda. Godot 4.3+ client, Python authoritative WebSocket server.
-**Latest work: `docs/RESTORATION_REPORT.md`** (what was restored from the original prototype, how, what was tested — with real
+**Latest work:** `docs/SCALE.md` (one consistent world scale, true-size furniture, sit/lie poses, scale test scene) and
+`docs/SOCIAL.md` (player profiles, friends, invites, gifts, private messages, voice calls, notifications, levels).
+Previous milestone: `docs/RESTORATION_REPORT.md` (what was restored from the original prototype, how, what was tested — with real
 in-engine screenshots in `docs/screenshots/`). Comparison of both projects: `docs/COMPARISON.md`. Adding buildings/activities: `docs/BUILDINGS.md`.
 
 ## Run
@@ -12,7 +14,8 @@ cd server_python
 pip install -r requirements.txt
 python server.py            # ws://0.0.0.0:7777   (override: ANGOLA_HOST / ANGOLA_PORT)
 ```
-Data is saved in `server_python/data/` (accounts.json, characters.json). Delete that folder to reset the world.
+Data is saved in `server_python/data/` (accounts.json, characters.json, social.json). Delete that folder to reset the world.
+Optional: `ANGOLA_ICE_SERVERS` (STUN/TURN list for voice calls, JSON), `ANGOLA_INVITE_TTL`, `ANGOLA_CALL_RING_SECS`.
 
 ### 2. Client (Godot 4.3+)
 Open the project folder in Godot, press **F5**. The project uses the **GL Compatibility** renderer (works on old GPUs / VMs).
@@ -34,6 +37,8 @@ Register → introduction → create character → life story → world.
 | Doors, stairs, exit | click / tap them, or the floor buttons (left) | `E` |
 | Zoom | pinch, wheel, `+`/`−` buttons | `+` / `-` |
 | Chat · Backpack · Phone | dock buttons (bottom right) | `Enter`/`T` · `I` · `Tab` |
+| Player profile (friend, invite, gift, message, call) | click / tap another player | — |
+| Notifications | bell button (dock) | — |
 | Debug info | Telemóvel → Definições | **F3** |
 | Log out | Telemóvel → Definições | F10 |
 
@@ -50,6 +55,10 @@ shared/scripts/WorldData.gd       client mirror of the server's world rules + pa
 client/scripts/InteriorBuilder.gd interiors from data using the same WallPieceL/R pieces as exteriors
 client/scripts/Hud.gd, Phone.gd   player HUD and phone;  DebugOverlay.gd = F3 (independent)
 server_python/world.py, game.py   geometry/validation and gameplay rules (needs, economy, activities)
+server_python/social.py           friends, blocks, invites, gifts, DMs, notifications, call signaling, levels
+client/scripts/SocialPanel.gd     player profile panel;  VoiceCall.gd = WebRTC voice;  Phone.gd = Mensagens/Amigos apps
+client/scripts/ScaleTest.gd       scale lab: run with the argument --scale-test
+tools/generate_furniture.py       true-scale furniture sprites (boxes in metres, game projection)
 tools/web_test/                   run the real client in a browser against the real server (test harness)
 ```
 Older layout notes:
