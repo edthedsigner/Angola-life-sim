@@ -1,0 +1,163 @@
+{
+ "tiles": 12288,
+ "size_m": [
+  256.0,
+  192.0
+ ],
+ "walkable_outdoor_tiles": 11365,
+ "unreachable_walkable_tiles": 0,
+ "buildings": {
+  "existente": 4,
+  "novo (este marco)": 1,
+  "lote reservado": 36
+ },
+ "building_tiles": 531,
+ "road_tiles": 1762,
+ "surfaces": {
+  "Relva / vegetação": 2218,
+  "Capim seco": 1215,
+  "Terra batida": 1579,
+  "Solo nu": 1262,
+  "Areia": 985,
+  "Brita / cascalho": 640,
+  "Betão": 670,
+  "Passeio calcetado": 573,
+  "Asfalto": 876,
+  "Vala de drenagem (não se atravessa)": 125,
+  "Pontão": 6,
+  "Campo de terra": 148,
+  "Carreiro / atalho pedonal": 383,
+  "Quintal (terra + relva)": 928,
+  "Rua de terra batida compactada": 680
+ },
+ "errors": [],
+ "cross_map_s": {
+  "oeste-este (avenida)": 52.8
+ },
+ "hub_seconds": {
+  "Praça (spawn)": {
+   "Praça (spawn)": 0,
+   "Mercearia / R. do Comércio": 5,
+   "Escritório": 7,
+   "Restaurante": 3,
+   "Mercado informal": 21,
+   "Prédio Kilamba": 17,
+   "Casa Mussulo": 11,
+   "Campo de futebol": 13,
+   "Largo da periferia": 23,
+   "Areal": 31
+  },
+  "Mercearia / R. do Comércio": {
+   "Praça (spawn)": 5,
+   "Mercearia / R. do Comércio": 0,
+   "Escritório": 5,
+   "Restaurante": 6,
+   "Mercado informal": 16,
+   "Prédio Kilamba": 12,
+   "Casa Mussulo": 13,
+   "Campo de futebol": 17,
+   "Largo da periferia": 27,
+   "Areal": 26
+  },
+  "Escritório": {
+   "Praça (spawn)": 7,
+   "Mercearia / R. do Comércio": 5,
+   "Escritório": 0,
+   "Restaurante": 6,
+   "Mercado informal": 16,
+   "Prédio Kilamba": 16,
+   "Casa Mussulo": 9,
+   "Campo de futebol": 20,
+   "Largo da periferia": 30,
+   "Areal": 31
+  },
+  "Restaurante": {
+   "Praça (spawn)": 3,
+   "Mercearia / R. do Comércio": 6,
+   "Escritório": 6,
+   "Restaurante": 0,
+   "Mercado informal": 20,
+   "Prédio Kilamba": 18,
+   "Casa Mussulo": 8,
+   "Campo de futebol": 15,
+   "Largo da periferia": 24,
+   "Areal": 32
+  },
+  "Mercado informal": {
+   "Praça (spawn)": 21,
+   "Mercearia / R. do Comércio": 16,
+   "Escritório": 16,
+   "Restaurante": 20,
+   "Mercado informal": 0,
+   "Prédio Kilamba": 11,
+   "Casa Mussulo": 25,
+   "Campo de futebol": 33,
+   "Largo da periferia": 43,
+   "Areal": 20
+  },
+  "Prédio Kilamba": {
+   "Praça (spawn)": 17,
+   "Mercearia / R. do Comércio": 12,
+   "Escritório": 16,
+   "Restaurante": 18,
+   "Mercado informal": 11,
+   "Prédio Kilamba": 0,
+   "Casa Mussulo": 25,
+   "Campo de futebol": 23,
+   "Largo da periferia": 33,
+   "Areal": 14
+  },
+  "Casa Mussulo": {
+   "Praça (spawn)": 11,
+   "Mercearia / R. do Comércio": 13,
+   "Escritório": 9,
+   "Restaurante": 8,
+   "Mercado informal": 25,
+   "Prédio Kilamba": 25,
+   "Casa Mussulo": 0,
+   "Campo de futebol": 21,
+   "Largo da periferia": 30,
+   "Areal": 39
+  },
+  "Campo de futebol": {
+   "Praça (spawn)": 13,
+   "Mercearia / R. do Comércio": 17,
+   "Escritório": 20,
+   "Restaurante": 15,
+   "Mercado informal": 33,
+   "Prédio Kilamba": 23,
+   "Casa Mussulo": 21,
+   "Campo de futebol": 0,
+   "Largo da periferia": 10,
+   "Areal": 36
+  },
+  "Largo da periferia": {
+   "Praça (spawn)": 23,
+   "Mercearia / R. do Comércio": 27,
+   "Escritório": 30,
+   "Restaurante": 24,
+   "Mercado informal": 43,
+   "Prédio Kilamba": 33,
+   "Casa Mussulo": 30,
+   "Campo de futebol": 10,
+   "Largo da periferia": 0,
+   "Areal": 43
+  },
+  "Areal": {
+   "Praça (spawn)": 31,
+   "Mercearia / R. do Comércio": 26,
+   "Escritório": 31,
+   "Restaurante": 32,
+   "Mercado informal": 20,
+   "Prédio Kilamba": 14,
+   "Casa Mussulo": 39,
+   "Campo de futebol": 36,
+   "Largo da periferia": 43,
+   "Areal": 0
+  }
+ },
+ "residential_units": {
+  "agora": 7,
+  "com_lotes": 45
+ }
+}
