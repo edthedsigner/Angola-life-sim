@@ -6,6 +6,10 @@ Persistent multiplayer life sim set in Luanda. Godot 4.3+ client, Python authori
 Previous milestone: `docs/RESTORATION_REPORT.md` (what was restored from the original prototype, how, what was tested — with real
 in-engine screenshots in `docs/screenshots/`). Comparison of both projects: `docs/COMPARISON.md`. Adding buildings/activities: `docs/BUILDINGS.md`.
 
+## Put it online
+`docs/DEPLOY.md`: GitHub Actions builds and tests the web client with the official Godot export, Render hosts the client and the
+server (wss), and Neon PostgreSQL keeps accounts and progress. Works on iPhone Safari (no-threads export).
+
 ## Run
 
 ### 1. Server (Python 3.10+)
@@ -15,6 +19,7 @@ pip install -r requirements.txt
 python server.py            # ws://0.0.0.0:7777   (override: ANGOLA_HOST / ANGOLA_PORT)
 ```
 Data is saved in `server_python/data/` (accounts.json, characters.json, social.json). Delete that folder to reset the world.
+Other storage: `DATABASE_URL=postgresql://…` (production) or `ANGOLA_STORAGE=sqlite:path/db.sqlite`, see `server_python/storage.py`.
 Optional: `ANGOLA_ICE_SERVERS` (STUN/TURN list for voice calls, JSON), `ANGOLA_INVITE_TTL`, `ANGOLA_CALL_RING_SECS`.
 
 ### 2. Client (Godot 4.3+)
@@ -23,7 +28,8 @@ Open the project folder in Godot, press **F5**. The project uses the **GL Compat
 **Two clients on one PC:** Godot editor → *Debug → Customize Run Instances…* → enable 2 instances → F5.
 Or from a terminal run the project twice: `godot --path . ` (two terminals).
 
-**Server on another machine:** `godot --path . -- --server=192.168.1.20:7777` (or env var `ANGOLA_SERVER=host:port`).
+**Server on another machine:** `godot --path . -- --server=192.168.1.20:7777` (or env var `ANGOLA_SERVER=host:port`, or a full
+`wss://…` URL). Web builds get their server from `config/server.json`, written by the cloud build (see `docs/DEPLOY.md`).
 The client auto-retries the connection every 2 s until the server is up.
 
 ### 3. Play

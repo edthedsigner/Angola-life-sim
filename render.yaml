@@ -1,0 +1,39 @@
+# Render Blueprint — Dashboard → New → Blueprint → escolher este repositório. Ver docs/DEPLOY.md.
+# Dois serviços, ambos no plano gratuito:
+#   angola-life-sim-server  servidor de jogo Python (WebSocket; o Render põe o TLS => o cliente liga por wss://)
+#   angola-life-sim         cliente web (ficheiros estáticos do ramo `web-build`, gerado pelo GitHub Actions)
+# A base de dados (DATABASE_URL) é externa (ex.: Neon, gratuito) porque o disco do Render é apagado a cada reinício
+# e o PostgreSQL gratuito do Render expira ao fim de 30 dias.
+services:
+  - type: web
+    name: angola-life-sim-server
+    runtime: python
+    plan: free
+    region: frankfurt            # a região do Render mais próxima de Angola
+    buildCommand: pip install -r server_python/requirements.txt
+    startCommand: python server_python/server.py
+    healthCheckPath: /healthz
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - server_python/**
+        - shared/data/**
+        - render.yaml
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: ANGOLA_REQUIRE_DATABASE   # sem DATABASE_URL o servidor recusa arrancar (não finge persistência)
+        value: "1"
+      - key: DATABASE_URL              # pedido ao criar o Blueprint: cola o "connection string" do Neon
+        sync: false
+
+  - type: web
+    name: angola-life-sim
+    runtime: static
+    branch: web-build                # escrito pelo workflow .github/workflows/build.yml
+    buildCommand: echo "build feito no GitHub Actions"
+    staticPublishPath: ./
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache              # os ficheiros mantêm o nome entre builds: revalidar para apanhar versões novas

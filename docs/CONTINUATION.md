@@ -1,6 +1,10 @@
 # Project continuation notes
 
-## 00. After M3 (scale + social) — start here
+## 000. Deployment prep — start here
+* `docs/DEPLOY.md` has the steps and lists what is verified only by the first GitHub Actions run and a real iPhone.
+* Workflows: `.github/workflows/build.yml` (tests, Godot export, smoke test, publish to `web-build`), `deploy-check.yml` (public check).
+
+## 00. After M3 (scale + social)
 * Read `docs/SCALE.md` and `docs/SOCIAL.md`. Run `python tests/run_integration.py` (141 checks).
 * Voice calls work in the **web export**. For native builds add the webrtc-native GDExtension. For players behind strict NATs
   deploy a TURN server (coturn) and set `ANGOLA_ICE_SERVERS`. Test a call between two real machines/browsers on different networks.
