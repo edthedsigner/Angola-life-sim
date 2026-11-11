@@ -80,12 +80,19 @@ func _ready() -> void:
 		return
 	if "--check-scripts" in OS.get_cmdline_args():      # dev: compila cada script isoladamente e mostra erros com linha
 		for d in ["res://client/scripts/", "res://shared/scripts/"]:
+			var names: Array[String] = []
 			for f in DirAccess.get_files_at(d):
-				if f.ends_with(".gd"):
-					var sc: Script = load(d + f)
-					var err: int = sc.reload() if sc != null else FAILED
-					# ERR_ALREADY_IN_USE = já tem instâncias (autoloads, esta cena): compilou, logo está ok
-					print("[check] %s %s" % ["ok " if err == OK or err == ERR_ALREADY_IN_USE else "ERRO", f])
+				# no editor: X.gd; num export do Godot 4.4: X.gdc (tokens binários) + X.gd.remap
+				var n: String = f.trim_suffix(".remap").trim_suffix(".gdc").trim_suffix(".gd")
+				if (f.ends_with(".gd") or f.ends_with(".gdc") or f.ends_with(".gd.remap")) and not names.has(n):
+					names.append(n)
+			for n in names:
+				var f: String = n + ".gd"
+				var sc: Script = load(d + f)
+				var err: int = sc.reload() if sc != null else FAILED
+				# ERR_ALREADY_IN_USE = já tem instâncias (autoloads, esta cena). Script com erro de sintaxe não é instanciável.
+				var ok: bool = sc != null and (err == OK or err == ERR_ALREADY_IN_USE or sc.can_instantiate())
+				print("[check] %s %s" % ["ok " if ok else "ERRO", f])
 		return
 	if "--scale-test" in OS.get_cmdline_args() or "--scale-test" in OS.get_cmdline_user_args():
 		get_tree().change_scene_to_file.call_deferred("res://client/scenes/tests/ScaleTest.tscn")   # laboratório de escala
