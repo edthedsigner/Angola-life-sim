@@ -17,8 +17,15 @@ import json
 import os
 import random
 import secrets
+import sys
 import time
 import uuid
+
+try:   # logs linha a linha mesmo redirecionados para ficheiro/host (Render, CI) — senão ficam presos no buffer
+    sys.stdout.reconfigure(line_buffering=True)
+    sys.stderr.reconfigure(line_buffering=True)
+except AttributeError:
+    pass
 from pathlib import Path
 from typing import Any
 
