@@ -1,0 +1,178 @@
+{
+ "balcao_e": [
+  40,
+  25
+ ],
+ "balcao_n": [
+  12,
+  23
+ ],
+ "balcao_s": [
+  12,
+  23
+ ],
+ "balcao_w": [
+  40,
+  23
+ ],
+ "bancada_e": [
+  28,
+  21
+ ],
+ "bancada_n": [
+  12,
+  20
+ ],
+ "bancada_s": [
+  12,
+  20
+ ],
+ "bancada_w": [
+  28,
+  20
+ ],
+ "cadeira_e": [
+  9,
+  20
+ ],
+ "cadeira_n": [
+  9,
+  17
+ ],
+ "cadeira_s": [
+  9,
+  20
+ ],
+ "cadeira_w": [
+  9,
+  17
+ ],
+ "cama_e": [
+  28,
+  22
+ ],
+ "cama_n": [
+  34,
+  13
+ ],
+ "cama_s": [
+  34,
+  22
+ ],
+ "cama_w": [
+  28,
+  13
+ ],
+ "chuveiro_e": [
+  16,
+  40
+ ],
+ "chuveiro_n": [
+  16,
+  40
+ ],
+ "chuveiro_s": [
+  16,
+  38
+ ],
+ "chuveiro_w": [
+  16,
+  40
+ ],
+ "estante_e": [
+  16,
+  39
+ ],
+ "estante_n": [
+  8,
+  39
+ ],
+ "estante_s": [
+  8,
+  39
+ ],
+ "estante_w": [
+  16,
+  39
+ ],
+ "fogao_e": [
+  12,
+  19
+ ],
+ "fogao_n": [
+  12,
+  19
+ ],
+ "fogao_s": [
+  12,
+  19
+ ],
+ "fogao_w": [
+  12,
+  19
+ ],
+ "mesa_e": [
+  28,
+  17
+ ],
+ "mesa_n": [
+  16,
+  17
+ ],
+ "mesa_s": [
+  16,
+  17
+ ],
+ "mesa_w": [
+  28,
+  17
+ ],
+ "planta_e": [
+  9,
+  20
+ ],
+ "planta_n": [
+  9,
+  20
+ ],
+ "planta_s": [
+  9,
+  20
+ ],
+ "planta_w": [
+  9,
+  20
+ ],
+ "secretaria_e": [
+  24,
+  19
+ ],
+ "secretaria_n": [
+  13,
+  17
+ ],
+ "secretaria_s": [
+  13,
+  19
+ ],
+ "secretaria_w": [
+  24,
+  17
+ ],
+ "sofa_e": [
+  34,
+  19
+ ],
+ "sofa_n": [
+  16,
+  14
+ ],
+ "sofa_s": [
+  16,
+  19
+ ],
+ "sofa_w": [
+  34,
+  14
+ ]
+}

@@ -99,6 +99,29 @@ func set_activity(label: String) -> void:
 	_status.text = label
 	_status.visible = label != ""
 
+## Pose visual durante uma atividade (sentar no sofá/banco, deitar na cama). Só visual: a posição no servidor não muda.
+func set_pose(p: String, seat_px: Vector2 = Vector2.ZERO, rot: float = 0.0, lift: float = 0.0, flip: float = 1.0) -> void:
+	visual.set_pose(p)
+	visual.scale.x = flip
+	if not has_meta("label_pos"):
+		set_meta("label_pos", name_label.position)
+		set_meta("status_pos", _status.position)
+	if p == "stand":
+		visual.position = Vector2.ZERO
+		visual.rotation = 0.0
+		visual.z_index = 0
+		name_label.position = get_meta("label_pos")
+		_status.position = get_meta("status_pos")
+		return
+	visual.rotation = rot
+	# o pivô do visual são os pés; para deitar, centra o corpo (17 px acima dos pés) no ponto pedido
+	var centre_fix := Vector2(0, -17).rotated(rot) if p == "lie" else Vector2.ZERO
+	visual.position = seat_px - global_position + Vector2(0, -lift) - centre_fix
+	visual.z_index = 2
+	var shift := seat_px - global_position + Vector2(0, -lift + (10.0 if p == "lie" else 4.0))   # nome/estado seguem a pose
+	name_label.position = (get_meta("label_pos") as Vector2) + shift
+	_status.position = (get_meta("status_pos") as Vector2) + shift
+
 func set_character_data(data: Dictionary) -> void:
 	peer_id = str(data.get("peer_id", ""))
 	character_name = str(data.get("name", "Jogador"))

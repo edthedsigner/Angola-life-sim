@@ -68,6 +68,9 @@ func _fit_menu() -> void:
 	get_window().content_scale_size = Vector2i(640, 640) if minf(logical.x, logical.y) < 600.0 else Vector2i(1280, 720)
 
 func _ready() -> void:
+	if "--scale-test" in OS.get_cmdline_args() or "--scale-test" in OS.get_cmdline_user_args():
+		get_tree().change_scene_to_file.call_deferred("res://client/scenes/tests/ScaleTest.tscn")   # laboratório de escala
+		return
 	_fit_menu()
 	get_window().size_changed.connect(_fit_menu)
 	var brand: Dictionary = Branding.data()

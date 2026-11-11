@@ -270,7 +270,7 @@ async def gameplay_tests(open_bot):
     await H.send(type="rent", rental="casa", days=7); await H.get("notice")
     hp = await walk(H, "w", (W.spawn["x"], W.spawn["y"]), W.entrance_tile(casa, casa["entrances"][0]))
     await H.send(type="enter_building", building="casa", entrance="frente"); z = await H.get("zone_change", pred=lambda m, _b=H: m["peer_id"] == _b.pid); hp = (z["x"], z["y"])
-    hp = await walk(H, zone, hp, (1, 2)); await G.drain(); await H.drain()
+    hp = await walk(H, zone, hp, (1, 0)); await G.drain(); await H.drain()
     await G.send(type="interact", fid=cama["fid"], action="sleep"); s_ = await G.get("activity_started", timeout=2)
     if s_ is None:
         n = await G.get("notice"); print("   (sleep:", n, ")")

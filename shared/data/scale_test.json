@@ -1,0 +1,29 @@
+{
+ "_doc": "Laboratório de escala (docs/SCALE.md). Mesmo formato de edifício que world.json; não faz parte do mundo nem do servidor.",
+ "building": {
+  "id": "lab", "name": "Laboratório de escala", "type": "residential", "c0": 0, "r0": 0, "w": 4, "d": 3,
+  "entrances": [{"id": "frente", "face": "front", "i": 2, "edge": "h:4:6"}],
+  "floors": [{"w": 7, "l": 6, "name": "Quarto 3x6 + sala 4x6",
+   "walls": [["v", 3, 0, 6]],
+   "openings": [["v", 3, 2, "door"], ["h", 1, 0, "window"], ["h", 5, 0, "window"], ["v", 0, 3, "window"]],
+   "furniture": [
+    {"id": "cama", "x": 0, "y": 0, "face": "s", "align": "nw"}, {"id": "estante", "x": 2, "y": 0, "face": "s", "align": "n"},
+    {"id": "planta", "x": 0, "y": 5, "face": "s", "align": "sw"},
+    {"id": "mesa", "x": 4, "y": 3, "face": "s"}, {"id": "cadeira", "x": 3, "y": 3, "face": "e"}, {"id": "cadeira", "x": 5, "y": 3, "face": "w"},
+    {"id": "cadeira", "x": 4, "y": 2, "face": "s", "align": "s"}, {"id": "cadeira", "x": 4, "y": 4, "face": "n", "align": "n"},
+    {"id": "sofa", "x": 6, "y": 4, "face": "w", "align": "e"}, {"id": "bancada", "x": 5, "y": 0, "face": "s", "align": "n"},
+    {"id": "fogao", "x": 6, "y": 0, "face": "s", "align": "ne"}, {"id": "balcao", "x": 1, "y": 3, "face": "s"}
+   ]}],
+  "stairs": []
+ },
+ "characters": [
+  {"label": "à porta", "stand": [4.5, 5.5]}, {"label": "junto à mesa", "stand": [6.5, 2.6]}, {"label": "na bancada", "stand": [5.5, 1.35]},
+  {"label": "no balcão", "stand": [1.6, 4.4]},
+  {"label": "sentada no sofá", "sit": 8}, {"label": "sentado na cadeira", "sit": 5}, {"label": "deitada na cama", "lie": 0}
+ ],
+ "legacy_grid": {"mesa": [2, 1], "sofa": [2, 1], "cama": [1, 2], "secretaria": [2, 1], "balcao": [2, 1], "bancada": [2, 1]},
+ "legacy_sprite": {"cadeira": "pack_original/furniture_cadeira", "mesa": "pack_original/furniture_mesa", "sofa": "pack_original/furniture_sofa",
+                   "cama": "pack_original/furniture_cama", "estante": "pack_original/furniture_estante", "planta": "pack_original/furniture_planta",
+                   "fogao": "_scale_reference/legacy_furniture/fogao", "bancada": "_scale_reference/legacy_furniture/balcao",
+                   "balcao": "_scale_reference/legacy_furniture/balcao", "chuveiro": "_scale_reference/legacy_furniture/chuveiro"}
+}

@@ -36,8 +36,8 @@ def wall(pal, side, kind):
         quad(dr, side, .22,.34,.78,.82, frame); quad(dr, side, .28,.40,.72,.76, glass)
         quad(dr, side, .48,.40,.52,.76, frame); quad(dr, side, .22,.30,.78,.34, sh(base,0.6))
     elif kind == "door":
-        quad(dr, side, .26,0,.74,.76, frame); quad(dr, side, .31,0,.69,.71, (112,70,40,255))
-        quad(dr, side, .34,.12,.66,.40, (96,58,32,255)); quad(dr, side, .58,.32,.62,.38, (230,200,90,255))
+        quad(dr, side, .3,0,.7,.88, frame); quad(dr, side, .34,0,.66,.85, (112,70,40,255))     # porta 2,1 m x 0,8 m (docs/SCALE.md)
+        quad(dr, side, .37,.14,.63,.46, (96,58,32,255)); quad(dr, side, .58,.38,.62,.44, (230,200,90,255))
     elif kind == "shop":
         quad(dr, side, .08,.14,.92,.58, frame); quad(dr, side, .12,.18,.88,.54, glass)
         for i in range(6):
@@ -72,32 +72,40 @@ def props():
     dr.ellipse([9,2,23,14], fill=(90,176,92,255)); im.save(d/"bush.png")
 
 def char_layers():
-    d = ROOT / "characters"; W, Hh = 24, 40
-    body = Image.new("RGBA",(W*3,Hh),(0,0,0,0)); legs = Image.new("RGBA",(W*3,Hh),(0,0,0,0)); shirt = Image.new("RGBA",(W*3,Hh),(0,0,0,0))
+    """Personagem 1,75 m = 34 px (escala do mundo, docs/SCALE.md). Quadros: 0 parado, 1-2 andar, 3 sentado.
+    O sprite continua 24x40 com os pés em y=39 (as cenas não mudam de âncora)."""
+    d = ROOT / "characters"; W, Hh, NF = 24, 40, 4
+    body = Image.new("RGBA",(W*NF,Hh),(0,0,0,0)); legs = Image.new("RGBA",(W*NF,Hh),(0,0,0,0)); shirt = Image.new("RGBA",(W*NF,Hh),(0,0,0,0))
     WH=(255,255,255,255); LT=(226,226,226,255); EYE=(36,26,26,255)
     bd = ImageDraw.Draw(body); lg = ImageDraw.Draw(legs); sd = ImageDraw.Draw(shirt)
-    for f in range(3):
-        o = f*W; la = 0 if f==0 else (1 if f==1 else -1)
-        bd.rectangle([o+7,2,o+16,11], fill=WH); bd.rectangle([o+7,9,o+16,11], fill=LT); bd.rectangle([o+10,12,o+13,13], fill=LT)
-        bd.point([o+9,6], fill=EYE); bd.point([o+14,6], fill=EYE); bd.line([o+11,9,o+12,9], fill=(150,80,80,255))
-        bd.rectangle([o+4,18+la,o+5,24+la], fill=WH); bd.rectangle([o+18,18-la,o+19,24-la], fill=WH)
-        sd.rectangle([o+6,13,o+17,25], fill=WH); sd.rectangle([o+4,13,o+5,19+la], fill=WH); sd.rectangle([o+18,13,o+19,19-la], fill=WH)
-        sd.rectangle([o+6,22,o+17,25], fill=(215,215,215,255))
-        lo = 0 if f==0 else (-2 if f==1 else 0); ro = 0 if f==0 else (0 if f==1 else -2)
-        pants=(52,62,104,255); shoe=(40,36,36,255)
-        lg.rectangle([o+7,26,o+11,36+lo], fill=pants); lg.rectangle([o+12,26,o+16,36+ro], fill=pants)
-        lg.rectangle([o+6,37+lo,o+11,39+lo], fill=shoe); lg.rectangle([o+12,37+ro,o+17,39+ro], fill=shoe)
+    pants=(52,62,104,255); shoe=(40,36,36,255)
+    for f in range(NF):
+        o = f*W; la = 0 if f in (0, 3) else (1 if f==1 else -1)
+        dy = 4 if f == 3 else 0          # sentado: cabeça 4 px abaixo, anca ao nível do assento
+        T = 6 + dy                       # topo da cabeça
+        bd.rectangle([o+7,T,o+16,T+9], fill=WH); bd.rectangle([o+7,T+7,o+16,T+9], fill=LT); bd.rectangle([o+10,T+10,o+13,T+11], fill=LT)
+        bd.point([o+9,T+4], fill=EYE); bd.point([o+14,T+4], fill=EYE); bd.line([o+11,T+7,o+12,T+7], fill=(150,80,80,255))
+        bd.rectangle([o+4,T+15+la,o+5,T+20+la], fill=WH); bd.rectangle([o+18,T+15-la,o+19,T+20-la], fill=WH)
+        sd.rectangle([o+6,T+11,o+17,T+21], fill=WH); sd.rectangle([o+4,T+11,o+5,T+16+la], fill=WH); sd.rectangle([o+18,T+11,o+19,T+16-la], fill=WH)
+        sd.rectangle([o+6,T+19,o+17,T+21], fill=(215,215,215,255))
+        if f == 3:   # sentado (3/4): coxas na horizontal para a direita, canelas para baixo; o jogo espelha conforme a frente da peça
+            lg.rectangle([o+7,32,o+20,35], fill=pants); lg.rectangle([o+7,35,o+20,35], fill=(36,44,78,255))
+            lg.rectangle([o+17,36,o+20,38], fill=pants); lg.rectangle([o+17,39,o+22,39], fill=shoe); lg.rectangle([o+21,38,o+22,38], fill=shoe)
+        else:
+            lo = 0 if f==0 else (-2 if f==1 else 0); ro = 0 if f==0 else (0 if f==1 else -2)
+            lg.rectangle([o+7,28,o+11,36+lo], fill=pants); lg.rectangle([o+12,28,o+16,36+ro], fill=pants)
+            lg.rectangle([o+6,37+lo,o+11,39+lo], fill=shoe); lg.rectangle([o+12,37+ro,o+17,39+ro], fill=shoe)
     body.save(d/"body.png"); legs.save(d/"legs.png"); shirt.save(d/"shirt.png")
-    s = Image.new("RGBA",(24,10),(0,0,0,0)); ImageDraw.Draw(s).ellipse([1,1,22,8], fill=(0,0,0,80)); s.save(d/"shadow.png")
-    G=(255,255,255,255); S=(214,214,214,255)
+    s = Image.new("RGBA",(24,10),(0,0,0,0)); ImageDraw.Draw(s).ellipse([3,2,20,8], fill=(0,0,0,80)); s.save(d/"shadow.png")
+    G=(255,255,255,255); S=(214,214,214,255); Y=4   # cabelo desce 4 px com a cabeça
     def new(): im = Image.new("RGBA",(W,Hh),(0,0,0,0)); return im, ImageDraw.Draw(im)
-    im,dr = new(); dr.rectangle([7,0,16,4],fill=G); dr.rectangle([6,2,7,6],fill=G); dr.rectangle([16,2,17,6],fill=G); dr.rectangle([7,4,16,4],fill=S); im.save(d/"hair_0.png")
-    im,dr = new(); dr.rectangle([6,0,17,5],fill=G); dr.rectangle([5,2,7,12],fill=G); dr.rectangle([16,2,18,12],fill=G); dr.rectangle([6,5,17,5],fill=S); im.save(d/"hair_1.png")
-    im,dr = new(); dr.rectangle([6,0,17,5],fill=G); dr.rectangle([6,5,17,5],fill=S)
+    im,dr = new(); dr.rectangle([7,Y,16,Y+4],fill=G); dr.rectangle([6,Y+2,7,Y+6],fill=G); dr.rectangle([16,Y+2,17,Y+6],fill=G); dr.rectangle([7,Y+4,16,Y+4],fill=S); im.save(d/"hair_0.png")
+    im,dr = new(); dr.rectangle([6,Y,17,Y+5],fill=G); dr.rectangle([5,Y+2,7,Y+12],fill=G); dr.rectangle([16,Y+2,18,Y+12],fill=G); dr.rectangle([6,Y+5,17,Y+5],fill=S); im.save(d/"hair_1.png")
+    im,dr = new(); dr.rectangle([6,Y,17,Y+5],fill=G); dr.rectangle([6,Y+5,17,Y+5],fill=S)
     for x in (4,18):
-        for y in range(4,24,4): dr.rectangle([x,y,x+1,y+2],fill=G); dr.rectangle([x,y+3,x+1,y+3],fill=S)
+        for y in range(Y+4,Y+22,4): dr.rectangle([x,y,x+1,y+2],fill=G); dr.rectangle([x,y+3,x+1,y+3],fill=S)
     im.save(d/"hair_2.png")
-    im,dr = new(); dr.rectangle([7,1,16,2],fill=S); dr.point([6,3],fill=S); dr.point([17,3],fill=S); im.save(d/"hair_3.png")
+    im,dr = new(); dr.rectangle([7,Y+1,16,Y+2],fill=S); dr.point([6,Y+3],fill=S); dr.point([17,Y+3],fill=S); im.save(d/"hair_3.png")
 # ------------------------------------------------------------------ interiores (mesmo sistema de peças por aresta)
 INT = (232, 222, 204)
 def int_walls():
@@ -109,12 +117,15 @@ def int_walls():
         for kind in ("plain", "window"):
             wall("int", side, kind).save(d / f"int_wall_{side}_{kind}.png")
         col = sh(INT, 0.95 if side == "l" else 0.8)
-        for kind in ("plain", "door", "exit"):
+        for kind in ("plain", "door", "doorway", "exit"):
             im = Image.new("RGBA", (32, 64), (0, 0, 0, 0)); dr = ImageDraw.Draw(im)
             if kind == "plain":
                 quad(dr, side, 0, 0, 1, 0.26, col); quad(dr, side, 0, 0.22, 1, 0.26, sh(col, 1.18)); quad(dr, side, 0, 0, 1, 0.04, sh(col, 0.7))
-            elif kind == "door":   # porta fechada vista em corte: folha de madeira baixa
-                quad(dr, side, 0.06, 0, 0.94, 0.3, (112, 70, 40, 255)); quad(dr, side, 0.06, 0.26, 0.94, 0.3, (150, 100, 60, 255))
+            elif kind in ("door", "doorway"):   # vão de 1,2 m (u 0,2-0,8) entre dois troços de parede; "door" = folha fechada
+                for u0, u1 in ((0, 0.2), (0.8, 1)):
+                    quad(dr, side, u0, 0, u1, 0.26, col); quad(dr, side, u0, 0.22, u1, 0.26, sh(col, 1.18)); quad(dr, side, u0, 0, u1, 0.04, sh(col, 0.7))
+                if kind == "door":
+                    quad(dr, side, 0.2, 0, 0.8, 0.3, (112, 70, 40, 255)); quad(dr, side, 0.2, 0.26, 0.8, 0.3, (150, 100, 60, 255))
             else:                  # saída para a rua: soleira escura + tapete
                 quad(dr, side, 0, 0, 1, 0.05, (70, 60, 52, 255)); quad(dr, side, 0.1, 0.0, 0.9, 0.03, (180, 60, 50, 255))
             im.save(d / f"int_low_{side}_{kind}.png")
@@ -135,7 +146,8 @@ def iso_box(im, cx, by, w, h, ht, top, left, right):
     dr.polygon([up(T), up(R), up(B), up(L)], fill=top)
     return dr, up, (T, R, B, L)
 
-def furniture():
+def furniture_legacy():
+    """(Substituído por tools/generate_furniture.py — peças à escala do mundo.)"""
     d = ROOT / "furniture"; d.mkdir(exist_ok=True)
     # fogão 1x1 (64x76): caixa branca com bicos
     im = Image.new("RGBA", (64, 76), (0, 0, 0, 0)); dr, up, (T, R, B, L) = iso_box(im, 32, 75, 1, 1, 30, (236, 236, 232, 255), (200, 200, 196, 255), (170, 170, 166, 255))
@@ -162,4 +174,5 @@ def furniture():
     im.save(d / "balcao.png")
 
 if __name__ == "__main__":
-    tiles(); buildings(); props(); char_layers(); int_walls(); furniture(); print("OK", ROOT)
+    tiles(); buildings(); props(); char_layers(); int_walls(); print("OK", ROOT)
+    import generate_furniture; generate_furniture.furniture(); generate_furniture.cars()

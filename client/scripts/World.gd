@@ -187,6 +187,7 @@ func _on_player_joined(peer_id: String, data: Dictionary) -> void:
 	entities.add_child(player)
 	if data.get("activity") != null:
 		player.set_activity(_activity_status(str(data["activity"])))
+		_apply_pose.call_deferred(player, str(data["activity"]), str(data.get("activity_fid", "")))
 	if player.is_local:
 		local_player = player
 		player.arrived.connect(_on_arrived)
@@ -264,13 +265,42 @@ func _on_game_message(msg: Dictionary) -> void:
 			var rp: CharacterBody2D = remote_players.get(str(msg.get("peer_id", "")))
 			if rp:
 				rp.set_activity("" if msg.get("action") == null else _activity_status(str(msg["action"])))
+				_apply_pose(rp, "" if msg.get("action") == null else str(msg["action"]), str(msg.get("fid", "")))
 		"activity_started":
 			if local_player:
 				local_player.stop_path()
 				local_player.set_activity(str(msg.get("status", "")))
+				_apply_pose(local_player, str(msg.get("action", "")), str(msg.get("fid", "")))
 		"activity_done":
 			if local_player:
 				local_player.set_activity("")
+				local_player.set_pose("stand")
+
+## Pose de uma atividade: "sit" no ponto da frente do assento, "lie" ao longo da cama (cabeceira = parte de trás).
+func _apply_pose(p: CharacterBody2D, action: String, fid: String) -> void:
+	if not is_instance_valid(p):
+		return
+	var pose := str(WorldData.data["activities"].get(action, {}).get("pose", "stand")) if action != "" else "stand"
+	if pose == "stand" or fid == "":
+		p.set_pose("stand")
+		return
+	var obj: Dictionary = {}
+	if p.zone == "w":
+		for pr in WorldData.props:
+			if pr["fid"] == fid:
+				obj = pr
+	else:
+		for f in WorldData.zone_floor(p.zone).get("furniture", []):
+			if f["fid"] == fid:
+				obj = f
+	if obj.is_empty():
+		p.set_pose("stand")
+		return
+	if obj.get("prop", false):        # banco de jardim: centro do tile, assento a ~0,45 m
+		p.set_pose("sit", WorldData.cell_center("w", Vector2i(int(obj["x"]), int(obj["y"]))) + Vector2(0, 2), 0.0, 3.0)
+		return
+	var ps: Dictionary = WorldData.pose_for(p.zone, obj, pose)
+	p.set_pose(pose, ps["point"], ps["rot"], ps["lift"], float(ps.get("flip", 1.0)))
 
 func _activity_status(action: String) -> String:
 	return str(WorldData.data["activities"].get(action, {}).get("status", ""))

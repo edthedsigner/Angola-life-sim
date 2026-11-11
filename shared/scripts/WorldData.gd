@@ -119,6 +119,8 @@ func origin(zone: String) -> Vector2:
 	if zone == "w":
 		return Vector2.ZERO
 	var b := zone_building(zone)
+	if b.has("origin"):
+		return Vector2(float(b["origin"][0]), float(b["origin"][1]) + zone_floor_index(zone) * float(data["floor_step"]))
 	var base: Array = data["interior_base"]
 	return Vector2(float(base[0]) + int(b["idx"]) * float(data["interior_step"]), float(base[1]) + zone_floor_index(zone) * float(data["floor_step"]))
 
@@ -169,9 +171,67 @@ func stair_base(st: Dictionary) -> Vector2i:
 func stair_landing(st: Dictionary) -> Vector2i:
 	return Vector2i(int(st["x"]), int(st["y"]) - int(st["len"]) - 1)
 
+## Dimensões SEPARADAS (docs/SCALE.md): grelha (navegação/colocação/interação) vs tamanho visual/colisão (metros).
 func furn_dims(f: Dictionary) -> Vector2i:
-	var d: Dictionary = data["furniture"].get(f["id"], {"w": 1, "h": 1})
-	return Vector2i(int(d["h"]), int(d["w"])) if int(f.get("r", 0)) % 2 == 1 else Vector2i(int(d["w"]), int(d["h"]))
+	var g: Array = data["furniture"].get(f["id"], {"grid": [1, 1]}).get("grid", [1, 1])
+	return Vector2i(int(g[1]), int(g[0])) if _swap(f) else Vector2i(int(g[0]), int(g[1]))
+
+static func _swap(f: Dictionary) -> bool:
+	var fc := str(f.get("face", "s"))
+	return fc == "e" or fc == "w"
+
+func cell_m() -> float:
+	return float(data.get("scale", {}).get("cell_m", 2.0))
+
+## Retângulo visual/colisão em espaço de células (igual a server_python/world.py visual_rect).
+func visual_rect(f: Dictionary) -> Rect2:
+	var d: Dictionary = data["furniture"][f["id"]]
+	var sw := float(d["size"][0]) / cell_m()
+	var sd := float(d["size"][1]) / cell_m()
+	if _swap(f):
+		var t := sw
+		sw = sd
+		sd = t
+	var g := furn_dims(f)
+	var al := str(f.get("align", ""))
+	var m := 0.04
+	var fx := float(f["x"])
+	var fy := float(f["y"])
+	var x0 := fx + (m if "w" in al else (g.x - sw - m if "e" in al else (g.x - sw) * 0.5))
+	var y0 := fy + (m if "n" in al else (g.y - sd - m if "s" in al else (g.y - sd) * 0.5))
+	x0 = clampf(x0, fx, fx + g.x - sw)
+	y0 = clampf(y0, fy, fy + g.y - sd)
+	return Rect2(x0, y0, sw, sd)
+
+## Onde/como um personagem fica numa peça: "sit" à frente do assento, "lie" ao longo da cama (cabeceira atrás).
+## Devolve {point (píxel, pés), rot (rad), lift (px)}. Usado pelo jogo e pelo laboratório de escala.
+func pose_for(zone: String, obj: Dictionary, pose: String) -> Dictionary:
+	var vr: Rect2 = visual_rect(obj)
+	var c := vr.get_center()
+	var face := str(obj.get("face", "s"))
+	var front := {"s": Vector2(c.x, vr.end.y), "n": Vector2(c.x, vr.position.y), "e": Vector2(vr.end.x, c.y), "w": Vector2(vr.position.x, c.y)}
+	var back := {"s": Vector2(0, -1), "n": Vector2(0, 1), "e": Vector2(-1, 0), "w": Vector2(1, 0)}
+	var ppm := float(data.get("scale", {}).get("px_per_m", 19.6))
+	var seat := float(data["furniture"].get(obj["id"], {}).get("seat", 0.45))
+	if pose == "sit":
+		# anca (7 px acima dos pés no quadro "sentado") sobre o centro do assento; pernas para o lado da frente
+		var fd: Vector2 = (front[face] as Vector2) - c
+		var flip := 1.0 if (fd.x - fd.y) >= 0.0 else -1.0
+		return {"point": vertex_px(zone, c.x, c.y), "rot": 0.0, "lift": maxf(0.0, seat * ppm - 7.0), "flip": flip}
+	var hd: Vector2 = back[face]
+	var sdir := Vector2((hd.x - hd.y) * 32.0, (hd.x + hd.y) * 16.0).normalized()
+	return {"point": vertex_px(zone, c.x, c.y), "rot": atan2(sdir.x, -sdir.y), "lift": seat * ppm}
+
+## Edifícios de teste (laboratório de escala): não fazem parte do mundo nem do servidor.
+func register_test_building(b: Dictionary, origin_px: Vector2) -> void:
+	var bb := b.duplicate(true)
+	bb["idx"] = building_list.size()
+	bb["origin"] = [origin_px.x, origin_px.y]
+	buildings[bb["id"]] = bb
+	var fl_list: Array = []
+	for i in (bb["floors"] as Array).size():
+		fl_list.append(_expand_floor(bb, i, bb["floors"][i]))
+	floors[bb["id"]] = fl_list
 
 func object_cells(f: Dictionary) -> Array:
 	if f.get("prop", false):
@@ -288,6 +348,10 @@ func _segment_clear(zone: String, a: Vector2, b: Vector2, doors: Dictionary) -> 
 					return false
 			elif edge_blocked(zone, prev, c, doors):
 				return false
+			elif edge_kind(zone, edge_key(prev, c)) == "door":
+				var along := fposmod(q.y if c.x != prev.x else q.x, 1.0)    # posição ao longo da aresta da porta
+				if along < 0.2 or along > 0.8:
+					return false
 			prev = c
 	return true
 

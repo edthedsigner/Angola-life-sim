@@ -19,19 +19,19 @@ offset = Vector2(-12, -5)
 texture = ExtResource("3")
 centered = false
 offset = Vector2(-12, -40)
-hframes = 3
+hframes = 4
 
 [node name="Body" type="Sprite2D" parent="."]
 texture = ExtResource("4")
 centered = false
 offset = Vector2(-12, -40)
-hframes = 3
+hframes = 4
 
 [node name="Shirt" type="Sprite2D" parent="."]
 texture = ExtResource("5")
 centered = false
 offset = Vector2(-12, -40)
-hframes = 3
+hframes = 4
 
 [node name="Hair" type="Sprite2D" parent="."]
 texture = ExtResource("6")

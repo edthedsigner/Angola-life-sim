@@ -7,6 +7,11 @@ Coordinates
 * Continuous cell space: cs = ((qx/32 + qy/16)/2, (qy/16 - qx/32)/2) with q = pixel - origin; cell = floor(cs).
 * Interior edges use the original v0.6 keys: "h:x:y" = edge (x,y)-(x+1,y); "v:x:y" = edge (x,y)-(x,y+1).
 * Stairs go "north" (y decreasing): base cell (x,y) on floor lo, ramp cells (x,y-1..y-len), landing (x,y-len-1) on lo+1.
+
+Scale (docs/SCALE.md): 1 cell = 2 m. Furniture has SEPARATE dimensions:
+* grid occupancy ("grid", cells)  -> navigation (A*) and placement; the whole cell is avoided by paths;
+* visual/collision size ("size", metres) -> where it is drawn and what physically blocks movement;
+* interaction footprint = grid cells (players interact from adjacent cells).
 """
 from __future__ import annotations
 
@@ -141,10 +146,46 @@ class World:
     def stair_landing(self, st: dict) -> tuple:
         return (st["x"], st["y"] - int(st["len"]) - 1)
 
+    @staticmethod
+    def _swap(f: dict) -> bool:
+        return f.get("face", "s") in ("e", "w")
+
+    def furn_grid(self, f: dict) -> tuple[int, int]:
+        gw, gh = self.furn_defs[f["id"]]["grid"]
+        return (gh, gw) if self._swap(f) else (gw, gh)
+
     def furn_cells(self, f: dict) -> list[tuple]:
-        d = self.furn_defs[f["id"]]
-        w, h = (d["h"], d["w"]) if int(f.get("r", 0)) % 2 else (d["w"], d["h"])
+        w, h = self.furn_grid(f)
         return [(f["x"] + i, f["y"] + j) for i in range(w) for j in range(h)]
+
+    def visual_rect(self, f: dict) -> tuple[float, float, float, float]:
+        """Pegada visual/colisão em espaço de células, alinhada dentro da pegada da grelha ("align": n/s/e/w)."""
+        cell = float(self.data.get("scale", {}).get("cell_m", 2.0))
+        W, D = self.furn_defs[f["id"]]["size"]
+        sw, sd = W / cell, D / cell
+        if self._swap(f):
+            sw, sd = sd, sw
+        gw, gh = self.furn_grid(f)
+        al, m = f.get("align", ""), 0.04
+        x0 = f["x"] + (m if "w" in al else (gw - sw - m if "e" in al else (gw - sw) / 2))
+        y0 = f["y"] + (m if "n" in al else (gh - sd - m if "s" in al else (gh - sd) / 2))
+        x0 = min(max(x0, f["x"]), f["x"] + gw - sw)        # nunca sai da pegada da grelha
+        y0 = min(max(y0, f["y"]), f["y"] + gh - sd)
+        return (x0, y0, x0 + sw, y0 + sd)
+
+    def solid_rects(self, zone: str) -> list[tuple]:
+        """O que bloqueia FISICAMENTE (igual aos colisores do cliente)."""
+        if zone == "w":
+            out = [(b["c0"], b["r0"], b["c0"] + b["w"], b["r0"] + b["d"]) for b in self.buildings.values()]
+            rules = self.data.get("prop_rules", {})
+            out += [(p["c"] + 0.2, p["r"] + 0.2, p["c"] + 0.8, p["r"] + 0.8) for p in self.props if rules.get(p["kind"], {}).get("blocks")]
+            return out
+        b, fl = self.parse_zone(zone)
+        out = [tuple(v + d for v, d in zip(self.visual_rect(f), (-0.03, -0.03, 0.03, 0.03))) for f in fl.furniture]
+        for st in b.get("stairs", []):
+            if st["lo"] == fl.idx or st["lo"] + 1 == fl.idx:
+                out.append((st["x"], st["y"] - st["len"], st["x"] + 1, st["y"]))
+        return out
 
     def blocked_cells(self, zone: str) -> set:
         if zone == "w":
@@ -170,19 +211,15 @@ class World:
             return not (doors or {}).get(key, True)
         return False
 
-    def walkable_point(self, zone: str, x: float, y: float, margin: float = 0.12) -> bool:
-        """Feet point must lie in a walkable cell; tolerates `margin` cells of overlap into a blocked neighbour."""
+    def walkable_point(self, zone: str, x: float, y: float, tol: float = 0.08) -> bool:
+        """Os pés têm de estar dentro da zona e fora de qualquer colisor (com `tol` células de folga para o corpo)."""
         u, v = self.to_cell_space(zone, x, y)
-        cell = (math.floor(u), math.floor(v))
-        blocked = self.blocked_cells(zone)
-        if self.in_bounds(zone, cell) and cell not in blocked:
-            return True
-        for du in (-margin, margin):
-            for dv in (-margin, margin):
-                c2 = (math.floor(u + du), math.floor(v + dv))
-                if self.in_bounds(zone, c2) and c2 not in blocked:
-                    return True
-        return False
+        if not self.in_bounds(zone, (math.floor(u), math.floor(v))):
+            return False
+        for (x0, y0, x1, y1) in self.solid_rects(zone):
+            if x0 + tol < u < x1 - tol and y0 + tol < v < y1 - tol:
+                return False
+        return True
 
     def crosses_wall(self, zone: str, x0: float, y0: float, x1: float, y1: float, doors: dict | None = None) -> bool:
         """True if the straight move between two pixel points crosses a blocking interior edge."""
@@ -280,6 +317,10 @@ class World:
                     for a in f.get("actions", []):
                         if a not in self.activities:
                             errs.append(f"{bid}: atividade desconhecida {a}")
+                    gw, gh = self.furn_grid(f)
+                    vr = self.visual_rect(f)
+                    if vr[2] - vr[0] > gw + 1e-6 or vr[3] - vr[1] > gh + 1e-6:
+                        errs.append(f"{bid} piso {fl.idx}: {f['id']} maior do que a sua pegada na grelha")
                     for c in self.furn_cells(f):
                         if not (0 <= c[0] < fl.w and 0 <= c[1] < fl.l):
                             errs.append(f"{bid} piso {fl.idx}: {f['id']} fora do piso em {c}")

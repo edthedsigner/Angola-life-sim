@@ -96,40 +96,39 @@ static func build(zone: String) -> Dictionary:
 		piece.offset = Vector2(-16, -56)
 		piece.name = "Wall_" + (key as String).replace(":", "_")
 		objects.add_child(piece)
-		var cs := CollisionShape2D.new()
-		var seg := SegmentShape2D.new()
-		seg.a = a_px
-		seg.b = b_px
-		cs.shape = seg
-		body.add_child(cs)
 		if kind == "door":
-			doors[key] = {"sprite": piece, "shape": cs}
+			# vão de 1,2 m (0,2-0,8 da aresta) entre dois troços fixos; só o troço do meio fecha
+			body.add_child(_seg(a_px, a_px.lerp(b_px, 0.2)))
+			body.add_child(_seg(a_px.lerp(b_px, 0.8), b_px))
+			var mid := _seg(a_px.lerp(b_px, 0.2), a_px.lerp(b_px, 0.8))
+			body.add_child(mid)
+			doors[key] = {"sprite": piece, "shape": mid, "closed": piece.texture, "open": _tex(INT + "int_low_%s_doorway.png" % side)}
+		else:
+			body.add_child(_seg(a_px, b_px))
 
-	# --- mobília (sprites do pack; "_r" para a variante rodada)
+	# --- mobília À ESCALA (docs/SCALE.md): sprite desenhado na pegada VISUAL (metros), não na célula inteira.
+	#     grelha -> navegação/interação; retângulo visual -> desenho, ordenação e colisão.
+	var anchors := _anchors()
 	var furniture := {}
 	for f in fl["furniture"]:
-		var fd: Dictionary = WorldData.data["furniture"][f["id"]]
-		var tex_base: String = ART + str(fd["tex"])
-		var tpath := tex_base + ("_r.png" if int(f.get("r", 0)) % 2 == 1 and ResourceLoader.exists(tex_base + "_r.png") else ".png")
+		var key := "%s_%s" % [f["id"], str(f.get("face", "s"))]
 		var sp := Sprite2D.new()
-		sp.texture = _tex(tpath)
+		sp.texture = _tex(ART + "furniture/" + key + ".png")
 		sp.centered = false
-		var dims := WorldData.furn_dims(f)
-		var fx := float(f["x"])
-		var fy := float(f["y"])
-		var bottom := WorldData.vertex_px(zone, fx + dims.x, fy + dims.y)
-		var centre := WorldData.vertex_px(zone, fx + dims.x * 0.5, fy + dims.y * 0.5)
-		var ts := sp.texture.get_size() if sp.texture else Vector2(64, 64)
-		# âncora como no original: base da imagem na esquina inferior (B) da pegada, centrada em B
-		sp.position = centre
-		sp.offset = Vector2(bottom.x - ts.x * 0.5, bottom.y - ts.y + 2) - centre
+		sp.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		var vr: Rect2 = WorldData.visual_rect(f)
+		var c := vr.get_center()
+		var anc: Array = anchors.get(key, [0, 0])
+		sp.position = WorldData.vertex_px(zone, c.x, c.y)                   # y-sort pelo centro da pegada visual
+		sp.offset = WorldData.vertex_px(zone, vr.position.x, vr.position.y) - Vector2(float(anc[0]), float(anc[1])) - sp.position
 		sp.name = "F_%s_%s" % [f["fid"], f["id"]]
 		sp.set_meta("fid", f["fid"])
 		objects.add_child(sp)
 		furniture[f["fid"]] = sp
+		var g := vr.grow(0.03)
 		var poly := CollisionPolygon2D.new()
-		poly.polygon = PackedVector2Array([WorldData.vertex_px(zone, fx + 0.08, fy + 0.08), WorldData.vertex_px(zone, fx + dims.x - 0.08, fy + 0.08),
-			WorldData.vertex_px(zone, fx + dims.x - 0.08, fy + dims.y - 0.08), WorldData.vertex_px(zone, fx + 0.08, fy + dims.y - 0.08)])
+		poly.polygon = PackedVector2Array([WorldData.vertex_px(zone, g.position.x, g.position.y), WorldData.vertex_px(zone, g.end.x, g.position.y),
+			WorldData.vertex_px(zone, g.end.x, g.end.y), WorldData.vertex_px(zone, g.position.x, g.end.y)])
 		body.add_child(poly)
 
 	# --- escadas (degraus) e aberturas (piso de cima)
@@ -149,7 +148,24 @@ static func build(zone: String) -> Dictionary:
 				body.add_child(poly2)
 	return {"floor_layer": floor_layer, "objects": objects, "doors": doors, "furniture": furniture, "body": body}
 
-## Porta aberta = vão livre (sem peça, sem colisão); fechada = folha baixa + colisão.
+static func _seg(a: Vector2, b: Vector2) -> CollisionShape2D:
+	var cs := CollisionShape2D.new()
+	var seg := SegmentShape2D.new()
+	seg.a = a
+	seg.b = b
+	cs.shape = seg
+	return cs
+
+static var _anchor_cache: Dictionary = {}
+
+static func _anchors() -> Dictionary:
+	if _anchor_cache.is_empty():
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(ART + "furniture/anchors.json"))
+		if typeof(parsed) == TYPE_DICTIONARY:
+			_anchor_cache = parsed
+	return _anchor_cache
+
+## Porta aberta = vão (troços laterais ficam); fechada = folha + colisão no troço do meio.
 static func set_door(entry: Dictionary, open: bool) -> void:
-	(entry["sprite"] as Sprite2D).visible = not open
+	(entry["sprite"] as Sprite2D).texture = entry["open"] if open else entry["closed"]
 	(entry["shape"] as CollisionShape2D).set_deferred("disabled", open)

@@ -487,7 +487,7 @@ def public_view(peer_id: str, ch: dict) -> dict:
     """Só dados públicos — o background de vida, dinheiro, necessidades e inventário NUNCA vão para outros jogadores."""
     return {"id": ch["id"], "peer_id": peer_id, "name": ch["name"], "appearance": ch.get("appearance", {}),
             "position": dict(ch.get("position", WORLD["spawn"])), "zone": ch.get("zone", "w"),
-            "activity": (activities.get(peer_id) or {}).get("action")}
+            "activity": (activities.get(peer_id) or {}).get("action"), "activity_fid": (activities.get(peer_id) or {}).get("fid")}
 
 
 def finite(v: Any) -> float | None:
@@ -703,7 +703,7 @@ async def handle_game(ws: Any, peer_id: str, mtype: str, msg: dict) -> bool:
             occupied[(zone, fid)] = peer_id
             act["task"] = asyncio.create_task(run_activity(peer_id, act))
             await send(ws, {"type": "activity_started", "action": action, "fid": fid, "secs": act["secs"], "status": a.get("status", a["label"])})
-            await broadcast_world({"type": "player_activity", "peer_id": peer_id, "action": action}, exclude_peer=peer_id)
+            await broadcast_world({"type": "player_activity", "peer_id": peer_id, "action": action, "fid": fid, "zone": zone}, exclude_peer=peer_id)
         await send_self(peer_id)
 
     elif mtype == "cancel_activity":

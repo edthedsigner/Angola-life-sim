@@ -50,7 +50,7 @@ s_.save(SC / "components" / "Lamp.tscn")
 # ambiente
 s_ = Scene(); s_.node("AmbientWalker", "Node2D", script=s_.res("Script", "res://client/scripts/AmbientWalker.gd")); s_.node("Visual", parent=".", inst=S + "CharacterVisual.tscn"); s_.save(SC / "ambient" / "AmbientWalker.tscn")
 s_ = Scene(); s_.node("AmbientCar", "Node2D", script=s_.res("Script", "res://client/scripts/AmbientCar.gd"))
-s_.node("Body", "Sprite2D", parent=".", texture=s_.res("Texture2D", A + "props/car_red_dr.png"), centered="false", offset=V(-20, -20)); s_.save(SC / "ambient" / "AmbientCar.tscn")
+s_.node("Body", "Sprite2D", parent=".", texture=s_.res("Texture2D", A + "props/car_red_dr.png"), centered="false", offset=V(-56, -44)); s_.save(SC / "ambient" / "AmbientCar.tscn")
 C = S + "components/"
 
 # ------------------------------------------------------------- edificios modulares
@@ -103,7 +103,7 @@ for t, f, c0, W, r0, D, fl, pal, ents, shop, bid, label in BUILDINGS: building(f
 s = Scene(); s.node("CharacterVisual", "Node2D", script=s.res("Script", "res://client/scripts/CharacterVisual.gd"))
 s.node("Shadow", "Sprite2D", parent=".", texture=s.res("Texture2D", A + "characters/shadow.png"), centered="false", offset=V(-12, -5))
 for n, f in (("Legs", "legs"), ("Body", "body"), ("Shirt", "shirt")):
-    s.node(n, "Sprite2D", parent=".", texture=s.res("Texture2D", A + f"characters/{f}.png"), centered="false", offset=V(-12, -40), hframes=3)
+    s.node(n, "Sprite2D", parent=".", texture=s.res("Texture2D", A + f"characters/{f}.png"), centered="false", offset=V(-12, -40), hframes=4)
 s.node("Hair", "Sprite2D", parent=".", texture=s.res("Texture2D", A + "characters/hair_0.png"), centered="false", offset=V(-12, -40))
 s.save(SC / "CharacterVisual.tscn")
 
