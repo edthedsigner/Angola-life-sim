@@ -6,10 +6,13 @@ extends CanvasLayer
 signal prompt_pressed
 signal floor_selected(level: int)
 signal zoom_step(factor: float)
+signal guide_requested(building: String)      # convite aceite: World mostra o caminho até lá
 
 const UIStyle = preload("res://client/scripts/UIStyle.gd")
 const Icons = preload("res://client/scripts/Icons.gd")
 const Phone = preload("res://client/scripts/Phone.gd")
+const SocialPanelScript = preload("res://client/scripts/SocialPanel.gd")
+const VoiceCallScript = preload("res://client/scripts/VoiceCall.gd")
 const VISUAL_SCENE := preload("res://client/scenes/CharacterVisual.tscn")
 const NEED_ORDER := [["hunger", "Fome", "food", Color(0.93, 0.62, 0.22)], ["energy", "Energia", "zap", Color(0.95, 0.85, 0.3)],
 	["hygiene", "Higiene", "drop", Color(0.4, 0.75, 0.95)], ["health", "Saúde", "heart", Color(0.9, 0.35, 0.35)]]
@@ -42,6 +45,14 @@ var popup_box: VBoxContainer
 var chat_row: HBoxContainer
 var chat_input: LineEdit
 var phone: Control
+var social_panel: PanelContainer
+var voice: Node
+var call_card: PanelContainer
+var call_box: VBoxContainer
+var bell: Button
+var bell_badge: Label
+var phone_badge: Label
+var lbl_level: Label
 var compact := false
 var _act_total := 0.0
 var _act_left := 0.0
@@ -64,8 +75,18 @@ func _ready() -> void:
 	_build_toast()
 	_build_popup()
 	_build_chat()
+	social_panel = SocialPanelScript.new()
+	root.add_child(social_panel)
+	voice = VoiceCallScript.new()
+	add_child(voice)
+	voice.state_changed.connect(_on_call_state)
+	social_panel.open_conversation.connect(func(p, n): phone.open_conversation(p, n))
+	social_panel.start_call.connect(func(p, n): voice.call_player(p, n))
+	_build_call_card()
 	phone = Phone.new()
 	root.add_child(phone)
+	phone.call_requested.connect(func(p, n): voice.call_player(p, n))
+	GameState.social_changed.connect(_update_badges)
 	get_viewport().size_changed.connect(_layout)
 	GameState.self_changed.connect(_on_self)
 	NetworkManager.game_message.connect(_on_msg)
@@ -122,8 +143,14 @@ func _build_card() -> void:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 2)
 	hb.add_child(vb)
+	var nrow := HBoxContainer.new()
+	nrow.add_theme_constant_override("separation", 8)
 	lbl_name = _label("", 16, UIStyle.GOLD)
-	vb.add_child(lbl_name)
+	nrow.add_child(lbl_name)
+	lbl_level = _label("", 12, UIStyle.TEXT)
+	lbl_level.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	nrow.add_child(lbl_level)
+	vb.add_child(nrow)
 	lbl_loc = _label("", 12, UIStyle.DIM)
 	vb.add_child(lbl_loc)
 	lbl_status = _label("", 12, Color(0.7, 0.88, 1.0))
@@ -181,7 +208,104 @@ func _build_dock() -> void:
 	root.add_child(dock)
 	dock.add_child(_icon_button("chat", "Falar (Enter)", toggle_chat))
 	dock.add_child(_icon_button("bag", "Mochila (I)", show_inventory))
-	dock.add_child(_icon_button("phone", "Telemóvel (Tab)", toggle_phone))
+	bell = _icon_button("bell", "Notificações (N)", show_notifications)
+	dock.add_child(bell)
+	bell_badge = _badge(bell)
+	var ph := _icon_button("phone", "Telemóvel (Tab)", toggle_phone)
+	dock.add_child(ph)
+	phone_badge = _badge(ph)
+
+func _badge(b: Button) -> Label:
+	var l := Label.new()
+	l.add_theme_font_size_override("font_size", 11)
+	l.add_theme_color_override("font_color", Color.WHITE)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.85, 0.2, 0.2)
+	sb.set_corner_radius_all(8)
+	sb.content_margin_left = 5
+	sb.content_margin_right = 5
+	l.add_theme_stylebox_override("normal", sb)
+	l.position = Vector2(34, -4)
+	l.visible = false
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(l)
+	return l
+
+func _update_badges() -> void:
+	var n := GameState.unread_notifications()
+	bell_badge.text = str(n)
+	bell_badge.visible = n > 0
+	var m := GameState.unread_messages()
+	phone_badge.text = str(m)
+	phone_badge.visible = m > 0
+	if popup.visible and _popup_target.get("kind", "") == "notifications":
+		_refresh_popup()
+
+# ------------------------------------------------------------------ chamadas (UI; o motor é VoiceCall.gd)
+func _build_call_card() -> void:
+	call_card = PanelContainer.new()
+	call_card.add_theme_stylebox_override("panel", UIStyle.box(Color(0.06, 0.09, 0.08, 0.96), Color(0.4, 0.85, 0.5), 2, Vector4(14, 10, 14, 10)))
+	call_box = VBoxContainer.new()
+	call_box.add_theme_constant_override("separation", 8)
+	call_card.add_child(call_box)
+	call_card.visible = false
+	root.add_child(call_card)
+
+func _on_call_state(state: String, info: Dictionary) -> void:
+	for c in call_box.get_children():
+		c.queue_free()
+	call_card.visible = state != "idle"
+	if state == "idle":
+		return
+	var title: String = {"outgoing": "A chamar…", "incoming": "Chamada a entrar", "connecting": "A ligar…", "active": "Em chamada"}.get(state, "")
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 8)
+	top.add_child(_icon("phone", Color(0.4, 0.9, 0.5), 20))
+	var vb := VBoxContainer.new()
+	vb.add_child(_label(str(info.get("name", "")), 16, UIStyle.GOLD))
+	var sub := title
+	if state == "active":
+		var secs := int(info.get("secs", 0))
+		sub = "Em chamada · %02d:%02d" % [secs / 60, secs % 60] + ("  · microfone desligado" if info.get("muted", false) else "")
+	vb.add_child(_label(sub, 12, UIStyle.DIM))
+	top.add_child(vb)
+	call_box.add_child(top)
+	if state == "active":
+		var lvl := ProgressBar.new()
+		lvl.show_percentage = false
+		lvl.custom_minimum_size = Vector2(200, 6)
+		lvl.value = clampf(float(info.get("mic", 0.0)) * 400.0, 0.0, 100.0)
+		lvl.tooltip_text = "Nível do teu microfone"
+		call_box.add_child(lvl)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	match state:
+		"incoming":
+			row.add_child(_call_btn("Atender", func(): voice.answer(true), true))
+			row.add_child(_call_btn("Recusar", func(): voice.answer(false)))
+		"outgoing", "connecting":
+			row.add_child(_call_btn("Cancelar", func(): voice.hangup()))
+		"active":
+			row.add_child(_call_btn("Ativar som" if info.get("muted", false) else "Silenciar", func(): voice.toggle_mute()))
+			row.add_child(_call_btn("Desligar", func(): voice.hangup(), true))
+	call_box.add_child(row)
+	_layout()
+
+func _call_btn(t: String, cb: Callable, primary := false) -> Button:
+	var b := Button.new()
+	b.text = t
+	b.custom_minimum_size = Vector2(110, 44)
+	b.focus_mode = Control.FOCUS_NONE
+	if primary:
+		b.theme_type_variation = "PrimaryButton"
+	b.pressed.connect(cb)
+	return b
+
+func open_profile(pub: String) -> void:
+	_close_popup()
+	if phone.visible:
+		phone.close()
+	social_panel.open(pub)
 
 func _build_zoom() -> void:
 	zoom_box = VBoxContainer.new()
@@ -323,6 +447,8 @@ func _layout() -> void:
 		top_right.position = Vector2(vs.x - top_right.size.x - m, m)
 	dock.size = Vector2.ZERO
 	dock.position = Vector2(vs.x - dock.size.x - m, vs.y - dock.size.y - m)
+	call_card.size = Vector2.ZERO
+	call_card.position = Vector2((vs.x - call_card.get_combined_minimum_size().x) * 0.5, (top_right.position.y + top_right.size.y + 8.0) if compact else m)
 	zoom_box.size = Vector2.ZERO
 	zoom_box.position = Vector2(m, vs.y - zoom_box.size.y - m)
 	floor_panel.size = Vector2.ZERO
@@ -364,6 +490,7 @@ func _on_self() -> void:
 	if st.is_empty():
 		return
 	lbl_money.text = GameState.fmt_kz(int(st.get("money", 0)))
+	lbl_level.text = "Nível %d" % int(st.get("level", {}).get("level", 1))
 	var needs: Dictionary = st.get("needs", {})
 	for k in need_bars:
 		var v := float(needs.get(k, 0))
@@ -412,6 +539,16 @@ func _on_msg(msg: Dictionary) -> void:
 			lbl_status.text = _mood(GameState.self_state.get("needs", {}))
 			notify(str(msg.get("text", "")), msg.get("action") != null)
 			_layout()
+		"notification":
+			var n: Dictionary = msg.get("data", {})
+			if str(n.get("kind", "")) != "dm" or not phone.is_conversation_open(str(n.get("from", {}).get("pub", ""))):
+				notify(str(n.get("text", "")), true, 4.0)
+		"social_result":
+			if str(msg.get("text", "")) != "":
+				notify(str(msg.get("text", "")), bool(msg.get("ok", false)))
+			var inv: Variant = msg.get("invite")
+			if bool(msg.get("ok", false)) and inv is Dictionary and str(inv.get("state", "")) == "accepted" and inv.get("building") != null:
+				guide_requested.emit(str(inv["building"]))
 		"profile":
 			phone.show_profile(msg.get("data", {}))
 
@@ -427,7 +564,7 @@ func _process(delta: float) -> void:
 
 # ------------------------------------------------------------------ menus de interação
 func is_modal_open() -> bool:
-	return popup.visible or phone.visible or chat_row.visible
+	return popup.visible or phone.visible or chat_row.visible or social_panel.visible
 
 func _clear_popup() -> void:
 	for c in popup_box.get_children():
@@ -537,6 +674,35 @@ func _refresh_popup() -> void:
 				_row("%s ×%d" % [WorldData.item_name(it), int(inv[it])], GameState.fmt_kz(price3), "Vender", func(): NetworkManager.send_game("interact", {"fid": fid3, "action": "sell", "item": item3}))
 			if not any:
 				popup_box.add_child(_label("Não tens nada que possamos comprar.", 13, UIStyle.DIM))
+		"notifications":
+			_popup_title("Notificações")
+			var lst: Array = GameState.social.get("notifications", [])
+			if lst.is_empty():
+				popup_box.add_child(_label("Sem notificações.", 13, UIStyle.DIM))
+			for i in range(lst.size() - 1, maxi(-1, lst.size() - 15), -1):
+				var n: Dictionary = lst[i]
+				var card := VBoxContainer.new()
+				card.add_theme_constant_override("separation", 4)
+				var t := _label(str(n.get("text", "")), 13)
+				t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				card.add_child(t)
+				card.add_child(_label(GameState.time_label(float(n.get("t", 0))), 10, UIStyle.DIM))
+				var nacts: Array = n.get("actions", [])
+				var nkind := str(n.get("kind", ""))
+				var row := HBoxContainer.new()
+				row.add_theme_constant_override("separation", 6)
+				if "accept" in nacts:
+					row.add_child(_small_btn("Aceitar", _notif_action.bind(n, "accept"), true))
+					row.add_child(_small_btn("Recusar", _notif_action.bind(n, "decline")))
+				var fp := str(n.get("from", {}).get("pub", "")) if n.get("from") is Dictionary else ""
+				if nkind in ["dm", "gift", "friend_accepted", "invite_reply"] and fp != "":
+					row.add_child(_small_btn("Conversar", _open_dm.bind(fp, str(n.get("from", {}).get("name", "")))))
+				if nkind == "missed_call" and fp != "":
+					row.add_child(_small_btn("Ligar", _call_back.bind(fp, str(n.get("from", {}).get("name", "")))))
+				if row.get_child_count() > 0:
+					card.add_child(row)
+				popup_box.add_child(card)
+				popup_box.add_child(HSeparator.new())
 		"inventory":
 			_popup_title("Mochila", "Saldo: " + GameState.fmt_kz(money))
 			if inv.is_empty():
@@ -553,6 +719,28 @@ func _refresh_popup() -> void:
 func _open_sub(t: Dictionary) -> void:
 	_popup_target = t
 	_refresh_popup()
+
+func show_notifications() -> void:
+	if popup.visible and _popup_target.get("kind", "") == "notifications":
+		_close_popup()
+		return
+	_popup_target = {"kind": "notifications"}
+	NetworkManager.send_game("notif_read")
+	for n in GameState.social.get("notifications", []):
+		n["read"] = true
+	_refresh_popup()
+	_update_badges()
+
+func _notif_action(n: Dictionary, action: String) -> void:
+	var kind := str(n.get("kind", ""))
+	var from_pub := str(n.get("from", {}).get("pub", ""))
+	n["actions"] = []
+	match kind:
+		"friend_request":
+			NetworkManager.send_game("friend_accept" if action == "accept" else "friend_decline", {"target": from_pub})
+		"invite":
+			NetworkManager.send_game("invite_respond", {"iid": n.get("data", {}).get("iid", ""), "accept": action == "accept"})
+	_close_popup()
 
 func show_inventory() -> void:
 	if popup.visible and _popup_target.get("kind", "") == "inventory":
@@ -579,6 +767,24 @@ func _send_chat(t: String) -> void:
 	chat_input.release_focus()
 	_layout()
 
+func _small_btn(t: String, cb: Callable, primary := false) -> Button:
+	var b := Button.new()
+	b.text = t
+	b.custom_minimum_size = Vector2(96, 40)
+	b.focus_mode = Control.FOCUS_NONE
+	if primary:
+		b.theme_type_variation = "PrimaryButton"
+	b.pressed.connect(cb)
+	return b
+
+func _open_dm(pub: String, name: String) -> void:
+	_close_popup()
+	phone.open_conversation(pub, name)
+
+func _call_back(pub: String, name: String) -> void:
+	_close_popup()
+	voice.call_player(pub, name)
+
 func toggle_phone() -> void:
 	if phone.visible:
 		phone.close()
@@ -588,6 +794,9 @@ func toggle_phone() -> void:
 
 func close_all() -> bool:
 	## Esc: fecha a camada de cima. Devolve true se fechou alguma coisa.
+	if social_panel.visible:
+		social_panel.close()
+		return true
 	if phone.visible:
 		phone.close()
 		return true

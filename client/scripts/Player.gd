@@ -11,6 +11,8 @@ const SEND_INTERVAL := 0.05   # 20 Hz
 var is_local: bool = false
 var input_enabled: bool = true
 var peer_id: String = ""
+var pub: String = ""             # identificador público (social); o id interno nunca chega a outros clientes
+var level: int = 1
 var character_name: String = "Jogador"
 var appearance: Dictionary = {}
 var zone: String = "w"
@@ -124,6 +126,8 @@ func set_pose(p: String, seat_px: Vector2 = Vector2.ZERO, rot: float = 0.0, lift
 
 func set_character_data(data: Dictionary) -> void:
 	peer_id = str(data.get("peer_id", ""))
+	pub = str(data.get("pub", ""))
+	level = int(data.get("level", 1))
 	character_name = str(data.get("name", "Jogador"))
 	appearance = data.get("appearance", {})
 	zone = str(data.get("zone", "w"))

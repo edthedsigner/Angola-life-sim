@@ -47,6 +47,7 @@ var _last_pinch := 0
 var _hover_cell := Vector2i(-99999, 0)
 var _hover_building: Dictionary = {}
 var _is_touch := false
+var guide_target := ""                 # edifício para onde um convite aceite nos leva
 
 func _ready() -> void:
 	if showcase:
@@ -69,6 +70,7 @@ func _ready() -> void:
 	hud.prompt_pressed.connect(interact_nearest)
 	hud.floor_selected.connect(_on_floor_selected)
 	hud.zoom_step.connect(func(f: float): set_zoom(zoom * f))
+	hud.guide_requested.connect(guide_to)
 	debug = DebugScript.new()
 	add_child(debug)
 	_register_debug()
@@ -229,6 +231,8 @@ func _on_zone_changed(peer_id: String, zone: String, pos: Vector2) -> void:
 		local_player.teleport(pos, zone)
 		pending = {}
 		Transition.fade_in(0.35)
+		if guide_target != "":
+			_continue_guide.call_deferred()
 		if floor_goal != -1:
 			if WorldData.zone_floor_index(zone) == floor_goal or zone == "w":
 				floor_goal = -1
@@ -238,6 +242,31 @@ func _on_zone_changed(peer_id: String, zone: String, pos: Vector2) -> void:
 		var rp: CharacterBody2D = remote_players[peer_id]
 		rp.teleport(pos, zone)
 		rp.visible = zone == my_zone
+
+## Convite aceite: leva o jogador até ao edifício (sai primeiro do edifício onde está, se for preciso).
+func guide_to(bid: String) -> void:
+	if not WorldData.buildings.has(bid) or local_player == null:
+		return
+	guide_target = bid
+	_continue_guide()
+
+func _continue_guide() -> void:
+	if guide_target == "":
+		return
+	if my_zone == "w":
+		var b: Dictionary = WorldData.buildings[guide_target]
+		hud.notify("A caminho de %s…" % b["name"])
+		var bid := guide_target
+		guide_target = ""
+		_go_interact({"type": "building", "b": WorldData.buildings[bid]})
+	elif WorldData.zone_floor_index(my_zone) > 0:
+		_on_floor_selected(0)
+	else:
+		for t in _interactables():
+			if t["type"] == "exit":
+				hud.notify("Primeiro, sai deste edifício.")
+				_go_interact(t)
+				return
 
 func _on_corrected(pos: Vector2, zone: String) -> void:
 	if local_player:
@@ -359,6 +388,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if showcase or _leaving or local_player == null:
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
+		# com o telemóvel/painel/chat abertos, as teclas não são atalhos do mundo (só Esc, Tab e F10)
+		if hud.is_modal_open() and not event.keycode in [KEY_ESCAPE, KEY_TAB, KEY_F10]:
+			return
 		match event.keycode:
 			KEY_F10:
 				logout()
@@ -419,6 +451,9 @@ func _on_tap(p: Vector2) -> void:
 		hud.close_all()
 		return
 	var t := _pick(p)
+	if t.get("type", "") == "player":
+		hud.open_profile(str(t["pub"]))         # tocar noutro jogador abre o perfil social
+		return
 	if t.is_empty():
 		_go_to_point(p)
 	else:
@@ -427,6 +462,15 @@ func _on_tap(p: Vector2) -> void:
 ## O que está debaixo do ponto (píxel do mundo) na zona atual.
 func _pick(p: Vector2) -> Dictionary:
 	var cell := WorldData.cell_of(my_zone, p)
+	var front := -INF
+	var who: CharacterBody2D = null
+	for pid in remote_players:                  # outros jogadores primeiro (o mais à frente ganha)
+		var rp: CharacterBody2D = remote_players[pid]
+		if rp.visible and rp.pub != "" and Rect2(rp.global_position + Vector2(-10, -40), Vector2(20, 44)).has_point(p) and rp.global_position.y > front:
+			front = rp.global_position.y
+			who = rp
+	if who:
+		return {"type": "player", "pub": who.pub}
 	if my_zone == "w":
 		var b := _building_at(p)
 		if not b.is_empty():
@@ -682,7 +726,11 @@ func _register_debug() -> void:
 	debug.register_section("Navegação e colisão", _dbg_nav)
 	debug.register_section("Entidades", _dbg_entities)
 	debug.register_section("Estado do servidor", _dbg_state, true)
+	debug.register_section("Chamada de voz", _dbg_call, true)
 	debug.visibility_toggled.connect(_on_debug_toggled)
+
+func _dbg_call() -> Array:
+	return hud.voice.debug_lines()
 
 func _on_debug_toggled(_on: bool) -> void:
 	overlay.queue_redraw()

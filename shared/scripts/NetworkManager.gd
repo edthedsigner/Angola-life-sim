@@ -140,6 +140,15 @@ func _handle_message(text: String) -> void:
 		"chat":
 			GameState.add_chat(str(msg.get("name", "")), str(msg.get("text", "")))
 			game_message.emit(msg)
+		"social_state":
+			GameState.apply_social(msg.get("data", {}))
+			game_message.emit(msg)
+		"dm_message":
+			GameState.on_dm(msg)
+			game_message.emit(msg)
+		"notification":
+			GameState.on_notification(msg.get("data", {}))
+			game_message.emit(msg)
 		"session_invalid":
 			session_invalid.emit()
 		"onboarding_state":

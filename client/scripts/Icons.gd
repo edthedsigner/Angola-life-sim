@@ -20,6 +20,8 @@ const P := {
 	"home": '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
 	"shop": '<path d="M4 9l1-5h14l1 5"/><path d="M4 9h16v11H4z"/>',
 	"gov": '<path d="M3 21h18M5 21V10M10 21V10M14 21V10M19 21V10M2 10l10-7 10 7z"/>',
+	"bell": '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20h4"/>',
+	"user": '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 15-5 16 0"/>',
 	"gear": '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
 }
 static var _cache := {}

@@ -68,6 +68,13 @@ func _fit_menu() -> void:
 	get_window().content_scale_size = Vector2i(640, 640) if minf(logical.x, logical.y) < 600.0 else Vector2i(1280, 720)
 
 func _ready() -> void:
+	if "--check-scripts" in OS.get_cmdline_args():      # dev: compila cada script isoladamente e mostra erros com linha
+		for d in ["res://client/scripts/", "res://shared/scripts/"]:
+			for f in DirAccess.get_files_at(d):
+				if f.ends_with(".gd"):
+					var sc: Script = load(d + f)
+					print("[check] %s %s" % ["ok " if sc != null and sc.reload() == OK else "ERRO", f])
+		return
 	if "--scale-test" in OS.get_cmdline_args() or "--scale-test" in OS.get_cmdline_user_args():
 		get_tree().change_scene_to_file.call_deferred("res://client/scenes/tests/ScaleTest.tscn")   # laboratório de escala
 		return
