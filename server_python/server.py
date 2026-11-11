@@ -30,6 +30,7 @@ except ImportError:
 
 import game
 import social as socialmod
+import storage as storagemod
 import world as worldmod
 
 # ---------------------------------------------------------------------------
@@ -37,7 +38,6 @@ import world as worldmod
 # ---------------------------------------------------------------------------
 HOST = "0.0.0.0"
 PORT = 7777
-DATA_DIR = Path(__file__).parent / "data"
 CONFIG_FILE = Path(__file__).parent / "world_config.json"
 WORLD = {"max_players": 64, "story_steps": 4}
 try:
@@ -47,8 +47,6 @@ except Exception:
 # Mapa, edifícios, interiores, mobília, atividades e economia: shared/data/world.json (mesmo ficheiro que o cliente lê).
 W = worldmod.load()
 WORLD["spawn"] = dict(W.spawn)            # fonte única do spawn (antes duplicado em world_config.json e World.tscn)
-WORLD_STATE_FILE = DATA_DIR / "world_state.json"
-SOCIAL_FILE = DATA_DIR / "social.json"
 social: "socialmod.Social" = None  # type: ignore[assignment]
 clock: game.Clock = game.Clock(W.clock_cfg, None)
 door_states: dict[str, dict[str, bool]] = {}   # zone -> {edge_key: open}
@@ -57,9 +55,6 @@ occupied: dict[tuple, str] = {}                # (zone, fid) -> peer_id (evita d
 last_chat: dict[str, float] = {}
 MAX_STEP_PX = 220.0
 ACTIVITY_SCALE = float(os.environ.get("ANGOLA_ACTIVITY_SCALE", "1"))   # testes: <1 encurta as atividades                             # salto máximo aceite entre duas mensagens de posição
-ACCOUNTS_FILE = DATA_DIR / "accounts.json"
-CHARACTERS_FILE = DATA_DIR / "characters.json"
-SESSIONS_FILE = DATA_DIR / "sessions.json"
 STORY_STEPS = int(WORLD.get("story_steps", 4))      # nº de páginas da introdução (client/data/intro_story.json)
 SESSION_TTL = 30 * 24 * 3600
 sessions: dict[str, dict] = {}   # sha256(token) -> {account_id, expires}
@@ -80,32 +75,23 @@ peers: dict[str, Any] = {}
 players_in_world: dict[str, dict] = {}
 
 
-def ensure_data_dir() -> None:
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+store: "storagemod.Store" = None  # type: ignore[assignment]   # storage.py: ficheiros, SQLite ou PostgreSQL
+_write_queue: dict[str, str] = {}
+_writer: "asyncio.Task | None" = None
 
 
-def load_json(path: Path) -> dict:
-    if not path.exists():
-        return {}
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return data if isinstance(data, dict) else {}
-    except Exception:
-        return {}
-
-
-def save_json(path: Path, data: dict) -> None:
-    tmp = path.with_suffix(".tmp")
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    os.replace(tmp, path)
+def snapshot() -> dict[str, dict]:
+    docs = {"accounts": accounts, "characters": characters, "sessions": sessions,
+            "world_state": {"game_s": clock.now(), "doors": door_states}}
+    if social is not None:
+        docs["social"] = social.dump()
+    return docs
 
 
 def load_all() -> None:
     global accounts, characters, account_characters
-    accounts = load_json(ACCOUNTS_FILE)
-    characters = load_json(CHARACTERS_FILE)
+    accounts = store.load("accounts")
+    characters = store.load("characters")
     account_characters = {}
     for cid, ch in characters.items():
         acc_id = ch.get("account_id", "")
@@ -116,23 +102,57 @@ def load_all() -> None:
             done = bool(account_characters.get(acc.get("id", "")))
             acc["onboarding"] = {"state": "completed" if done else "new", "story_step": STORY_STEPS - 1 if done else 0}
     global sessions, clock, door_states
-    sessions = {k: v for k, v in load_json(SESSIONS_FILE).items() if v.get("expires", 0) > time.time()}
-    ws_state = load_json(WORLD_STATE_FILE)
+    sessions = {k: v for k, v in store.load("sessions").items() if v.get("expires", 0) > time.time()}
+    ws_state = store.load("world_state")
     clock = game.Clock(W.clock_cfg, ws_state.get("game_s"))
     door_states = {z: {k: bool(v) for k, v in d.items()} for z, d in ws_state.get("doors", {}).items() if W.zone_valid(z)}
     for ch in characters.values():
         game.ensure_fields(ch, W)
     global social
-    social = socialmod.Social(load_json(SOCIAL_FILE), characters, W, game)
+    social = socialmod.Social(store.load("social"), characters, W, game)
 
 
 def save_all() -> None:
-    save_json(ACCOUNTS_FILE, accounts)
-    save_json(CHARACTERS_FILE, characters)
-    save_json(SESSIONS_FILE, sessions)
-    save_json(WORLD_STATE_FILE, {"game_s": clock.now(), "doors": door_states})
-    if social is not None:
-        save_json(SOCIAL_FILE, social.dump())
+    """Guarda os documentos que mudaram. Com o servidor a correr, a escrita vai para um único escritor em segundo plano
+    (uma base de dados remota não bloqueia o jogo); fora do ciclo (arranque/paragem) escreve logo."""
+    global _writer
+    ch = store.changed(snapshot())
+    if not ch:
+        return
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        store.write(ch)
+        return
+    _write_queue.update(ch)
+    if _writer is None or _writer.done():
+        _writer = asyncio.create_task(_write_loop())
+
+
+async def _write_loop() -> None:
+    while _write_queue:
+        batch = dict(_write_queue)
+        _write_queue.clear()
+        try:
+            await asyncio.to_thread(store.write, batch)
+        except Exception as e:          # base de dados em baixo: tenta outra vez sem perder o mais recente
+            print(f"[Storage] ERRO ao gravar ({', '.join(batch)}): {e!r} — nova tentativa em 3 s", flush=True)
+            for k, v in batch.items():
+                _write_queue.setdefault(k, v)
+            await asyncio.sleep(3)
+
+
+async def flush_storage() -> None:
+    """Paragem: espera pelo escritor e grava tudo o que falta, de forma síncrona."""
+    if _writer is not None and not _writer.done():
+        try:
+            await asyncio.wait_for(_writer, 20)
+        except Exception as e:
+            print(f"[Storage] escritor não terminou: {e!r}", flush=True)
+    pending = dict(_write_queue)
+    _write_queue.clear()
+    pending.update(store.changed(snapshot()))
+    store.write(pending)
 
 
 # ---------------------------------------------------------------------------
@@ -180,7 +200,7 @@ def advance_onboarding(acc: dict, state: str, step: Any) -> dict:
 def issue_session(acc_id: str) -> str:
     token = secrets.token_urlsafe(32)
     sessions[hashlib.sha256(token.encode()).hexdigest()] = {"account_id": acc_id, "expires": time.time() + SESSION_TTL}
-    save_json(SESSIONS_FILE, sessions)
+    save_all()
     return token
 
 
@@ -193,7 +213,7 @@ def resolve_session(token: str) -> dict | None:
 
 def revoke_session(token: str) -> None:
     if sessions.pop(hashlib.sha256(str(token).encode()).hexdigest(), None) is not None:
-        save_json(SESSIONS_FILE, sessions)
+        save_all()
 
 
 def hash_password(password: str, salt: str | None = None) -> str:
@@ -1107,19 +1127,71 @@ async def handler(ws: Any) -> None:
         print(f"[Net] Desconectado: {peer_id}")
 
 
+def _http_reply(path: str, upgrade: bool):
+    """Pedidos HTTP normais (sem upgrade WebSocket): health check do host e uma página de texto simples."""
+    if path.split("?")[0] in ("/healthz", "/health"):
+        return 200, "ok\n"
+    if not upgrade:
+        return 200, "Angola Life Simulator - servidor de jogo (WebSocket). Abre o jogo pelo link do cliente web.\n"
+    return None
+
+
+def process_request(a, b):
+    # websockets >= 14 (nova API): (connection, request);  API antiga / legacy: (path, request_headers)
+    if isinstance(a, str):
+        r = _http_reply(a, (b.get("Upgrade") or "").lower() == "websocket")
+        if r is None:
+            return None
+        import http
+        return http.HTTPStatus(r[0]), [("Content-Type", "text/plain; charset=utf-8")], r[1].encode()
+    r = _http_reply(b.path, (b.headers.get("Upgrade") or "").lower() == "websocket")
+    return None if r is None else a.respond(r[0], r[1])
+
+
+def env_flag(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in ("1", "true", "yes", "on")
+
+
 async def main() -> None:
-    ensure_data_dir()
+    global store
+    store = storagemod.open_store()
+    on_host = bool(os.environ.get("RENDER") or os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("FLY_APP_NAME"))
+    if not store.durable_on_ephemeral_hosts and (env_flag("ANGOLA_REQUIRE_DATABASE") or on_host):
+        msg = ("[Storage] Este host apaga o disco a cada reinício/deploy e não há DATABASE_URL: contas e progresso "
+               "perder-se-iam. Define DATABASE_URL (PostgreSQL) — ver docs/DEPLOY.md.")
+        if env_flag("ANGOLA_REQUIRE_DATABASE") or not env_flag("ANGOLA_ALLOW_EPHEMERAL"):
+            print(msg + " (Para um teste descartável: ANGOLA_ALLOW_EPHEMERAL=1 e ANGOLA_REQUIRE_DATABASE=0.)", flush=True)
+            raise SystemExit(2)
+        print(msg + " ANGOLA_ALLOW_EPHEMERAL=1: a continuar SEM persistência real.", flush=True)
     load_all()
     host = os.environ.get("ANGOLA_HOST", HOST)
-    port = int(os.environ.get("ANGOLA_PORT", PORT))
+    # PORT = convenção dos hosts (Render, Railway, Fly…); ANGOLA_PORT tem prioridade para uso local/testes
+    port = int(os.environ.get("ANGOLA_PORT") or os.environ.get("PORT") or PORT)
+    opts: dict[str, Any] = {"ping_interval": 20, "ping_timeout": 20, "process_request": process_request,
+                            "max_size": 256 * 1024}
+    origins = [o.strip().rstrip("/") for o in os.environ.get("ANGOLA_ALLOWED_ORIGINS", "").split(",") if o.strip()]
+    if origins:
+        opts["origins"] = origins + [None]          # None = clientes nativos (sem cabeçalho Origin)
     print("=== Angola Life Simulator — Servidor Python ===")
     print(f"A escutar em ws://{host}:{port}  (spawn {WORLD['spawn']})")
-    print("Ctrl+C para parar.\n", flush=True)
+    print(f"Armazenamento: {store.describe()}" + (f"   Origens permitidas: {', '.join(origins)}" if origins else ""))
+    print("Health check: GET /healthz   ·   Ctrl+C para parar.\n", flush=True)
+    stop = asyncio.Event()
+    try:
+        import signal
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGTERM, signal.SIGINT):
+            loop.add_signal_handler(sig, stop.set)      # deploy/reinício do host envia SIGTERM: grava antes de sair
+    except (NotImplementedError, RuntimeError, AttributeError):
+        pass                                            # Windows: Ctrl+C cai no KeyboardInterrupt abaixo
     asyncio.create_task(autosave_loop())
     asyncio.create_task(needs_loop())
     asyncio.create_task(social_loop())
-    async with websockets.serve(handler, host, port, ping_interval=20, ping_timeout=20):
-        await asyncio.Future()
+    async with websockets.serve(handler, host, port, **opts):
+        await stop.wait()
+    print("\nA parar: a gravar dados…", flush=True)
+    await flush_storage()
+    print("Servidor parado.", flush=True)
 
 
 if __name__ == "__main__":
@@ -1127,4 +1199,5 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         print("\nServidor parado.")
-        save_all()
+        if store is not None:
+            store.save(snapshot())

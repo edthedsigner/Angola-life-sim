@@ -10,6 +10,10 @@ try:
 except ImportError:
     sys.path.insert(0, str(ROOT / "tests" / "shim")); import websockets; SHIM = True
 PORT = 7791; URI = f"ws://127.0.0.1:{PORT}"
+sys.path.insert(0, str(ROOT / "server_python")); import storage as storagemod
+# Armazenamento a testar: omissão = ficheiros; ex. ANGOLA_TEST_STORAGE="sqlite:{tmp}/db.sqlite" ou "postgresql://…"
+STORAGE = os.environ.get("ANGOLA_TEST_STORAGE", "")
+STORE_SPEC = ""
 OK = []; FAIL = []
 def check(name, cond):
     (OK if cond else FAIL).append(name); print(("PASS " if cond else "FAIL ") + name)
@@ -30,15 +34,46 @@ class Bot:
             try: self.q.append(json.loads(await asyncio.wait_for(self.ws.recv(), 0.25)))
             except (asyncio.TimeoutError, TimeoutError): return
 
+async def production_tests(sp):
+    """Modo produção: recusa arrancar sem base de dados; health check HTTP (só com websockets real)."""
+    env = dict(os.environ, ANGOLA_PORT=str(PORT + 1), ANGOLA_REQUIRE_DATABASE="1", ANGOLA_STORAGE=f"file:{sp / 'data_prod'}", PYTHONUNBUFFERED="1", ANGOLA_WORLD=str(ROOT / "shared" / "data" / "world.json"))
+    if SHIM: env["PYTHONPATH"] = str(ROOT / "tests" / "shim")
+    r = subprocess.run([sys.executable, str(sp / "server.py")], env=env, capture_output=True, text=True, timeout=20)
+    check("produção sem DATABASE_URL: recusa arrancar (não finge persistência)", r.returncode == 2 and "DATABASE_URL" in r.stdout)
+    env2 = dict(env, RENDER="true"); env2.pop("ANGOLA_REQUIRE_DATABASE")
+    r = subprocess.run([sys.executable, str(sp / "server.py")], env=env2, capture_output=True, text=True, timeout=20)
+    check("no Render sem base de dados: recusa arrancar", r.returncode == 2)
+    if SHIM:
+        print("   (health check HTTP só é testado com o pacote websockets real)"); return
+    p = subprocess.Popen([sys.executable, str(sp / "server.py")], env=dict(env, ANGOLA_REQUIRE_DATABASE="0", PORT="", ANGOLA_PORT=str(PORT + 1)), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    try:
+        time.sleep(1.5)
+        import urllib.request
+        body = urllib.request.urlopen(f"http://127.0.0.1:{PORT + 1}/healthz", timeout=5).read().decode()
+        check("GET /healthz -> 200 ok", body.strip() == "ok")
+        body = urllib.request.urlopen(f"http://127.0.0.1:{PORT + 1}/", timeout=5).read().decode()
+        check("GET / sem upgrade -> página de texto (não erro)", "servidor de jogo" in body)
+    except Exception as e:
+        check(f"health check HTTP ({e!r})", False)
+    finally:
+        p.terminate(); p.wait()
+
 def start_server(data_dir):
     env = dict(os.environ, ANGOLA_PORT=str(PORT), PYTHONUNBUFFERED="1", ANGOLA_ACTIVITY_SCALE="0.1", ANGOLA_DEV_START_MONEY="30000", ANGOLA_CALL_RING_SECS="2", ANGOLA_INVITE_TTL="3",
-               ANGOLA_WORLD=str(ROOT / "shared" / "data" / "world.json"))
+               ANGOLA_WORLD=str(ROOT / "shared" / "data" / "world.json"), ANGOLA_STORAGE=STORE_SPEC)
+    for k in ("PORT", "RENDER", "DATABASE_URL", "ANGOLA_REQUIRE_DATABASE", "ANGOLA_ALLOWED_ORIGINS"):
+        env.pop(k, None)
     if SHIM: env["PYTHONPATH"] = str(ROOT / "tests" / "shim")
     p = subprocess.Popen([sys.executable, str(data_dir / "server.py")], env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     time.sleep(1.2); return p
 
 async def main():
-    tmp = Path(tempfile.mkdtemp()); shutil.copytree(ROOT / "server_python", tmp / "sp"); sp = tmp / "sp"
+    global STORE_SPEC
+    tmp = Path(tempfile.mkdtemp()); shutil.copytree(ROOT / "server_python", tmp / "sp", ignore=shutil.ignore_patterns("data", "__pycache__")); sp = tmp / "sp"
+    STORE_SPEC = STORAGE.replace("{tmp}", str(tmp)) if STORAGE else f"file:{sp / 'data'}"
+    st0 = storagemod.open_store(STORE_SPEC); st0.write({n: "{}" for n in storagemod.DOCS})      # começa vazio (também numa BD partilhada)
+    print("armazenamento:", st0.describe())
+    await production_tests(sp)
     srv = start_server(sp)
     try:
         print("websockets:", "STAND-IN (tests/shim)" if SHIM else "REAL")
@@ -143,10 +178,11 @@ async def main():
     await b.send(type="resume_session", token="lixo"); r = await b.get("session_invalid"); check("D: token falso rejeitado", r is not None); await b.cm.__aexit__()
     # Migração de contas antigas (sem campo onboarding)
     srv.terminate(); srv.wait()
-    accs = json.loads((sp / "data" / "accounts.json").read_text()); chs = json.loads((sp / "data" / "characters.json").read_text())
+    stm = storagemod.open_store(STORE_SPEC); accs = stm.load("accounts")
+    check("SIGTERM grava tudo antes de sair (conta criada mesmo antes da paragem)", "novo" in accs)
     for a_ in accs.values(): a_.pop("onboarding", None)
     accs["legado_vazio"] = {"id": "legacy1", "username": "legado_vazio", "password_hash": accs["novo"]["password_hash"], "created_at": "x"}
-    (sp / "data" / "accounts.json").write_text(json.dumps(accs)); time.sleep(0.4); srv = start_server(sp)
+    stm.write({"accounts": storagemod.dumps(accs)}); time.sleep(0.4); srv = start_server(sp)
     b = await open_bot(); r = await login(b, "novo"); check("migração: conta antiga com personagem => completed (nada apagado)", r["data"]["onboarding"]["state"] == "completed" and r["data"]["character"]["name"] == "Novo Jogador"); await b.cm.__aexit__()
     b = await open_bot(); r = await login(b, "legado_vazio"); check("migração: conta antiga sem personagem => new", r and r["data"]["onboarding"]["state"] == "new"); await b.cm.__aexit__()
     await gameplay_tests(open_bot)
