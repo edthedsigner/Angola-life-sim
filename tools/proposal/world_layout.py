@@ -222,7 +222,7 @@ place("mercearia", "Mercearia Girassol", "shop", 55, 40, 5, 4, 2, "side", E)    
 place("escritorio", "Escritório Atlântico", "office", 56, 27, 4, 5, 3, "side", E)
 place("restaurante", "Restaurante Maianga", "restaurant", 72, 30, 3, 4, 2, "front", E)
 place("casa", "Casa Mussulo", "residential", 78, 13, 3, 4, 1, "front", E)
-place("predio_kilamba", "Prédio Kilamba (6 apart.)", "apartment", 32, 56, 6, 4, 3, "side", N_)
+place("predio_imbondeiro", "Prédio Imbondeiro (6 apart.)", "apartment", 32, 56, 6, 4, 3, "side", N_)
 place("farmacia", "Farmácia", "service", 57, 34, 3, 3, 1, "side", RSV)
 place("padaria", "Padaria", "shop", 77, 34, 3, 3, 1, "front", RSV)
 place("banco", "Banco / Multicaixa", "service", 58, 19, 3, 3, 1, "side", RSV)
@@ -368,7 +368,7 @@ for t, x, y in PROPS:
     if t != "baliza" and (is_road[y, x] or is_path[y, x] or (x, y) in ENT): errs.append(f"adereço {t} a tapar caminho em {x},{y}")
 unreach = int((walk & ~np.isfinite(D0)).sum())
 HUBS = [("Praça (spawn)", SPAWN), ("Mercearia / R. do Comércio", (61, 42)), ("Escritório", (61, 29)), ("Restaurante", (73, 35)),
-        ("Mercado informal", (25, 36)), ("Prédio Kilamba", (39, 58)), ("Casa Mussulo", entrance_tile(next(b for b in B if b["id"] == "casa"))),
+        ("Mercado informal", (25, 36)), ("Prédio Imbondeiro", (39, 58)), ("Casa Mussulo", entrance_tile(next(b for b in B if b["id"] == "casa"))),
         ("Campo de futebol", (94, 62)), ("Largo da periferia", (112, 76)), ("Areal", (16, 82))]
 hub_d = {}
 for n, p in HUBS:

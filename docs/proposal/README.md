@@ -50,16 +50,22 @@ Boundaries come from noise-distorted regions, not rectangles, so areas blend int
 
 ## 4. Buildings on the map
 * Existing (keep their current exteriors): Mercearia 5×4 (2 floors), Escritório 4×5 (3), Restaurante 3×4 (2), Casa Mussulo 3×4 (1).
-* New in this milestone: Prédio Kilamba 6×4, 3 floors, 6 apartments, on Rua dos Prédios.
+* New in this milestone: Prédio Imbondeiro 6×4, 3 floors, 6 apartments, on Rua dos Prédios.
 * Reserved plots (drawn hatched, not built now): Farmácia, Padaria, Banco, Bar, Oficina, Armazém, Escola, Salão, Prédios B and C,
   26 houses. Housing: 7 units now, 45 with every plot built.
 * Doors can only be on the south and east faces (the two faces the camera sees), so buildings sit north or west of the street they
   face. The south side of the avenue therefore carries vendors, parking and walls instead of shop fronts.
 
+## Naming rule
+Names of real places that will become their own locations in the game are reserved for those locations and are not used for
+buildings or streets here: **Kilamba** (future city) and **Mussulo** (future island to visit) so far. This map is the Maianga
+neighbourhood; new buildings take names that are local or not place names (the apartment block is "Prédio Imbondeiro", after the
+baobab tree). "Casa Mussulo" is an existing in-game name and stays until a new one is chosen.
+
 ## 5. Exterior and interior are separate representations
 ```jsonc
 "buildings": [{
-  "id": "predio_kilamba", "name": "Prédio Kilamba", "type": "apartment",
+  "id": "predio_imbondeiro", "name": "Prédio Imbondeiro", "type": "apartment",
   "exterior": {                       // what occupies the shared map
     "c0": -32, "r0": 8, "w": 6, "d": 4, "floors": 3, "palette": "green", "roof": "flat", "shopfront": false,
     "entrances": [{"id": "frente", "face": "side", "i": 2, "to": {"floor": 0, "edge": "v:4:5"}}]

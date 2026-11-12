@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """PROPOSTA: mostra, à mesma escala, a pegada EXTERIOR de cada edifício e o seu INTERIOR jogável independente
-(plantas lidas de shared/data/world.json; o Prédio Kilamba é o desenho proposto). Saída: docs/proposal/building_examples.png"""
+(plantas lidas de shared/data/world.json; o Prédio Imbondeiro é o desenho proposto). Saída: docs/proposal/building_examples.png"""
 import json, sys
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
@@ -14,7 +14,7 @@ F9, F11, F13, F17 = font(9, False), font(11, False), font(13), font(17)
 FURN = (150, 110, 70)
 
 # Prédio proposto: zona comum por piso (corredor + escadas + 2 portas de apartamento) e um modelo de apartamento T1
-PREDIO = dict(id="predio_kilamba", name="Prédio Kilamba (proposto)", type="apartment", w=6, d=4, palette=(132, 196, 150),
+PREDIO = dict(id="predio_imbondeiro", name="Prédio Imbondeiro (proposto)", type="apartment", w=6, d=4, palette=(132, 196, 150),
               entrances=[dict(id="frente", face="side", i=2, edge="v:4:5")],
               floors=[dict(name=f"Piso {n} — zona comum", w=4, l=8, walls=[], rooms=[],
                            openings=[["v", 0, 2, "unit"], ["v", 4, 2, "unit"]] + ([["v", 4, 5, "exit"]] if n == 0 else []),
@@ -84,7 +84,7 @@ def row(d, y0, b, title, unit=None):
     if unit:
         d.text((fx, y - 16), unit["name"], fill=(250, 200, 40), font=F9)
         draw_floor(d, fx, y, unit, [], 0, [])
-        d.text((fx, y + unit["l"] * S + 8), "× 6 instâncias: u:predio_kilamba:0A … 2B\n(móveis, arrumos, contrato e permissões por unidade;\nporta amarela = só inquilino e convidados, validado no servidor)", fill=(225, 225, 225), font=F9)
+        d.text((fx, y + unit["l"] * S + 8), "× 6 instâncias: u:predio_imbondeiro:0A … 2B\n(móveis, arrumos, contrato e permissões por unidade;\nporta amarela = só inquilino e convidados, validado no servidor)", fill=(225, 225, 225), font=F9)
     return y + max(fl["l"] for fl in b["floors"]) * S + 50
 
 world_pal = {b["id"]: b["palette"] for b in world["buildings"]}
@@ -95,7 +95,7 @@ y = 56
 y = row(d, y, BY["casa"], "Casa Mussulo — moradia unifamiliar (1 unidade residencial)")
 y = row(d, y, BY["mercearia"], "Mercearia Girassol — comércio, 2 pisos, 2 portas (frente e lado)")
 y = row(d, y, BY["escritorio"], "Escritório Atlântico — 3 pisos; o último é mais curto (terraço), como no exterior")
-y = row(d, y, PREDIO, "Prédio Kilamba — 3 pisos × 2 apartamentos; zona comum partilhada + interiores privados", unit=UNIT)
+y = row(d, y, PREDIO, "Prédio Imbondeiro — 3 pisos × 2 apartamentos; zona comum partilhada + interiores privados", unit=UNIT)
 lx, ly = 1130, 70
 d.text((lx, ly), "Legenda", fill=(255, 220, 110), font=F13); ly += 22
 for c, t in [((240, 60, 60), "porta exterior ↔ saída do interior (a mesma porta)"), ((60, 200, 90), "porta interior"), ((90, 170, 240), "janela"),
