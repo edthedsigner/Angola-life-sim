@@ -55,7 +55,7 @@ func _sep(vb: VBoxContainer, inset: float) -> void:
 	m.add_child(r)
 	vb.add_child(m)
 
-## Linha de lista. o: {sub, detail, app, glyph:[nome, cor], avatar:nome, tap:Callable, long:Callable, accessory:Control,
+## Linha de lista. o: {sub, detail, app, glyph:[nome, cor], avatar:nome, tap:Callable, accessory:Control,
 ## destructive, tint, center, check, dot:Color, no_chevron, title_col}
 func row(vb: VBoxContainer, title: String, o: Dictionary = {}) -> Control:
 	var lead := 0.0
@@ -143,7 +143,7 @@ func row(vb: VBoxContainer, title: String, o: Dictionary = {}) -> Control:
 		ch.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		hb.add_child(ch)
 	if o.has("tap"):
-		os.tappable(mc, o["tap"], o.get("long", Callable()))
+		os.tappable(mc, o["tap"])
 	vb.add_child(mc)
 	return mc
 
@@ -194,23 +194,6 @@ func badge_count(id: String) -> int:
 		"amigos":
 			return (GameState.social.get("incoming", []) as Array).size()
 	return 0
-
-func quick_actions(id: String) -> Array:
-	match id:
-		"mensagens":
-			return [["Perto de ti", "chat", func():
-				os.open_app("mensagens", false)
-				open_near(), false]]
-		"amigos":
-			var n := badge_count("amigos")
-			return [["Pedidos de amizade" + (" (%d)" % n if n > 0 else ""), "user", func(): os.open_app("amigos"), false]]
-		"banco":
-			return [["Saldo: " + GameState.fmt_kz(int(GameState.self_state.get("money", 0))), "bank", func(): os.open_app("banco"), false]]
-		"definicoes":
-			return [["Desativar Não incomodar" if os.dnd else "Ativar Não incomodar", "moon", func():
-				os.dnd = not os.dnd
-				os.save_settings(), false]]
-	return []
 
 func open(id: String) -> void:
 	match id:
@@ -276,7 +259,6 @@ func _bubble(list: Control, text: String, mine: bool, who: String = "", t: Strin
 		var tl2 := L(t, 11, pal["label3"])
 		tl2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT if mine else HORIZONTAL_ALIGNMENT_LEFT
 		wrap.add_child(tl2)
-	os.tappable(bub, func(): pass, func(): os.context_menu(bub, [["Copiar", "copy", func(): DisplayServer.clipboard_set(text), false]]))
 	list.add_child(wrap)
 
 func _compose(hb: HBoxContainer, placeholder: String, send: Callable) -> void:
@@ -657,7 +639,7 @@ func _settings_root(body: Control) -> void:
 	dnd_sw.toggled.connect(func(v):
 		os.dnd = v
 		os.save_settings())
-	row(a, "Não incomodar", {"glyph": ["moon", Color8(94, 92, 230)], "accessory": dnd_sw})
+	row(a, "Não incomodar", {"glyph": ["moon", Color8(94, 92, 230)], "accessory": dnd_sw, "sub": "Sem faixas de notificação (ficam no sino)"})
 	row(a, "Aspeto", {"glyph": ["sun", pal["tint"]], "detail": {"auto": "Automático", "light": "Claro", "dark": "Escuro"}[os.appearance], "tap": _appearance})
 	var p := section(body)
 	row(p, "Privacidade", {"glyph": ["lock", pal["tint"]], "detail": {"everyone": "Todos", "friends": "Amigos", "nobody": "Ninguém"}.get(str(GameState.social.get("privacy", {}).get("calls", "everyone")), ""), "tap": _privacy})
@@ -680,12 +662,6 @@ func _settings_root(body: Control) -> void:
 		os.brightness = maxf(0.15, v)
 		os.screen.modulate = Color(1, 1, 1).darkened(0.6 * (1.0 - os.brightness)))
 	row(snd, "Brilho", {"glyph": ["sun", pal["orange"]], "accessory": br})
-	var lk := Kit.SwitchX.new(os.lock_on_open, k)
-	lk.on_col = pal["green"]
-	lk.toggled.connect(func(v):
-		os.lock_on_open = v
-		os.save_settings())
-	row(snd, "Ecrã bloqueado ao pegar", {"glyph": ["lock", pal["label2"]], "accessory": lk})
 	var g := section(body)
 	var dbg_on := false
 	var dbg: Variant = os.get_tree().get_first_node_in_group("debug_overlay")
@@ -739,7 +715,6 @@ func _about() -> void:
 		row(s, "Modelo", {"detail": "Kianda 15"})
 		row(s, "Software", {"detail": "KiandaOS 1.0"})
 		row(s, "Operadora", {"detail": "Unitel"})
-		row(s, "Bateria", {"detail": "%d%%" % roundi(os.battery * 100)})
 		row(s, "Rede", {"detail": ("%d ms" % int(NetworkManager.latency_ms)) if NetworkManager.latency_ms >= 0 else "—"})})
 
 # ================================================================== widgets do ecrã principal

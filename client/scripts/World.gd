@@ -243,31 +243,6 @@ func _on_zone_changed(peer_id: String, zone: String, pos: Vector2) -> void:
 		rp.teleport(pos, zone)
 		rp.visible = zone == my_zone
 
-## Lanterna do telemóvel (Centro de Controlo / ecrã bloqueado): luz local à volta do jogador. Só visual, só para quem a liga.
-func set_torch(on: bool) -> void:
-	if local_player == null:
-		return
-	var light: PointLight2D = local_player.get_node_or_null("Torch")
-	if light == null:
-		light = PointLight2D.new()
-		light.name = "Torch"
-		var g := GradientTexture2D.new()
-		g.fill = GradientTexture2D.FILL_RADIAL
-		g.fill_from = Vector2(0.5, 0.5)
-		g.fill_to = Vector2(0.5, 0.0)
-		g.width = 256
-		g.height = 256
-		var gr := Gradient.new()
-		gr.set_color(0, Color(1, 0.97, 0.85, 1))
-		gr.set_color(1, Color(1, 0.97, 0.85, 0))
-		g.gradient = gr
-		light.texture = g
-		light.texture_scale = 1.6
-		light.energy = 0.9
-		light.position = Vector2(0, -12)
-		local_player.add_child(light)
-	light.enabled = on
-
 ## Convite aceite: leva o jogador até ao edifício (sai primeiro do edifício onde está, se for preciso).
 func guide_to(bid: String) -> void:
 	if not WorldData.buildings.has(bid) or local_player == null:
