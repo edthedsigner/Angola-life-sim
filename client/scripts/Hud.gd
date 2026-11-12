@@ -540,9 +540,7 @@ func _on_msg(msg: Dictionary) -> void:
 			notify(str(msg.get("text", "")), msg.get("action") != null)
 			_layout()
 		"notification":
-			var n: Dictionary = msg.get("data", {})
-			if str(n.get("kind", "")) != "dm" or not phone.is_conversation_open(str(n.get("from", {}).get("pub", ""))):
-				notify(str(n.get("text", "")), true, 4.0)
+			phone.on_notification(msg.get("data", {}))       # faixa estilo telemóvel (dentro ou fora do aparelho; respeita Não incomodar)
 		"social_result":
 			if str(msg.get("text", "")) != "":
 				notify(str(msg.get("text", "")), bool(msg.get("ok", false)))
@@ -798,7 +796,7 @@ func close_all() -> bool:
 		social_panel.close()
 		return true
 	if phone.visible:
-		phone.close()
+		phone.escape()
 		return true
 	if popup.visible:
 		_close_popup()
