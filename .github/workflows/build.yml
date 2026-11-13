@@ -180,6 +180,14 @@ jobs:
         run: |
           set -e
           cd out/build/web
+          # Versão no nome do ficheiro do jogo: cada build tem um .pck com nome novo, por isso nenhum browser (nem a app
+          # no ecrã principal do iPhone) consegue usar uma cópia antiga em cache — os jogadores recebem a atualização ao
+          # recarregar, sem limpar nada. O motor (index.wasm/index.js, 43 MB) mantém o nome e continua em cache.
+          v=${GITHUB_SHA::7}
+          mv index.pck "index-$v.pck"
+          sed -i "s/\"executable\":\"index\",/\"executable\":\"index\",\"mainPack\":\"index-$v.pck\",/; s/\"index.pck\":/\"index-$v.pck\":/" index.html
+          grep -q "\"mainPack\":\"index-$v.pck\"" index.html || { echo "::error::não consegui pôr a versão no index.html"; exit 1; }
+          grep -q "\"index-$v.pck\":" index.html || { echo "::error::fileSizes sem o .pck versionado"; exit 1; }
           touch .nojekyll
           git init -q -b web-build
           git add -A

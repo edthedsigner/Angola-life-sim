@@ -73,6 +73,13 @@ collect their passwords. Development builds without that file accept `?server=` 
 Claude can do steps 1.3 and 4.1–4.4 once GitHub is connected with push access. Render can also be driven by Claude through
 the Render connector if it's enabled in the chat.
 
+## Updates reach players without clearing the cache
+Each published build names the game file after the commit (`index-<commit>.pck`), and `index.html` points to it
+(`mainPack` in `GODOT_CONFIG`). A browser, or the iPhone Home Screen app, can never reuse an old copy: a normal reload
+loads the new version. The engine files (`index.wasm`, `index.js`, about 43 MB) keep their names and stay cached, so
+updates don't re-download them. `render.yaml` also asks Render to send `Cache-Control: no-cache`, so the page itself is
+re-checked on each visit.
+
 ## Free-plan behaviour to expect
 * **Cold start:** the free server sleeps after 15 minutes without traffic and takes about a minute to wake. The game keeps retrying and
   connects by itself. Open WebSocket connections count as traffic, so it stays awake while people play.
