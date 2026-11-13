@@ -243,6 +243,26 @@ func _on_zone_changed(peer_id: String, zone: String, pos: Vector2) -> void:
 		rp.teleport(pos, zone)
 		rp.visible = zone == my_zone
 
+## AVALIAÇÃO de personagens (só neste ecrã): F4 alterna personagem clássica / amostra Townsfolk em todos os jogadores.
+func _toggle_character_set() -> void:
+	Art.character_set = "classic" if Art.character_set == "townsfolk_sample" else "townsfolk_sample"
+	for p in [local_player] + remote_players.values():
+		if is_instance_valid(p):
+			p.apply_character_set(Art.character_set)
+	hud.notify("Personagem: " + ("amostra Townsfolk (Austin)" if Art.character_set == "townsfolk_sample" else "original"))
+
+## F5: força cada animação do pack no teu jogador (idle → walk → run → wave → automático), para avaliar todas.
+func _cycle_eval_anim() -> void:
+	if local_player == null or not ("force" in local_player.visual):
+		hud.notify("F5 só funciona com a personagem Townsfolk (F4).", false)
+		return
+	var order := ["", "idle", "walk", "run", "wave"]
+	var v = local_player.visual
+	v.force = order[(order.find(v.force) + 1) % order.size()]
+	if v.force == "wave":
+		v.wave(99)
+	hud.notify("Animação: " + (v.force if v.force != "" else "automática"))
+
 ## Convite aceite: leva o jogador até ao edifício (sai primeiro do edifício onde está, se for preciso).
 func guide_to(bid: String) -> void:
 	if not WorldData.buildings.has(bid) or local_player == null:
@@ -394,6 +414,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		match event.keycode:
 			KEY_F10:
 				logout()
+			KEY_F4:
+				_toggle_character_set()
+			KEY_F5:
+				_cycle_eval_anim()
 			KEY_ESCAPE:
 				if not hud.close_all():
 					local_player.stop_path()

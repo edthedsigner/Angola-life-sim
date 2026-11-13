@@ -1,0 +1,49 @@
+{
+  "character": "Austin",
+  "frame_width": 64,
+  "frame_height": 64,
+  "pivot": [
+    32,
+    55
+  ],
+  "rows": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "animations": {
+    "idle": {
+      "file": "idle.png",
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "speed_px_per_sec": 0
+    },
+    "walk": {
+      "file": "walk.png",
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "speed_px_per_sec": 37.5
+    },
+    "run": {
+      "file": "run.png",
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "speed_px_per_sec": 90.1
+    },
+    "wave": {
+      "file": "wave.png",
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "speed_px_per_sec": 0
+    }
+  }
+}

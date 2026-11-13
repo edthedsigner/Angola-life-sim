@@ -34,12 +34,17 @@ var _bubble_label: Label
 var _status: Label
 
 @onready var name_label: Label = $NameLabel
-@onready var visual: Node2D = $Visual
+@onready var visual: Node2D = $Visual           # CharacterVisual (clássico) ou TownsfolkVisual (avaliação)
 @onready var camera: Camera2D = $Camera2D
+
+const TownsfolkVisual = preload("res://client/scripts/TownsfolkVisual.gd")
+var label_lift := 0.0          # quanto o nome/estado/balão sobem para ficarem acima de uma personagem mais alta
+var _prev_pos := Vector2.ZERO
 
 func _ready() -> void:
 	if not is_local:
 		collision_mask = 0             # o remoto só é desenhado/interpolado; nunca empurra nem é empurrado
+	apply_character_set(Art.character_set)
 	name_label.text = character_name
 	visual.apply_appearance(appearance)
 	_target = global_position
@@ -51,6 +56,38 @@ func _ready() -> void:
 		camera.reset_smoothing()
 	else:
 		camera.queue_free()
+
+## Troca só o visual (avaliação de personagens): movimento, colisão, câmara, nome e rede continuam iguais.
+func apply_character_set(set_name: String) -> void:
+	var want_sample := set_name == "townsfolk_sample"
+	var is_sample: bool = visual.get_script() == TownsfolkVisual
+	if want_sample == is_sample:
+		return
+	var old := visual
+	var nv: Node2D
+	if want_sample:
+		nv = TownsfolkVisual.new()
+	else:
+		nv = (load("res://client/scenes/CharacterVisual.tscn") as PackedScene).instantiate()
+	old.name = "VisualOld"
+	nv.name = "Visual"
+	add_child(nv)
+	move_child(nv, old.get_index())
+	old.queue_free()
+	visual = nv
+	if not want_sample:
+		visual.apply_appearance(appearance)
+	var new_lift := 0.0
+	if want_sample:
+		new_lift = float(nv.head_height) - 38.0    # o nome estava pensado para uma personagem de ~38 px
+	var d := new_lift - label_lift
+	label_lift = new_lift
+	name_label.position.y -= d
+	if _status:
+		_status.position.y -= d
+	if has_meta("label_pos"):
+		set_meta("label_pos", (get_meta("label_pos") as Vector2) - Vector2(0, d))
+		set_meta("status_pos", (get_meta("status_pos") as Vector2) - Vector2(0, d))
 
 func _build_bubble() -> void:
 	_bubble = PanelContainer.new()
@@ -75,7 +112,7 @@ func _build_bubble() -> void:
 	_status.add_theme_constant_override("outline_size", 3)
 	_status.add_theme_color_override("font_outline_color", Color(0, 0, 0))
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_status.position = Vector2(-60, -72)
+	_status.position = Vector2(-60, -72 - label_lift)
 	_status.size = Vector2(120, 10)
 	_status.visible = false
 	add_child(_status)
@@ -100,7 +137,7 @@ func say(text: String) -> void:
 	_say_t = 5.0
 	var sz := _bubble.get_combined_minimum_size()
 	_bubble.size = sz
-	_bubble.position = Vector2(-sz.x * 0.5, -64.0 - sz.y - (12.0 if _status.visible else 0.0))
+	_bubble.position = Vector2(-sz.x * 0.5, -64.0 - label_lift - sz.y - (12.0 if _status.visible else 0.0))
 
 func set_activity(label: String) -> void:
 	activity = label
@@ -212,6 +249,8 @@ func _physics_process(delta: float) -> void:
 			velocity = Vector2.ZERO
 		move_and_slide()
 		visual.set_moving(velocity.length() > 5.0, velocity.x)
+		if visual.has_method("set_motion"):
+			visual.set_motion(velocity)
 		_send_t += delta
 		if _send_t >= SEND_INTERVAL and global_position.distance_to(_last_sent) > 0.1:
 			_send_t = 0.0
@@ -221,6 +260,9 @@ func _physics_process(delta: float) -> void:
 		var d := _target - global_position
 		global_position = global_position.lerp(_target, clampf(delta * 14.0, 0.0, 1.0))
 		visual.set_moving(d.length() > 1.5, d.x)
+		if visual.has_method("set_motion"):
+			visual.set_motion((global_position - _prev_pos) / maxf(delta, 0.001))
+		_prev_pos = global_position
 
 func apply_remote_position(pos: Vector2) -> void:
 	if not is_local:
