@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import re
 import secrets
 import sys
 import time
@@ -50,8 +51,11 @@ def check_client(client: str, server: str) -> None:
     check(st == 200 and b"GODOT_CONFIG" in body, f"cliente: {base}/ responde (página Godot)")
     st, _ = http_get(base + "/index.wasm", timeout=120)
     check(st == 200, "cliente: index.wasm disponível")
-    st, pck = http_get(base + "/index.pck", timeout=120)
-    check(st == 200 and len(pck) > 100_000, f"cliente: index.pck disponível ({len(pck) // 1024} KB)")
+    # o .pck tem a versão no nome (index-<commit>.pck, ver build.yml); o index.html diz qual é
+    m = re.search(rb'"mainPack":"([^"]+)"', body)
+    pck_name = m.group(1).decode() if m else "index.pck"
+    st, pck = http_get(base + "/" + pck_name, timeout=120)
+    check(st == 200 and len(pck) > 100_000, f"cliente: {pck_name} disponível ({len(pck) // 1024} KB)")
     host = server.split("://", 1)[-1].rstrip("/").encode()
     check(host in pck, f"cliente: build aponta para {host.decode()} (config/server.json embutido)")
     check(b"GODOT_THREADS_ENABLED = false" in body, "cliente: export sem threads (iPhone/Safari, sem cabeçalhos especiais)")
