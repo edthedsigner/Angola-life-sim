@@ -695,8 +695,10 @@ func _make_page(spec: Dictionary) -> Control:
 	bar_bg.add_child(sep)
 	var title := Kit.label(str(spec.get("title", "")), 17, k, pal["label"], "semibold")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.size = Vector2(W - _px(180), _px(24))
-	title.position = Vector2(_px(90), nav_h - _px(34))
+	title.clip_text = true                                  # títulos longos encolhem com "…"
+	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	title.size = Vector2(W - _px(220), _px(24))
+	title.position = Vector2(_px(110), nav_h - _px(34))
 	title.modulate.a = 0.0 if spec.get("large", false) else 1.0
 	bar.add_child(title)
 	page.set_meta("bar_bg", bar_bg)
@@ -840,12 +842,16 @@ func alert(title: String, message: String, buttons: Array) -> void:
 	var tv := VBoxContainer.new()
 	tv.add_theme_constant_override("separation", int(_px(4)))
 	tm.add_child(tv)
+	# texto com quebra de linha: largura explícita, senão mede-se com 0 px, fica altíssimo e o alerta sai do ecrã
+	var text_w := aw - _px(32)
 	var tl := Kit.label(title, 17, k, pal["label"], "semibold", true)
 	tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tl.custom_minimum_size = Vector2(text_w, 0)
 	tv.add_child(tl)
 	if message != "":
 		var ml := Kit.label(message, 13, k, pal["label"], "regular", true)
 		ml.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		ml.custom_minimum_size = Vector2(text_w, 0)
 		tv.add_child(ml)
 	vb.add_child(tm)
 	var row := buttons.size() == 2            # 2 botões lado a lado; 1 ou 3+ empilhados (como no iOS)
@@ -881,7 +887,8 @@ func alert(title: String, message: String, buttons: Array) -> void:
 	await get_tree().process_frame
 	if not is_instance_valid(card):
 		return
-	card.position = (Vector2(W, H) - card.size) / 2.0
+	card.reset_size()                          # medir de novo com o texto já dividido em linhas
+	card.position = _clamp_popup(Vector2((W - card.size.x) / 2.0, (H - card.size.y) / 2.0), card.size)
 	card.pivot_offset = card.size / 2.0
 	card.scale = Vector2(1.15, 1.15)
 	card.modulate.a = 0.0
@@ -893,9 +900,10 @@ func alert(title: String, message: String, buttons: Array) -> void:
 func action_sheet(title: String, items: Array) -> void:
 	_release_field()
 	_overlay_bg(0.35, _clear_overlay)
+	var sheet_w := W - _px(16)
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", int(_px(8)))
-	vb.size = Vector2(W - _px(16), 0)
+	vb.custom_minimum_size = Vector2(sheet_w, 0)
 	var group := PanelContainer.new()
 	group.add_theme_stylebox_override("panel", Kit.rounded(Color(0.97, 0.97, 0.97, 0.96) if not pal["dark"] else Color(0.17, 0.17, 0.18, 0.96), _px(14)))
 	var gv := VBoxContainer.new()
@@ -904,9 +912,15 @@ func action_sheet(title: String, items: Array) -> void:
 	if title != "":
 		var tl := Kit.label(title, 13, k, pal["label2"], "semibold", true)
 		tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		tl.custom_minimum_size = Vector2(0, _px(40))
 		tl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		gv.add_child(tl)
+		var tm := MarginContainer.new()
+		for side in ["left", "right"]:
+			tm.add_theme_constant_override("margin_" + side, int(_px(16)))
+		for side in ["top", "bottom"]:
+			tm.add_theme_constant_override("margin_" + side, int(_px(12)))
+		tl.custom_minimum_size = Vector2(sheet_w - _px(32), 0)      # largura explícita (ver alert)
+		tm.add_child(tl)
+		gv.add_child(tm)
 	for it in items:
 		var sep := ColorRect.new()
 		sep.color = pal["sep"]
@@ -936,8 +950,16 @@ func action_sheet(title: String, items: Array) -> void:
 	await get_tree().process_frame
 	if not is_instance_valid(vb):
 		return
-	vb.position = Vector2(_px(8), H)
-	vb.create_tween().tween_property(vb, "position:y", H - vb.size.y - _px(30), 0.3).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	vb.reset_size()
+	var final := _clamp_popup(Vector2(_px(8), H - vb.size.y - _px(30)), vb.size)
+	vb.position = Vector2(final.x, H)
+	vb.create_tween().tween_property(vb, "position:y", final.y, 0.3).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+## Garante que um alerta/folha fica dentro do ecrã (abaixo da barra de estado, acima da barra inicial).
+func _clamp_popup(pos: Vector2, sz: Vector2) -> Vector2:
+	var top := _px(50)
+	var bottom := H - _px(20)
+	return Vector2(clampf(pos.x, 0.0, maxf(0.0, W - sz.x)), clampf(pos.y, top, maxf(top, bottom - sz.y)))
 
 # ================================================================== toque e scroll
 ## Torna um controlo tocável. Não dispara se o dedo arrastou (ex.: a fazer scroll numa lista).
