@@ -1,79 +1,53 @@
 extends PanelContainer
-## Perfil social de OUTRO jogador (abre ao tocar/clicar nele). Só mostra dados públicos enviados pelo servidor:
-## nome, avatar, nível, estado público, desde quando joga, nº de amigos e a relação contigo.
-## Todas as ações são pedidos ao servidor, que decide (amizade, saldo, posse, permissões de chamada, convites).
-## Ações agrupadas: Amizade (cabeçalho) · Convidar · Jogar · Presentes · Comunicar. Dinheiro/artigos pedem confirmação.
+## Perfil de OUTRO jogador (abre ao tocar/clicar nele). Painel flutuante à direita no computador, folha de baixo no
+## telemóvel; o mundo continua visível. Só mostra dados públicos enviados pelo servidor: nome, avatar, nível, estado
+## público, desde quando joga, nº de amigos e a relação contigo. Todas as ações são pedidos ao servidor, que decide
+## (amizade, saldo, posse, permissões de chamada, convites). Ações destrutivas e presentes pedem confirmação.
 
 signal open_conversation(pub: String, name: String)
 signal start_call(pub: String, name: String)
 
 const UIStyle = preload("res://client/scripts/UIStyle.gd")
+const UI = preload("res://client/scripts/ui/UIKit.gd")
 const Icons = preload("res://client/scripts/Icons.gd")
-const VISUAL := preload("res://client/scenes/CharacterVisual.tscn")
 
 var pub := ""
 var prof: Dictionary = {}
-var view := "main"            # main | places | gift_money | gift_item | confirm
-var pending: Dictionary = {}  # presente a confirmar
+var view := "main"            # main | invite | places | gift | gift_money | gift_item | sending
 var box: VBoxContainer
+var scroll: ScrollContainer
 var _amount: LineEdit
 
 func _ready() -> void:
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	var m := MarginContainer.new()
-	for k in ["margin_left", "margin_right"]:
-		m.add_theme_constant_override(k, 14)
-	for k in ["margin_top", "margin_bottom"]:
-		m.add_theme_constant_override(k, 12)
-	add_child(m)
-	var sc := ScrollContainer.new()
-	sc.name = "Scroll"
-	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	m.add_child(sc)
-	box = VBoxContainer.new()
+	add_theme_stylebox_override("panel", UIStyle.surface(0.84, 18, Vector4(14, 12, 14, 14)))
+	scroll = ScrollContainer.new()
+	scroll.name = "Scroll"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(scroll)
+	box = UI.vbox(10)
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	box.add_theme_constant_override("separation", 8)
-	sc.add_child(box)
+	box.mouse_filter = Control.MOUSE_FILTER_PASS
+	scroll.add_child(box)
 	NetworkManager.game_message.connect(_on_msg)
 	GameState.social_changed.connect(_on_social_changed)
 	get_viewport().size_changed.connect(_place)
 
-func _noop() -> void:
-	pass
-
-func _set_amount(v: int) -> void:
-	_amount.text = str(v)
+func _hud() -> Node:
+	return get_tree().get_first_node_in_group("hud")
 
 func _on_social_changed() -> void:
 	if visible and pub != "":
 		_request()
-
-func _do_message() -> void:
-	var p := pub
-	var n := str(prof.get("name", ""))
-	close()                                  # fecha primeiro (close() limpa `pub`)
-	open_conversation.emit(p, n)
-
-func _do_call() -> void:
-	var p := pub
-	var n := str(prof.get("name", ""))
-	close()
-	start_call.emit(p, n)
-
-func _invite_place(b_id: String) -> void:
-	_send("invite", {"kind": "place", "place": b_id})
-	_go("main")
-
-func _pick_item(item: String) -> void:
-	pending = {"kind": "item", "item": item, "qty": 1}
-	_go("confirm")
 
 func open(p: String) -> void:
 	pub = p
 	prof = {}
 	view = "main"
 	visible = true
+	modulate.a = 0.0
+	create_tween().tween_property(self, "modulate:a", 1.0, 0.14)
 	_render()
 	_request()
 
@@ -91,52 +65,27 @@ func _on_msg(msg: Dictionary) -> void:
 		"social_profile":
 			if str(msg.get("data", {}).get("pub", "")) == pub:
 				prof = msg["data"]
+				if view == "sending":
+					view = "main"
 				_render()
 		"social_result":
-			if str(msg.get("action", "")).begins_with("gift") and bool(msg.get("ok", false)):
+			if str(msg.get("action", "")).begins_with("gift"):
 				view = "main"
 				_render()
 
-# ------------------------------------------------------------------ construção
-func _l(t: String, size: int, col: Color = UIStyle.TEXT, wrap := false) -> Label:
-	var l := Label.new()
-	l.text = t
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_color", col)
-	if wrap:
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	else:                                   # nunca alarga o painel além do ecrã (telemóvel): corta com "…"
-		l.clip_text = true
-		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	return l
+func _send(type: String, extra: Dictionary = {}) -> void:
+	var d := extra.duplicate()
+	d["target"] = pub
+	NetworkManager.send_game(type, d)
 
-func _b(t: String, cb: Callable, icon := "", primary := false, enabled := true, tip := "") -> Button:
-	var b := Button.new()
-	b.text = t
-	if icon != "":
-		b.icon = Icons.tex(icon, Color(0.1, 0.06, 0.02) if primary else UIStyle.TEXT, 18)
-	b.custom_minimum_size = Vector2(0, 44)
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.clip_text = true
-	b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	b.focus_mode = Control.FOCUS_NONE
-	b.disabled = not enabled
-	b.tooltip_text = tip
-	if primary:
-		b.theme_type_variation = "PrimaryButton"
-	b.pressed.connect(cb)
-	return b
+func _go(v: String) -> void:
+	view = v
+	_render()
 
-func _row(items: Array) -> HBoxContainer:
-	var hb := HBoxContainer.new()
-	hb.add_theme_constant_override("separation", 8)
-	for it in items:
-		hb.add_child(it)
-	return hb
+func _name() -> String:
+	return str(prof.get("name", ""))
 
-func _section(t: String) -> void:
-	box.add_child(_l(t.to_upper(), 11, UIStyle.DIM))
-
+# ================================================================== desenho
 func _clear() -> void:
 	for c in box.get_children():
 		c.queue_free()
@@ -144,112 +93,201 @@ func _clear() -> void:
 func _render() -> void:
 	_clear()
 	if prof.is_empty():
-		box.add_child(_l("A carregar perfil…", 13, UIStyle.DIM))
-		box.add_child(_b("Fechar", close))
+		var h := UI.hbox(8)
+		h.add_child(UI.title("A carregar perfil…", 14, UIStyle.DIM))
+		h.add_child(UI.icon_button("x", close, "Fechar", 36, UIStyle.DIM))
+		box.add_child(h)
 		_place()
 		return
 	match view:
 		"main":
 			_render_main()
+		"invite":
+			_render_invite()
 		"places":
 			_render_places()
+		"gift":
+			_render_gift_menu()
 		"gift_money":
 			_render_gift_money()
 		"gift_item":
 			_render_gift_item()
-		"confirm":
-			_render_confirm()
+		"sending":
+			_sub_header("A enviar…")
+			box.add_child(UI.label("A aguardar a confirmação do servidor.", 13, UIStyle.DIM))
 	_place()
 
+func _sub_header(title: String) -> void:
+	var h := UI.hbox(6)
+	h.add_child(UI.icon_button("back", func(): _go("main"), "Voltar", 36, UIStyle.TEXT))
+	h.add_child(UI.title(title, 16, UIStyle.TEXT, "bold"))
+	h.add_child(UI.icon_button("x", close, "Fechar (Esc)", 36, UIStyle.DIM))
+	box.add_child(h)
+
 func _header() -> void:
-	var hb := HBoxContainer.new()
-	hb.add_theme_constant_override("separation", 10)
-	var av := Control.new()
-	av.custom_minimum_size = Vector2(48, 56)
-	av.clip_contents = true
-	var fr := Panel.new()
-	fr.set_anchors_preset(Control.PRESET_FULL_RECT)
-	fr.add_theme_stylebox_override("panel", UIStyle.box(Color(0.16, 0.2, 0.17), UIStyle.GOLD, 2))
-	fr.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	av.add_child(fr)
-	var v: Node2D = VISUAL.instantiate()
-	v.scale = Vector2(2, 2)
-	v.position = Vector2(24, 86)
-	av.add_child(v)
-	v.apply_appearance(prof.get("appearance", {}))
-	hb.add_child(av)
-	var vb := VBoxContainer.new()
+	var hb := UI.hbox(12)
+	var online := bool(prof.get("online", false))
+	hb.add_child(UI.avatar(prof.get("appearance", {}), 58, UIStyle.GOLD, 1 if online else 0))
+	var vb := UI.vbox(4)
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	vb.add_theme_constant_override("separation", 1)
-	vb.add_child(_l(str(prof.get("name", "")), 17, UIStyle.GOLD))
-	vb.add_child(_l("Nível %d" % int(prof.get("level", 1)), 13))
-	var st := _l(str(prof.get("status", "")), 12, Color(0.5, 0.9, 0.55) if prof.get("online", false) else UIStyle.DIM)
-	vb.add_child(st)
+	vb.add_child(UI.title(_name(), 18, UIStyle.TEXT, "bold"))
+	var chips := UI.hbox(6)
+	chips.add_child(UI.chip("Nv %d" % int(prof.get("level", 1)), UIStyle.GOLD, "star"))
+	var rel := str(prof.get("relation", "none"))
+	var rel_chip: Dictionary = {"friends": ["Amigos", UIStyle.GOOD, "user"], "request_sent": ["Pedido enviado", UIStyle.DIM, "user"],
+		"request_received": ["Quer ser teu amigo", UIStyle.GOLD, "user"], "blocked": ["Bloqueado", UIStyle.BAD, "block"]}
+	if rel_chip.has(rel):
+		chips.add_child(UI.chip(rel_chip[rel][0], rel_chip[rel][1], rel_chip[rel][2]))
+	vb.add_child(chips)
+	vb.add_child(UI.title(str(prof.get("status", "")), 12, UIStyle.GOOD if online else UIStyle.DIM, "medium"))
 	hb.add_child(vb)
-	var right := VBoxContainer.new()
-	right.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	right.custom_minimum_size = Vector2(112, 0)
-	match str(prof.get("relation", "none")):
-		"none":
-			right.add_child(_b("Adicionar", func(): _send("friend_request"), "plus", true))
-		"request_sent":
-			right.add_child(_l("Pedido enviado", 11, UIStyle.DIM))
-			right.add_child(_b("Cancelar", func(): _send("friend_cancel")))
-		"request_received":
-			right.add_child(_b("Aceitar", func(): _send("friend_accept"), "", true))
-			right.add_child(_b("Recusar", func(): _send("friend_decline")))
-		"friends":
-			right.add_child(_l("Amigos", 14, UIStyle.GOOD))
-			right.add_child(_b("Remover", func(): _send("friend_remove")))
-		"blocked":
-			right.add_child(_b("Desbloquear", func(): _send("unblock")))
-	hb.add_child(right)
+	var x := UI.icon_button("x", close, "Fechar (Esc)", 36, UIStyle.DIM)
+	x.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	hb.add_child(x)
 	box.add_child(hb)
+
+## Tile de ação (ícone em cima, texto em baixo), em grelha 2×2.
+func _tile(icon_name: String, text: String, cb: Callable, enabled: bool = true, tip: String = "") -> Button:
+	var b := Button.new()
+	b.text = text
+	b.icon = Icons.tex(icon_name, UIStyle.GOLD if enabled else UIStyle.FAINT, 22)
+	b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.custom_minimum_size = Vector2(0, 68)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.focus_mode = Control.FOCUS_NONE
+	b.disabled = not enabled
+	b.tooltip_text = tip
+	b.add_theme_font_override("font", UIStyle.font("semibold"))
+	b.add_theme_font_size_override("font_size", 13)
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	b.pressed.connect(cb)
+	return b
 
 func _render_main() -> void:
 	_header()
-	box.add_child(HSeparator.new())
-	var blocked := str(prof.get("relation", "")) == "blocked"
+	var rel := str(prof.get("relation", "none"))
+	var blocked := rel == "blocked"
+	# ação de amizade principal (destacada)
+	match rel:
+		"none":
+			box.add_child(UI.button("Adicionar amigo", func(): _send("friend_request"), "primary", "plus"))
+		"request_sent":
+			box.add_child(UI.button("Cancelar pedido de amizade", func(): _send("friend_cancel"), "secondary"))
+		"request_received":
+			var r := UI.hbox(8)
+			var a := UI.button("Aceitar pedido", func(): _send("friend_accept"), "primary", "check")
+			a.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			r.add_child(a)
+			var d := UI.button("Recusar", func(): _send("friend_decline"), "secondary")
+			d.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			r.add_child(d)
+			box.add_child(r)
 	if blocked:
-		box.add_child(_l("Bloqueaste este jogador: não te pode contactar.", 13, UIStyle.DIM, true))
+		box.add_child(UI.card(UI.label("Bloqueaste este jogador: não te pode enviar mensagens, convites, presentes nem ligar.", 13, UIStyle.DIM, "regular", true)))
+		box.add_child(UI.button("Desbloquear", func(): _send("unblock"), "secondary"))
 	else:
-		_section("Convidar")
-		box.add_child(_row([_b("Para minha casa", func(): _send("invite", {"kind": "house"}), "home"),
-			_b("Sítio público…", func(): _go("places"), "shop")]))
-		_section("Jogar")
-		var games: Dictionary = GameState.social.get("games", {})
-		box.add_child(_b("Jogar um jogo" if not games.is_empty() else "Jogar um jogo — sem jogos disponíveis ainda", _noop, "job", false, not games.is_empty(),
-			"Os minijogos multijogador ainda não existem; o convite fica ativo quando forem registados."))
-		_section("Presentes")
-		box.add_child(_row([_b("Dinheiro", func(): _go("gift_money"), "wallet"), _b("Artigo", func(): _go("gift_item"), "bag")]))
-		_section("Comunicar")
 		var can_msg := bool(prof.get("can_message", true))
 		var can_call := bool(prof.get("can_call", false))
 		var call_tip := "" if can_call else ("Offline" if not prof.get("online", false) else "Esta pessoa não aceita chamadas tuas")
-		box.add_child(_row([_b("Mensagem", _do_message, "chat", false, can_msg),
-			_b("Ligar" if can_call else "Ligar (indisponível)", _do_call, "phone", false, can_call, call_tip)]))
-	box.add_child(HSeparator.new())
-	box.add_child(_l("A jogar desde %s · %d amigos" % [str(prof.get("since", "?")), int(prof.get("friends_count", 0))], 11, UIStyle.DIM))
-	var foot := _row([_b("Bloquear" if not blocked else "Desbloquear", func(): _send("unblock" if blocked else "block")), _b("Fechar", close)])
-	box.add_child(foot)
+		var grid := GridContainer.new()
+		grid.columns = 2
+		grid.add_theme_constant_override("h_separation", 8)
+		grid.add_theme_constant_override("v_separation", 8)
+		grid.mouse_filter = Control.MOUSE_FILTER_PASS
+		grid.add_child(_tile("chat", "Mensagem", _do_message, can_msg))
+		grid.add_child(_tile("phone", "Ligar" if can_call else "Ligar · indisponível", _do_call, can_call, call_tip))
+		grid.add_child(_tile("home", "Convidar", func(): _go("invite")))
+		grid.add_child(_tile("gift", "Presente", func(): _go("gift")))
+		box.add_child(grid)
+		var games: Dictionary = GameState.social.get("games", {})
+		var g := UI.button("Jogar um jogo" if not games.is_empty() else "Jogar um jogo · em breve", func(): pass, "ghost", "gamepad", not games.is_empty(),
+			"Os minijogos multijogador ainda não existem; o convite fica ativo quando forem registados.")
+		box.add_child(g)
+	box.add_child(UI.label("A jogar desde %s · %d amigo%s" % [str(prof.get("since", "?")), int(prof.get("friends_count", 0)), "" if int(prof.get("friends_count", 0)) == 1 else "s"], 12, UIStyle.FAINT))
+	# zona de risco, separada e com confirmação
+	var danger := UI.hbox(8)
+	if rel == "friends":
+		var rm := UI.button("Remover amigo", func():
+			_hud().confirm("Remover %s?" % _name(), "Deixam de ser amigos. Podes voltar a enviar um pedido mais tarde.", "Remover", func(): _send("friend_remove"), true), "danger")
+		rm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		danger.add_child(rm)
+	if not blocked:
+		var bl := UI.button("Bloquear", func():
+			_hud().confirm("Bloquear %s?" % _name(), "Remove a amizade e os pedidos pendentes. Deixa de te poder enviar mensagens, convites, presentes e chamadas.", "Bloquear", func(): _send("block"), true), "danger", "block")
+		bl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		danger.add_child(bl)
+	if danger.get_child_count() > 0:
+		box.add_child(HSeparator.new())
+		box.add_child(danger)
+
+func _do_message() -> void:
+	var p := pub
+	var n := _name()
+	close()                                  # fecha primeiro (close() limpa `pub`)
+	open_conversation.emit(p, n)
+
+func _do_call() -> void:
+	var p := pub
+	var n := _name()
+	close()
+	start_call.emit(p, n)
+
+func _option(icon_name: String, title: String, sub: String, cb: Callable) -> Control:
+	var b := Button.new()
+	b.focus_mode = Control.FOCUS_NONE
+	b.custom_minimum_size = Vector2(0, 58)
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	b.pressed.connect(cb)
+	var h := UI.hbox(12)
+	h.set_anchors_preset(Control.PRESET_FULL_RECT)
+	h.offset_left = 14
+	h.offset_right = -12
+	h.add_child(UI.icon(icon_name, UIStyle.GOLD, 20))
+	var v := UI.vbox(1)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	v.alignment = BoxContainer.ALIGNMENT_CENTER
+	v.add_child(UI.title(title, 14, UIStyle.TEXT, "semibold"))
+	if sub != "":
+		v.add_child(UI.title(sub, 12, UIStyle.DIM, "regular"))
+	h.add_child(v)
+	h.add_child(UI.icon("send", UIStyle.FAINT, 14))
+	b.add_child(h)
+	return b
+
+func _render_invite() -> void:
+	_sub_header("Convidar %s" % _name())
+	box.add_child(_option("home", "Para a minha casa", "Só se tiveres casa arrendada; dá acesso de visita por 30 min", func():
+		_send("invite", {"kind": "house"})
+		_go("main")))
+	box.add_child(_option("pin", "Para um sítio público…", "Recebe o caminho até lá", func(): _go("places")))
 
 func _render_places() -> void:
-	box.add_child(_l("Convidar %s para…" % prof.get("name", ""), 16, UIStyle.GOLD))
+	_sub_header("Sítio público")
 	var places: Dictionary = GameState.social.get("places", {})
+	if places.is_empty():
+		box.add_child(UI.empty_state("pin", "Sem sítios públicos", ""))
 	for bid in places:
 		var b_id: String = bid
-		box.add_child(_b(str(places[bid]), _invite_place.bind(b_id), "enter"))
-	box.add_child(_b("Voltar", func(): _go("main"), "back"))
+		box.add_child(_option("pin", str(places[bid]), "", func():
+			_send("invite", {"kind": "place", "place": b_id})
+			_go("main")))
+
+func _render_gift_menu() -> void:
+	_sub_header("Presente para %s" % _name())
+	box.add_child(_option("wallet", "Dinheiro", "Saldo: " + GameState.fmt_kz(int(GameState.self_state.get("money", 0))), func(): _go("gift_money")))
+	box.add_child(_option("bag", "Artigo da mochila", "Escolhe um artigo", func(): _go("gift_item")))
 
 func _render_gift_money() -> void:
+	_sub_header("Enviar dinheiro")
 	var money := int(GameState.self_state.get("money", 0))
-	box.add_child(_l("Enviar dinheiro a %s" % prof.get("name", ""), 16, UIStyle.GOLD))
-	box.add_child(_l("O teu saldo: %s" % GameState.fmt_kz(money), 12, UIStyle.DIM))
-	var presets := HBoxContainer.new()
-	presets.add_theme_constant_override("separation", 6)
+	box.add_child(UI.chip("O teu saldo: " + GameState.fmt_kz(money), UIStyle.GOLD, "wallet"))
+	var presets := UI.hbox(6)
 	for v in [500, 1000, 5000]:
 		var amt: int = v
-		presets.add_child(_b(GameState.fmt_kz(v), _set_amount.bind(amt), "", false, money >= v))
+		var b := UI.button(GameState.fmt_kz(v), func(): _amount.text = str(amt), "secondary", "", money >= v)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		presets.add_child(b)
 	box.add_child(presets)
 	var field := PanelContainer.new()
 	field.theme_type_variation = "FieldBox"
@@ -257,67 +295,72 @@ func _render_gift_money() -> void:
 	_amount.placeholder_text = "Outro valor (Kz)"
 	_amount.max_length = 7
 	_amount.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_NUMBER
+	_amount.focus_entered.connect(func(): field.theme_type_variation = "FieldBoxFocus")
+	_amount.focus_exited.connect(func(): field.theme_type_variation = "FieldBox")
 	field.add_child(_amount)
 	box.add_child(field)
-	box.add_child(_row([_b("Voltar", func(): _go("main"), "back"), _b("Continuar", _confirm_money, "", true)]))
+	box.add_child(UI.button("Continuar", _confirm_money, "primary", "send"))
 
 func _confirm_money() -> void:
 	var t := _amount.text.strip_edges()
 	if not t.is_valid_int() or int(t) <= 0:
-		get_tree().call_group("hud", "notify", "Escreve um valor válido.", false)
+		_hud().notify("Escreve um valor válido.", false)
 		return
-	pending = {"kind": "money", "amount": int(t)}
-	_go("confirm")
+	var amount := int(t)
+	var after := int(GameState.self_state.get("money", 0)) - amount
+	_hud().confirm("Enviar %s a %s?" % [GameState.fmt_kz(amount), _name()], "Saldo depois: %s. Os presentes não podem ser anulados." % GameState.fmt_kz(after), "Enviar",
+		func(): _send_gift({"kind": "money", "amount": amount}))
 
 func _render_gift_item() -> void:
-	box.add_child(_l("Oferecer um artigo a %s" % prof.get("name", ""), 16, UIStyle.GOLD))
+	_sub_header("Oferecer um artigo")
 	var inv: Dictionary = GameState.self_state.get("inventory", {})
 	if inv.is_empty():
-		box.add_child(_l("Não tens artigos. Compra-os na Mercearia ou no Restaurante.", 13, UIStyle.DIM, true))
+		box.add_child(UI.empty_state("bag", "Mochila vazia", "Compra artigos na Mercearia ou no Restaurante."))
 	for it in inv:
 		var item: String = it
-		var have := int(inv[it])
-		box.add_child(_row([_l("%s ×%d" % [WorldData.item_name(it), have], 14), _b("Oferecer 1", _pick_item.bind(item))]))
-	box.add_child(_b("Voltar", func(): _go("main"), "back"))
+		var row := UI.hbox(10)
+		var ic := TextureRect.new()
+		ic.texture = UI.item_icon(item, 36)
+		ic.custom_minimum_size = Vector2(36, 36)
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+		row.add_child(ic)
+		row.add_child(UI.title("%s  ×%d" % [WorldData.item_name(it), int(inv[it])], 14))
+		var b := UI.button("Oferecer 1", func():
+			_hud().confirm("Oferecer %s a %s?" % [WorldData.item_name(item), _name()], "Os presentes não podem ser anulados.", "Oferecer",
+				func(): _send_gift({"kind": "item", "item": item, "qty": 1})), "secondary", "gift")
+		b.custom_minimum_size = Vector2(0, 38)
+		row.add_child(b)
+		box.add_child(UI.card(row, Vector4(10, 6, 8, 6)))
 
-func _render_confirm() -> void:
-	box.add_child(_l("Confirmar presente", 16, UIStyle.GOLD))
-	var what := GameState.fmt_kz(int(pending.get("amount", 0))) if pending.get("kind") == "money" else "%s ×%d" % [WorldData.item_name(str(pending.get("item", ""))), int(pending.get("qty", 1))]
-	box.add_child(_l("Vais enviar %s a %s." % [what, prof.get("name", "")], 15, UIStyle.TEXT, true))
-	if pending.get("kind") == "money":
-		box.add_child(_l("Saldo depois: %s" % GameState.fmt_kz(int(GameState.self_state.get("money", 0)) - int(pending["amount"])), 12, UIStyle.DIM))
-	box.add_child(_l("Os presentes não podem ser anulados.", 11, UIStyle.DIM))
-	box.add_child(_row([_b("Cancelar", func(): _go("main")), _b("Enviar", _send_gift, "send", true)]))
-
-func _send_gift() -> void:
+func _send_gift(p: Dictionary) -> void:
 	# req_id único por confirmação: o servidor ignora repetições (duplo toque, reenvio) — nunca transfere duas vezes
 	var req := "%x%x" % [Time.get_ticks_usec(), randi()]
-	if pending.get("kind") == "money":
-		NetworkManager.send_game("gift_money", {"target": pub, "amount": int(pending["amount"]), "req_id": req})
+	if p.get("kind") == "money":
+		NetworkManager.send_game("gift_money", {"target": pub, "amount": int(p["amount"]), "req_id": req})
 	else:
-		NetworkManager.send_game("gift_item", {"target": pub, "item": pending["item"], "qty": int(pending["qty"]), "req_id": req})
-	view = "sending"
-	_clear()
-	box.add_child(_l("A enviar…", 14, UIStyle.DIM))
+		NetworkManager.send_game("gift_item", {"target": pub, "item": p["item"], "qty": int(p["qty"]), "req_id": req})
+	_go("sending")
 
-func _go(v: String) -> void:
-	view = v
-	_render()
-
-func _send(type: String, extra: Dictionary = {}) -> void:
-	var d := extra.duplicate()
-	d["target"] = pub
-	NetworkManager.send_game(type, d)
-
+# ================================================================== posição: painel à direita / folha de baixo
 func _place() -> void:
+	if not is_inside_tree():
+		return
 	var vs := get_viewport_rect().size
 	var compact := vs.x < 760.0
-	var w := vs.x - 16.0 if compact else 360.0
+	var w := vs.x - 16.0 if compact else 370.0
 	custom_minimum_size = Vector2(w, 0)
 	size = Vector2.ZERO
 	await get_tree().process_frame
-	var sc: ScrollContainer = get_node("MarginContainer/Scroll") if has_node("MarginContainer/Scroll") else get_child(0).get_child(0)
-	sc.custom_minimum_size = Vector2(w - 28.0, minf(box.get_combined_minimum_size().y, vs.y * (0.55 if compact else 0.7)))
+	if not is_instance_valid(scroll):
+		return
+	var bottom := vs.y - 70.0
+	var top := 8.0
+	var hud := _hud()
+	if hud and "zoom_box" in hud:                 # no telemóvel: entre o HUD de cima e o dock/zoom, sem tapar nenhum
+		bottom = minf(hud.dock.position.y, hud.zoom_box.position.y) - 6.0
+		top = hud.content_top()
+	var max_h := (bottom - top - 30.0) if compact else vs.y * 0.74
+	scroll.custom_minimum_size = Vector2(w - 28.0, minf(box.get_combined_minimum_size().y, max_h))
 	size = Vector2.ZERO
 	var s := get_combined_minimum_size()
-	position = Vector2(8.0, vs.y - s.y - 8.0) if compact else Vector2(vs.x - s.x - 12.0, (vs.y - s.y) * 0.5)
+	position = Vector2(8.0, maxf(8.0, bottom - s.y)) if compact else Vector2(vs.x - s.x - 14.0, (vs.y - s.y) * 0.5)
