@@ -107,7 +107,10 @@ for n, f in (("Legs", "legs"), ("Body", "body"), ("Shirt", "shirt")):
 s.node("Hair", "Sprite2D", parent=".", texture=s.res("Texture2D", A + "characters/hair_0.png"), centered="false", offset=V(-12, -40))
 s.save(SC / "CharacterVisual.tscn")
 
-s = Scene(); s.node("Player", "CharacterBody2D", script=s.res("Script", "res://client/scripts/Player.gd"))
+# física do jogador: camada 2 / máscara 1 (não colide com outros jogadores), modo FLOATING (vista de cima, sem "chão";
+# no modo GROUNDED um jogador encostado por baixo virava plataforma e o local seguia-o). Ver Player.gd.
+s = Scene(); s.node("Player", "CharacterBody2D", collision_layer="2", collision_mask="1", motion_mode="1",
+                    platform_floor_layers="0", platform_wall_layers="0", script=s.res("Script", "res://client/scripts/Player.gd"))
 shape = s.subres("RectangleShape2D", size="Vector2(14, 8)")
 s.node("CollisionShape2D", "CollisionShape2D", parent=".", position=V(0, -4), shape=shape)
 s.node("Visual", parent=".", inst=S + "CharacterVisual.tscn")

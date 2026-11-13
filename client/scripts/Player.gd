@@ -1,9 +1,13 @@
 extends CharacterBody2D
 ## Jogador local (teclado OU caminho de navegação + câmara) ou remoto (interpolado a partir do servidor).
 ## Rato, toque e interações usam todos o mesmo caminho: World calcula-o com WorldData.find_path e chama set_path().
+##
+## Física (Player.tscn): modo FLOATING (vista de cima, sem "chão") e camada própria (2) com máscara só do mundo (1).
+## Os jogadores não colidem entre si: o servidor não os trata como obstáculos, e no modo GROUNDED um jogador remoto
+## encostado por baixo passava a ser o "chão" do local, que herdava o movimento dele e o seguia (bug de seguir).
 
 signal arrived                 # chegou ao fim do caminho
-signal path_failed             # ficou preso (bloqueado por outro jogador, porta fechada entretanto, etc.)
+signal path_failed             # ficou preso (porta fechada entretanto, canto de parede, etc.)
 
 const ISO_Y := 0.5            # achatamento vertical isométrico
 const SEND_INTERVAL := 0.05   # 20 Hz
@@ -34,6 +38,8 @@ var _status: Label
 @onready var camera: Camera2D = $Camera2D
 
 func _ready() -> void:
+	if not is_local:
+		collision_mask = 0             # o remoto só é desenhado/interpolado; nunca empurra nem é empurrado
 	name_label.text = character_name
 	visual.apply_appearance(appearance)
 	_target = global_position
