@@ -3,6 +3,7 @@
 Persistent multiplayer life sim set in Luanda. Godot 4.3+ client, Python authoritative WebSocket server.
 **Latest work:** `docs/SCALE.md` (one consistent world scale, true-size furniture, sit/lie poses, scale test scene) and
 `docs/SOCIAL.md` (player profiles, friends, invites, gifts, private messages, voice calls, notifications, levels).
+In-game phone (iPhone-style device, gestures, Notification and Control Centre): `docs/PHONE.md`.
 Previous milestone: `docs/RESTORATION_REPORT.md` (what was restored from the original prototype, how, what was tested — with real
 in-engine screenshots in `docs/screenshots/`). Comparison of both projects: `docs/COMPARISON.md`. Adding buildings/activities: `docs/BUILDINGS.md`.
 
