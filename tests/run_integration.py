@@ -59,7 +59,7 @@ async def production_tests(sp):
         p.terminate(); p.wait()
 
 def start_server(data_dir):
-    env = dict(os.environ, ANGOLA_PORT=str(PORT), PYTHONUNBUFFERED="1", ANGOLA_ACTIVITY_SCALE="0.1", ANGOLA_DEV_START_MONEY="30000", ANGOLA_CALL_RING_SECS="2", ANGOLA_INVITE_TTL="3",
+    env = dict(os.environ, ANGOLA_PORT=str(PORT), PYTHONUNBUFFERED="1", ANGOLA_ACTIVITY_SCALE="0.1", ANGOLA_DEV_START_MONEY="30000", ANGOLA_CALL_RING_SECS="2", ANGOLA_INVITE_TTL="3", ANGOLA_GAME_INVITE_TTL="2", ANGOLA_GAME_RECONNECT="2",
                ANGOLA_WORLD=str(ROOT / "shared" / "data" / "world.json"), ANGOLA_STORAGE=STORE_SPEC)
     for k in ("PORT", "RENDER", "DATABASE_URL", "ANGOLA_REQUIRE_DATABASE", "ANGOLA_ALLOWED_ORIGINS"):
         env.pop(k, None)
@@ -187,6 +187,7 @@ async def main():
     b = await open_bot(); r = await login(b, "legado_vazio"); check("migração: conta antiga sem personagem => new", r and r["data"]["onboarding"]["state"] == "new"); await b.cm.__aexit__(None, None, None)
     await gameplay_tests(open_bot)
     await social_tests(open_bot)
+    await minigame_tests(open_bot)
     srv.terminate(); shutil.rmtree(tmp, ignore_errors=True)
     print(f"\n{len(OK)} passaram, {len(FAIL)} falharam"); sys.exit(1 if FAIL else 0)
 # ---------------------------------------------------------------- gameplay (zones, interiors, needs, economy)
@@ -444,7 +445,7 @@ async def social_tests(open_bot):
     # 7. convites
     await A.send(type="invite", target=pb, kind="house"); r = await last_of(A, "social_result"); check("convite para casa sem casa arrendada rejeitado", r and not r["ok"])
     await A.send(type="invite", target=pb, kind="place", place="casa"); r = await last_of(A, "social_result"); check("convite para sítio privado como 'público' rejeitado", r and not r["ok"])
-    await A.send(type="invite", target=pb, kind="game", game="xadrez"); r = await last_of(A, "social_result"); check("convite para jogar: sem jogos registados -> indisponível", r and not r["ok"] and "jogos" in r["text"])
+    await A.send(type="invite", target=pb, kind="game", game="xadrez"); r = await last_of(A, "social_result"); check("convite para jogar um jogo inexistente rejeitado", r and not r["ok"] and "jogo" in r["text"])
     await A.send(type="invite", target=pb, kind="place", place="restaurante"); r = await last_of(A, "social_result")
     n = await B.get("notification", pred=lambda m: m["data"]["kind"] == "invite"); check("convite para o Restaurante Maianga com destino", r and r["ok"] and n and n["data"]["data"]["building"] == "restaurante")
     await asyncio.sleep(0.5)
@@ -514,5 +515,144 @@ async def social_tests(open_bot):
     await A.send(type="call_start", target=pb); r = await A.get("call_failed"); check("ligar a quem está offline falha", r and r["reason"] == "offline")
     for bot in (A, C):
         await bot.cm.__aexit__(None, None, None)
+
+async def minigame_tests(open_bot):
+    """Jogo do Galo (1v1): convites, elegibilidade, turnos, validação, fim, revanche, desligar/voltar, acesso."""
+    G1, c1, _ = await make_player(open_bot, "mg_gil", "Gil Galo")
+    G2, c2, _ = await make_player(open_bot, "mg_gina", "Gina Galo")
+    G3, c3, _ = await make_player(open_bot, "mg_guto", "Guto Galo")
+    pubs = []
+    for b in (G1, G2, G3):
+        await b.send(type="social_state_request"); pubs.append((await last_of(b, "social_state"))["data"]["pub"])
+    p1, p2, p3 = pubs
+    await G1.send(type="friend_request", target=p2); await G1.get("social_result")
+    await G2.send(type="friend_accept", target=p1); await G2.get("social_result")
+    for b in (G1, G2, G3):
+        await b.drain(); b.q.clear()
+    async def gs(b, pred=None, timeout=3):
+        """Último game_state que satisfaz pred (descarta os anteriores já recebidos)."""
+        end = time.time() + timeout
+        while time.time() < end:
+            await b.drain()
+            hits = [m for m in b.q if m["type"] == "game_state" and (pred is None or (m["data"] and pred(m["data"])))]
+            if hits:
+                b.q = [m for m in b.q if m["type"] != "game_state"]
+                return hits[-1]["data"]
+        return None
+    async def invite():
+        await asyncio.sleep(0.9)                       # limite de ritmo dos convites
+        await G1.send(type="invite", target=p2, kind="game", game="galo"); r = await last_of(G1, "social_result")
+        n = await G2.get("notification", pred=lambda m: m["data"]["kind"] == "invite")
+        return r, n
+    # --- elegibilidade
+    await G1.send(type="invite", target=p3, kind="game", game="galo"); r = await last_of(G1, "social_result")
+    check("galo: só se convida amigos (não-amigo rejeitado)", r and not r["ok"] and "amigos" in r["text"])
+    await asyncio.sleep(0.9)
+    await G1.send(type="invite", target=p2, kind="game", game="xadrez"); r = await last_of(G1, "social_result")
+    check("galo: jogo desconhecido rejeitado", r and not r["ok"])
+    # --- recusar
+    r, n = await invite()
+    check("galo: convite enviado + notificação com Aceitar/Recusar", r and r["ok"] and n and n["data"]["data"]["game"] == "galo" and n["data"]["actions"] == ["accept", "decline"])
+    check("galo: convite de jogo expira depressa (≤ 2 min)", n and 0 < n["data"]["data"]["expires_in"] <= 120)
+    await G2.send(type="invite_respond", iid=n["data"]["data"]["iid"], accept=False); r = await last_of(G2, "social_result")
+    rep = await G1.get("notification", pred=lambda m: m["data"]["kind"] == "invite_reply")
+    nog = await G1.get("game_state", timeout=0.6)
+    check("galo: recusar avisa quem convidou e não cria partida", r and r["ok"] and rep and not rep["data"]["data"]["accepted"] and nog is None)
+    # --- expirar
+    r, n = await invite()
+    await asyncio.sleep(2.6)
+    await G2.send(type="invite_respond", iid=n["data"]["data"]["iid"], accept=True); r = await last_of(G2, "social_result")
+    nog = await G2.get("game_state", timeout=0.6)
+    check("galo: convite expirado não pode ser aceite", r and not r["ok"] and "expirou" in r["text"] and nog is None)
+    # --- aceitar -> partida
+    r, n = await invite()
+    await G2.send(type="invite_respond", iid=n["data"]["data"]["iid"], accept=True); r = await last_of(G2, "social_result")
+    s1, s2 = await gs(G1), await gs(G2)
+    check("galo: aceitar cria a partida e os dois entram", r and r["ok"] and s1 and s2 and s1["mid"] == s2["mid"] and s1["status"] == "active")
+    mid = s1["mid"]
+    check("galo: quem convidou é X e começa", s1["you"] == 0 and s2["you"] == 1 and s1["state"]["turn"] == 0 and s1["state"]["board"] == [""] * 9)
+    check("galo: estado só com dados públicos (sem ids internos)", c1["id"] not in json.dumps(s1) and c2["id"] not in json.dumps(s2) and "money" not in json.dumps(s1))
+    await asyncio.sleep(0.9)
+    await G2.send(type="invite", target=p1, kind="game", game="galo"); r = await last_of(G2, "social_result")
+    check("galo: quem já está numa partida não pode convidar", r and not r["ok"] and "partida" in r["text"])
+    # --- turnos e jogadas
+    await G2.send(type="game_move", mid=mid, cell=0, seq=0); e = await G2.get("game_error")
+    check("galo: jogar fora da vez é rejeitado", e and "vez" in e["text"])
+    await G1.send(type="game_move", mid=mid, cell=4, seq=0); s1, s2 = await gs(G1, lambda d: d["seq"] == 1), await gs(G2, lambda d: d["seq"] == 1)
+    check("galo: jogada válida -> mesmo tabuleiro para os dois", s1 and s2 and s1["state"]["board"] == s2["state"]["board"] and s1["state"]["board"][4] == "X" and s2["state"]["turn"] == 1)
+    await G1.send(type="game_move", mid=mid, cell=0, seq=0); e = await G1.get("game_error")
+    check("galo: jogada repetida/desatualizada (seq antigo) rejeitada", e and "desatualizada" in e["text"])
+    await G1.send(type="game_move", mid=mid, cell=0, seq=1); e = await G1.get("game_error")
+    check("galo: duas jogadas seguidas do mesmo jogador rejeitadas", e and "vez" in e["text"])
+    await G2.send(type="game_move", mid=mid, cell=4, seq=1); e = await G2.get("game_error")
+    check("galo: casa ocupada rejeitada", e and "ocupada" in e["text"])
+    bad = []
+    for cell in (9, -1, "3", 2.5, None, True):
+        await G2.send(type="game_move", mid=mid, cell=cell, seq=1); e = await G2.get("game_error"); bad.append(bool(e and "inválida" in e["text"]))
+    check("galo: casas inválidas (fora 0-8, texto, decimal, vazio) rejeitadas", all(bad))
+    await G3.send(type="game_move", mid=mid, cell=0, seq=1); e = await G3.get("game_error")
+    await G3.send(type="game_leave", mid=mid); e2 = await G3.get("game_error")
+    await G3.send(type="game_state_request"); g3 = await G3.get("game_state")
+    check("galo: terceiro não joga, não sai nem vê a partida dos outros", e and "não fazes parte" in e["text"].lower() and e2 and g3 and g3["data"] is None)
+    await G1.drain(); await G2.drain()
+    check("galo: jogadas rejeitadas não mudam o tabuleiro", not [m for m in G1.q + G2.q if m["type"] == "game_state" and m["data"]["seq"] != 1])
+    G1.q.clear(); G2.q.clear()
+    # --- vitória (X: 4, 2, 6)
+    seq = 1
+    for b, cell in ((G2, 0), (G1, 2), (G2, 1), (G1, 6)):
+        await b.send(type="game_move", mid=mid, cell=cell, seq=seq); seq += 1
+        await gs(G1, lambda d, s_=seq: d["seq"] == s_); await gs(G2, lambda d, s_=seq: d["seq"] == s_)
+    await G1.send(type="game_state_request"); f1 = await gs(G1)
+    check("galo: 3 em linha -> vitória com a linha certa", f1 and f1["status"] == "finished" and f1["result"]["winner"] == 0 and f1["result"]["line"] == [2, 4, 6] and f1["series"] == [1, 0])
+    await G2.send(type="game_move", mid=mid, cell=8, seq=seq); e = await G2.get("game_error")
+    check("galo: sem jogadas depois do fim", e and "terminou" in e["text"])
+    # --- revanche (lugares trocam: quem era O passa a X)
+    await G1.send(type="game_rematch", mid=mid); v = await gs(G2, lambda d: d["mid"] == mid)
+    check("galo: voto de revanche visível ao outro", v and any(p["rematch"] for p in v["players"]) and v["status"] == "finished")
+    await G2.send(type="game_rematch", mid=mid); n1, n2 = await gs(G1, lambda d: d["mid"] != mid), await gs(G2, lambda d: d["mid"] != mid)
+    check("galo: revanche -> nova partida, marcas trocadas, placar mantido", n1 and n2 and n1["mid"] == n2["mid"] and n2["you"] == 0 and n1["you"] == 1 and n1["status"] == "active" and n2["series"] == [0, 1])
+    mid = n1["mid"]
+    # --- empate (G2 = X)
+    seq = 0
+    for b, cell in ((G2, 0), (G1, 1), (G2, 2), (G1, 4), (G2, 3), (G1, 5), (G2, 7), (G1, 6), (G2, 8)):
+        await b.send(type="game_move", mid=mid, cell=cell, seq=seq); seq += 1
+        await gs(G1, lambda d, s_=seq: d["seq"] == s_); await gs(G2, lambda d, s_=seq: d["seq"] == s_)
+    await G2.send(type="game_state_request"); f = await gs(G2)
+    check("galo: tabuleiro cheio sem linha -> empate", f and f["status"] == "finished" and f["result"].get("draw") and f["series"] == [0, 1])
+    await G1.send(type="game_rematch", mid=mid); await G2.send(type="game_rematch", mid=mid)
+    n1 = await gs(G1, lambda d: d["mid"] != mid and d["status"] == "active"); await G2.drain()
+    mid = n1["mid"]
+    check("galo: segunda revanche volta a trocar (Gil é X)", n1["you"] == 0)
+    await G1.send(type="game_move", mid=mid, cell=0, seq=0); await gs(G1, lambda d: d["seq"] == 1)
+    # --- desligar e voltar dentro do tempo
+    await G2.cm.__aexit__(None, None, None)
+    off = await gs(G1, lambda d: not d["players"][1]["online"])
+    check("galo: quem fica é avisado de que o outro desligou (com prazo)", off and off["status"] == "active" and off["away_deadline"])
+    G2 = await open_bot(); await G2.send(type="login", username="mg_gina", password="pw1234"); r = await G2.get("auth_response")
+    await G2.send(type="enter_world", character_id=r["data"]["character"]["id"])
+    back = await gs(G2); on = await gs(G1, lambda d: d["players"][1]["online"])
+    check("galo: ao voltar, recupera a partida com o tabuleiro intacto", back and back["mid"] == mid and back["status"] == "active" and back["state"]["board"][0] == "X" and back["you"] == 1)
+    check("galo: o adversário vê-o voltar", on is not None)
+    # --- desligar e não voltar -> perde por falta de comparência
+    await G2.cm.__aexit__(None, None, None)
+    gone = await gs(G1, lambda d: d["status"] == "finished", timeout=5)
+    check("galo: não voltar a tempo -> perde por abandono", gone and gone["result"]["reason"] == "disconnect" and gone["result"]["winner"] == 0)
+    # --- desistir
+    G2 = await open_bot(); await G2.send(type="login", username="mg_gina", password="pw1234"); r = await G2.get("auth_response")
+    await G2.send(type="enter_world", character_id=r["data"]["character"]["id"]); last = await gs(G2)
+    check("galo: ao voltar depois do fim vê o resultado (pode pedir revanche)", last and last["status"] == "finished" and last["mid"] == mid)
+    await G1.send(type="game_rematch", mid=mid); await G2.send(type="game_rematch", mid=mid)
+    n2 = await gs(G2, lambda d: d["mid"] != mid and d["status"] == "active"); mid = n2["mid"]; await G1.drain()
+    await G2.send(type="game_leave", mid=mid); f1 = await gs(G1, lambda d: d["mid"] == mid and d["status"] == "finished")
+    check("galo: desistir dá a vitória ao outro", f1 and f1["result"]["reason"] == "forfeit" and f1["result"]["winner"] == f1["you"])
+    await G1.send(type="game_rematch", mid=mid); e = await G1.get("game_error")
+    check("galo: sem revanche depois de o outro sair", e and "saiu" in e["text"])
+    # --- aceitar quando quem convidou já saiu
+    r, n = await invite()
+    await G1.cm.__aexit__(None, None, None); await asyncio.sleep(0.4)
+    await G2.send(type="invite_respond", iid=n["data"]["data"]["iid"], accept=True); r = await last_of(G2, "social_result")
+    check("galo: aceitar convite de quem já não está online falha sem criar partida", r and not r["ok"] and "online" in r["text"])
+    for b in (G2, G3):
+        await b.cm.__aexit__(None, None, None)
 
 asyncio.run(main())

@@ -18,6 +18,7 @@ const Icons = preload("res://client/scripts/Icons.gd")
 const Phone = preload("res://client/scripts/Phone.gd")
 const SocialPanelScript = preload("res://client/scripts/SocialPanel.gd")
 const VoiceCallScript = preload("res://client/scripts/VoiceCall.gd")
+const MatchPanelScript = preload("res://client/scripts/MatchPanel.gd")
 const NEED_ORDER := [["hunger", "Fome", "food"], ["energy", "Energia", "zap"], ["hygiene", "Higiene", "drop"], ["health", "Saúde", "heart"]]
 
 var root: Control
@@ -70,6 +71,7 @@ var chat_input: LineEdit
 # outros
 var phone: Control
 var social_panel: PanelContainer
+var match_panel: Control          # minijogo em curso (MatchPanel.gd)
 var voice: Node
 var call_card: PanelContainer
 var call_box: VBoxContainer
@@ -109,6 +111,8 @@ func _ready() -> void:
 	phone = Phone.new()
 	root.add_child(phone)
 	phone.call_requested.connect(func(p, n): voice.call_player(p, n))
+	match_panel = MatchPanelScript.new()
+	root.add_child(match_panel)
 	dialog_layer = Control.new()
 	dialog_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dialog_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -398,6 +402,7 @@ func _grow(c: Control) -> Control:
 
 func open_profile(pub: String) -> void:
 	_close_popup()
+	_minimize_match()
 	if phone.visible:
 		phone.close()
 	social_panel.open(pub)
@@ -466,6 +471,7 @@ func toggle_chat() -> void:
 	chat_row.visible = not chat_row.visible
 	if chat_row.visible:
 		_close_popup()
+		_minimize_match()
 		_refresh_chat_log()
 		chat_input.grab_focus()
 	else:
@@ -578,6 +584,7 @@ func _close_popup() -> void:
 	_inv_gift = false
 
 func _show_popup() -> void:
+	_minimize_match()
 	if not popup.visible:
 		popup.visible = true
 		popup.modulate.a = 0.0
@@ -763,6 +770,9 @@ func _render_notifications() -> void:
 func _notif_row(n: Dictionary, is_new: bool) -> Control:
 	var kind := str(n.get("kind", ""))
 	var look: Array = NOTIF_ICON.get(kind, ["bell", UIStyle.DIM])
+	var nd: Variant = n.get("data")
+	if kind == "invite" and nd is Dictionary and (nd as Dictionary).get("game") != null:
+		look = ["gamepad", look[1]]                 # convite para jogar
 	var hb := UI.hbox(10)
 	var ib := PanelContainer.new()
 	ib.add_theme_stylebox_override("panel", UIStyle.box(Color(look[1], 0.16), Color(0, 0, 0, 0), 0, Vector4(8, 8, 8, 8), 18))
@@ -985,6 +995,7 @@ func _layout() -> void:
 	if call_card.visible and not compact:
 		toast.position.y = call_card.position.y + call_card.size.y + 8
 	_place_sheet(vs, m, top_band, bottom_y)
+	match_panel._place()
 
 ## Topo da área livre para painéis (abaixo do cartão do jogador e da faixa do mundo).
 func content_top() -> float:
@@ -1121,13 +1132,27 @@ func _process(delta: float) -> void:
 
 # ================================================================== modais e Esc
 func is_modal_open() -> bool:
-	return popup.visible or phone.visible or chat_row.visible or social_panel.visible or dialog_open()
+	return popup.visible or phone.visible or chat_row.visible or social_panel.visible or match_panel.is_open() or dialog_open()
+
+## A partida vem para a frente: fecha o que estiver aberto por cima do mundo.
+func close_others_for_match() -> void:
+	_close_popup()
+	if social_panel.visible:
+		social_panel.close()
+	if phone.visible:
+		phone.close()
+	chat_row.visible = false
+
+func _minimize_match() -> void:
+	if match_panel.is_open():
+		match_panel.minimize()
 
 func toggle_phone() -> void:
 	if phone.visible:
 		phone.close()
 	else:
 		_close_popup()
+		_minimize_match()
 		chat_row.visible = false
 		phone.open()
 
@@ -1135,6 +1160,9 @@ func close_all() -> bool:
 	## Esc: fecha a camada de cima. Devolve true se fechou alguma coisa.
 	if dialog_open():
 		_close_dialog()
+		return true
+	if match_panel.is_open():          # Esc minimiza a partida (nunca desiste)
+		match_panel.minimize()
 		return true
 	if social_panel.visible:
 		social_panel.close()

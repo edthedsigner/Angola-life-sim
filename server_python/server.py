@@ -49,6 +49,7 @@ except ImportError:
     raise SystemExit(1)
 
 import game
+import minigames as mgmod
 import social as socialmod
 import storage as storagemod
 import world as worldmod
@@ -68,6 +69,7 @@ except Exception:
 W = worldmod.load()
 WORLD["spawn"] = dict(W.spawn)            # fonte única do spawn (antes duplicado em world_config.json e World.tscn)
 social: "socialmod.Social" = None  # type: ignore[assignment]
+minigames: "mgmod.Minigames" = None  # type: ignore[assignment]   # partidas de minijogos (em memória)
 clock: game.Clock = game.Clock(W.clock_cfg, None)
 door_states: dict[str, dict[str, bool]] = {}   # zone -> {edge_key: open}
 activities: dict[str, dict] = {}               # peer_id -> atividade em curso
@@ -128,8 +130,9 @@ def load_all() -> None:
     door_states = {z: {k: bool(v) for k, v in d.items()} for z, d in ws_state.get("doors", {}).items() if W.zone_valid(z)}
     for ch in characters.values():
         game.ensure_fields(ch, W)
-    global social
+    global social, minigames
     social = socialmod.Social(store.load("social"), characters, W, game)
+    minigames = mgmod.Minigames(characters)
 
 
 def save_all() -> None:
@@ -561,9 +564,14 @@ def cancel_activity(peer_id: str) -> dict | None:
 async def leave_world(peer_id: str) -> None:
     cancel_activity(peer_id)
     if peer_id in players_in_world:
+        cid = players_in_world[peer_id]["id"]
         del players_in_world[peer_id]
         await broadcast_world({"type": "player_left", "peer_id": peer_id})
         print(f"[World] Peer {peer_id} saiu")
+        if minigames is not None and peer_of(cid) is None:     # saiu mesmo (não é só uma sessão substituída)
+            m = minigames.disconnected(cid)
+            if m:
+                await send_game(m)
 
 
 def char_of(peer_id: str) -> dict | None:
@@ -889,11 +897,31 @@ async def handle_social(ws: Any, peer_id: str, mtype: str, msg: dict) -> bool:
         ok, text, out = social.set_privacy(me, str(msg.get("calls", "")))
         await result(ok, text, out)
     elif mtype == "invite":
+        if str(msg.get("kind", "")) == "game":
+            err = game_invite_error(me, target)
+            if err:
+                await send(ws, {"type": "social_result", "action": mtype, "ok": False, "text": err})
+                return True
         ok, text, out, iid = social.invite(me, target, str(msg.get("kind", "")), str(msg.get("place", "")), str(msg.get("game", "")), now)
         await result(ok, text, out, {"iid": iid})
     elif mtype == "invite_respond":
-        ok, text, out, inv = social.invite_respond(me, str(msg.get("iid", "")), bool(msg.get("accept", False)))
+        pend = social.invites.get(str(msg.get("iid", "")))
+        accept = bool(msg.get("accept", False))
+        if accept and pend and pend.get("kind") == "game" and pend["to"] == me and pend["state"] == "pending":
+            err = game_invite_error(pend["from"], me, accepting=True)
+            if err:                                        # já não dá para jogar: o convite caduca (sem dizer "recusou")
+                pend["state"] = "cancelled"
+                social.resolve_notif(me, "invite", "iid", pend["iid"])
+                await result(False, err, [])
+                return True
+        ok, text, out, inv = social.invite_respond(me, str(msg.get("iid", "")), accept)
+        match = None
+        if ok and accept and pend and pend.get("kind") == "game":
+            match = minigames.create(pend["game"], [pend["from"], me])      # quem convidou joga primeiro (X)
+            text = "A partida vai começar."
         await result(ok, text, out, {"invite": inv})
+        if match:
+            await send_game(match)
     elif mtype == "invite_cancel":
         ok, text, out = social.invite_cancel(me, str(msg.get("iid", "")))
         await result(ok, text, out)
@@ -948,6 +976,63 @@ async def handle_social(ws: Any, peer_id: str, mtype: str, msg: dict) -> bool:
     return True
 
 
+# ---------------------------------------------------------------------------
+# Minijogos (regras e partidas em minigames.py; aqui só elegibilidade e entrega)
+# ---------------------------------------------------------------------------
+GAME_TYPES = {"game_move", "game_leave", "game_rematch", "game_state_request"}
+
+
+def game_invite_error(inviter: str, invitee: str, accepting: bool = False) -> str | None:
+    """Só amigos online que não estejam já numa partida."""
+    if invitee not in social.friends.get(inviter, []):
+        return "Só podes convidar amigos para jogar."
+    online = online_cids()
+    other = inviter if accepting else invitee
+    if other not in online:
+        return f"{characters[other]['name']} não está online."
+    if minigames.busy(inviter if not accepting else invitee):
+        return "Já estás numa partida."
+    if minigames.busy(other):
+        return f"{characters[other]['name']} já está numa partida."
+    return None
+
+
+async def send_game(m: dict) -> None:
+    """Estado da partida a cada participante (cada um com o seu lugar). Nunca a quem não joga."""
+    online = online_cids()
+    await deliver([(cid, {"type": "game_state", "data": minigames.view(m, cid, online)}) for cid in m["players"]])
+
+
+async def handle_minigame(ws: Any, peer_id: str, mtype: str, msg: dict) -> bool:
+    if mtype not in GAME_TYPES:
+        return False
+    me_ch = char_of(peer_id)
+    if me_ch is None:
+        await send(ws, {"type": "error", "error": "Não estás no mundo"})
+        return True
+    me = me_ch["id"]
+    mid = msg.get("mid")
+    if mtype == "game_state_request":
+        m = minigames.latest_of(me)
+        await send(ws, {"type": "game_state", "data": minigames.view(m, me, online_cids()) if m else None})
+        return True
+    if mtype == "game_move":
+        ok, err, m = minigames.move(me, mid, {"cell": msg.get("cell")}, msg.get("seq"))
+        new = None
+    elif mtype == "game_leave":
+        ok, err, m = minigames.leave(me, mid)
+        new = None
+    else:
+        ok, err, m, new = minigames.rematch(me, mid)
+    if not ok:
+        await send(ws, {"type": "game_error", "action": mtype, "mid": mid, "text": err})
+        if m:                                  # ressincroniza quem pediu (ex.: jogada sobre um estado antigo)
+            await send(ws, {"type": "game_state", "data": minigames.view(m, me, online_cids())})
+        return True
+    await send_game(new or m)
+    return True
+
+
 # STUN público por omissão; para redes restritivas configura um TURN (ANGOLA_ICE_SERVERS = JSON).
 ICE_SERVERS = json.loads(os.environ.get("ANGOLA_ICE_SERVERS", '[{"urls": ["stun:stun.l.google.com:19302"]}]'))
 
@@ -959,6 +1044,9 @@ async def social_loop() -> None:
             out = social.call_timeouts()
             if out:
                 await deliver(out)
+        if minigames is not None:
+            for m in minigames.tick():
+                await send_game(m)
 
 
 async def handle_message(ws: Any, raw: str) -> None:
@@ -1058,6 +1146,9 @@ async def handle_message(ws: Any, raw: str) -> None:
             await send(ws, {"type": "zone_state", "zone": ch["zone"], "doors": door_states.get(ch["zone"], {})})
         await send_self(peer_id)
         await send_social(peer_id)
+        m = minigames.reconnected(cid)               # volta à partida que deixou a meio (ou à última, para a revanche)
+        if m:
+            await send_game(m)
         print(f"[World] {ch['name']} entrou (peer {peer_id}); online: {len(players_in_world)}")
 
     elif mtype == "position":
@@ -1086,6 +1177,8 @@ async def handle_message(ws: Any, raw: str) -> None:
     elif await handle_game(ws, peer_id, mtype, msg):
         pass
 
+    elif await handle_minigame(ws, peer_id, mtype, msg):
+        pass
     elif await handle_social(ws, peer_id, mtype, msg):
         pass
 
