@@ -3,6 +3,11 @@ extends Node
 ## Para trocar a arte: substitui os PNG em assets/art/ (mesmo nome) ou edita os caminhos aqui.
 
 const CHARACTER_DIR := "res://assets/art/characters/"
+## Personagem dos jogadores no mundo: "classic" (camadas originais, personalizáveis) ou "townsfolk_sample"
+## (AVALIAÇÃO TEMPORÁRIA do pack Isometric Pre-rendered Townsfolk — ver docs/CHARACTER_EVAL.md). Mudar aqui volta atrás.
+## Em jogo, F4 alterna entre os dois para comparar (só no teu ecrã).
+const CHARACTER_SET := "townsfolk_sample"
+var character_set: String = CHARACTER_SET
 const HAIR_STYLE_COUNT := 4
 const SKIN_TONES := [Color(0.93, 0.76, 0.62), Color(0.76, 0.54, 0.38), Color(0.55, 0.36, 0.24), Color(0.34, 0.22, 0.15)]
 const SKIN_NAMES := ["Tom 1 (claro)", "Tom 2", "Tom 3", "Tom 4 (escuro)"]
