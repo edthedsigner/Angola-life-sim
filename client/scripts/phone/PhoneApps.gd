@@ -214,6 +214,8 @@ func open(id: String) -> void:
 			os.push({"title": "Governo", "large": true, "key": "gov", "build": _gov_root}, false)
 		"definicoes":
 			os.push({"title": "Definições", "large": true, "key": "settings", "build": _settings_root}, false)
+		"jogos":
+			os.push({"title": "Jogos", "large": true, "key": "games", "build": _games_root}, false)
 
 # ================================================================== Mensagens
 func _messages_root(body: Control) -> void:
@@ -450,6 +452,52 @@ func _contact(f: Dictionary) -> void:
 func open_conversation_from_contact(pub: String, name: String) -> void:
 	os.open_app("mensagens", false)
 	open_conversation(pub, name)
+
+# ================================================================== Jogos (minijogos multijogador)
+func _match_panel() -> Node:
+	var h: Node = os.get_tree().get_first_node_in_group("hud")
+	return h.match_panel if h else null
+
+func _games_root(body: Control) -> void:
+	var mp := _match_panel()
+	if mp and mp.has_match():
+		var cur := section(body, "Partida")
+		var md: Dictionary = mp.m
+		row(cur, str(md.get("name", "Jogo")), {"glyph": ["gamepad", pal["tint"]], "sub": "A decorrer · toca para voltar" if mp.active() else "Terminou · ver resultado",
+			"weight": "semibold", "tap": func():
+				os.close()
+				mp.expand()})
+	var games: Dictionary = GameState.social.get("games", {})
+	var sec := section(body, "Jogar com amigos", "Escolhe um jogo e convida um amigo online. O convite expira em 2 minutos.")
+	if games.is_empty():
+		row(sec, "Sem jogos disponíveis", {"title_col": pal["label2"]})
+	for gid in games:
+		var g: Dictionary = games[gid]
+		row(sec, str(g.get("name", gid)), {"app": "jogos", "sub": "%d jogadores · %s" % [int(g.get("max_players", 2)), str(g.get("desc", ""))], "tap": _game_page.bind(str(gid))})
+
+func _game_page(gid: String) -> void:
+	var g: Dictionary = GameState.social.get("games", {}).get(gid, {})
+	os.push({"title": str(g.get("name", gid)), "key": "game:" + gid, "build": func(body):
+		var about := section(body)
+		row(about, str(g.get("name", gid)), {"app": "jogos", "sub": str(g.get("desc", "")), "weight": "semibold"})
+		var fr: Array = GameState.social.get("friends", [])
+		var online := fr.filter(func(f): return bool(f.get("online", false)))
+		var mp := _match_panel()
+		var busy: bool = mp != null and mp.active()
+		var foot := "Já estás numa partida. Termina-a antes de convidar." if busy else ("Nenhum amigo online agora." if online.is_empty() else "")
+		var sec := section(body, "Amigos online · %d" % online.size(), foot)
+		if fr.is_empty():
+			row(sec, "Ainda não tens amigos", {"title_col": pal["label2"]})
+		for f in online:
+			var pub := str(f["pub"])
+			var nm := str(f["name"])
+			row(sec, nm, {"avatar": nm, "dot": pal["green"], "sub": "Nível %d" % int(f.get("level", 1)),
+				"accessory": pill_button("Convidar", func(): NetworkManager.send_game("invite", {"target": pub, "kind": "game", "game": gid}), not busy)})
+		var off := fr.filter(func(f): return not bool(f.get("online", false)))
+		if not off.is_empty():
+			var so := section(body, "Offline · %d" % off.size())
+			for f in off:
+				row(so, str(f["name"]), {"avatar": str(f["name"]), "sub": "Só podes convidar amigos online", "title_col": pal["label2"]})})
 
 # ================================================================== Banco
 func _bank_root(body: Control) -> void:

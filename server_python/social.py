@@ -23,6 +23,7 @@ DM_MAX = 500
 DM_KEEP = 200
 NOTIF_KEEP = 60
 INVITE_TTL = float(os.environ.get("ANGOLA_INVITE_TTL", 10 * 60.0))      # segundos reais
+GAME_INVITE_TTL = float(os.environ.get("ANGOLA_GAME_INVITE_TTL", 2 * 60.0))   # convite para jogar: expira mais depressa
 GUEST_TTL = 30 * 60.0
 CALL_RING_TTL = float(os.environ.get("ANGOLA_CALL_RING_SECS", 30.0))
 GIFT_MAX = 1_000_000
@@ -275,14 +276,14 @@ class Social:
         elif kind == "game":
             games = self.W.data.get("games", {})
             if game_id not in games:
-                return False, "Ainda não há jogos disponíveis.", out, None
+                return False, "Esse jogo não existe.", out, None
             data.update(game=game_id, place_name=games[game_id]["name"])
         else:
             return False, "Tipo de convite inválido.", out, None
         if not self._limit(("inv", me), 0.8):        # só convites válidos contam para o limite
             return False, "Calma — espera um pouco.", out, None
         iid = secrets.token_hex(6)
-        inv = {"iid": iid, "from": me, "to": other, "kind": kind, "state": "pending", "created": now(), "expires": now() + INVITE_TTL, **data}
+        inv = {"iid": iid, "from": me, "to": other, "kind": kind, "state": "pending", "created": now(), "expires": now() + (GAME_INVITE_TTL if kind == "game" else INVITE_TTL), **data}
         self.invites[iid] = inv
         label = {"house": "para a casa dele(a)", "place": f"para {data['place_name']}", "game": f"para jogar {data['place_name']}"}[kind]
         out.append(self.notify(other, "invite", me, f"{me_ch['name']} convidou-te {label}.", {"iid": iid, **self.invite_out(inv)}, ["accept", "decline"]))

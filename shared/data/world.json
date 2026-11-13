@@ -1751,6 +1751,6 @@
    "rest_bench": 1
   }
  },
- "games": {},
- "_games_doc": "Registo de jogos multijogador para convites 'Jogar'. Vazio de propósito: cada jogo regista-se aqui (id: {name, min_players, max_players}) e no servidor (social.GAME_HANDLERS)."
+ "games": {"galo": {"name": "Jogo do Galo", "min_players": 2, "max_players": 2, "icon": "galo", "desc": "3 em linha. X começa; ganha quem alinhar primeiro."}},
+ "_games_doc": "Registo de jogos multijogador para convites 'Jogar'. Cada jogo regista-se aqui (id: {name, min_players, max_players, icon, desc}) e no servidor (minigames.GAMES, com as regras)."
 }

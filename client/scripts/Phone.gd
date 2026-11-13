@@ -11,8 +11,8 @@ const Apps = preload("res://client/scripts/phone/PhoneApps.gd")
 signal call_requested(pub: String, name: String)
 
 const APP_NAMES := {"mensagens": "Mensagens", "amigos": "Amigos", "banco": "Banco", "emprego": "Emprego", "imoveis": "Imóveis",
-	"negocios": "Negócios", "governo": "Governo", "definicoes": "Definições"}
-const GRID := ["emprego", "imoveis", "negocios", "governo"]          # ecrã principal (por baixo do widget)
+	"negocios": "Negócios", "governo": "Governo", "definicoes": "Definições", "jogos": "Jogos"}
+const GRID := ["emprego", "imoveis", "negocios", "governo", "jogos"]  # ecrã principal (por baixo do widget; 4 por linha)
 const DOCK := ["mensagens", "amigos", "banco", "definicoes"]        # apps mais usadas
 const CFG := "user://phone.cfg"
 const WEEKDAYS := ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"]
@@ -350,9 +350,9 @@ func _refresh_home() -> void:
 	y += cell.y * 1.5 + _px(18)
 	for i in GRID.size():
 		var ic := _icon(GRID[i], true)
-		ic.position = Vector2(_px(20) + i * cell.x + (cell.x - ic.size.x) / 2.0, y)
+		ic.position = Vector2(_px(20) + (i % 4) * cell.x + (cell.x - ic.size.x) / 2.0, y + (i / 4) * cell.y)
 		home_root.add_child(ic)
-	y += cell.y
+	y += cell.y * ceili(GRID.size() / 4.0)
 	var saude: Control = apps.widget("saude", Vector2(W - _px(48), cell.y * 1.5))
 	saude.position = Vector2(_px(24), y)
 	home_root.add_child(saude)
@@ -408,7 +408,10 @@ func _notif_meta(n: Dictionary) -> Dictionary:
 	var from: Dictionary = n.get("from", {}) if n.get("from") is Dictionary else {}
 	var app: String = {"dm": "mensagens", "friend_request": "amigos", "friend_accepted": "amigos", "invite": "amigos", "invite_reply": "amigos",
 		"gift": "banco", "missed_call": "telefone"}.get(kind, "definicoes")
-	var app_name: String = {"mensagens": "MENSAGENS", "amigos": "AMIGOS", "banco": "BANCO", "telefone": "TELEFONE"}.get(app, "KIANDA")
+	var nd: Variant = n.get("data")
+	if kind == "invite" and nd is Dictionary and (nd as Dictionary).get("game") != null:
+		app = "jogos"
+	var app_name: String = {"mensagens": "MENSAGENS", "amigos": "AMIGOS", "banco": "BANCO", "telefone": "TELEFONE", "jogos": "JOGOS"}.get(app, "KIANDA")
 	var title := str(from.get("name", "")) if from.get("name") != null else ""
 	if kind == "missed_call":
 		title = "Chamada não atendida"

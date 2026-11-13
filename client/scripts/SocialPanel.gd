@@ -106,6 +106,8 @@ func _render() -> void:
 			_render_invite()
 		"places":
 			_render_places()
+		"games":
+			_render_games()
 		"gift":
 			_render_gift_menu()
 		"gift_money":
@@ -201,8 +203,9 @@ func _render_main() -> void:
 		grid.add_child(_tile("gift", "Presente", func(): _go("gift")))
 		box.add_child(grid)
 		var games: Dictionary = GameState.social.get("games", {})
-		var g := UI.button("Jogar um jogo" if not games.is_empty() else "Jogar um jogo · em breve", func(): pass, "ghost", "gamepad", not games.is_empty(),
-			"Os minijogos multijogador ainda não existem; o convite fica ativo quando forem registados.")
+		var can_play := rel == "friends" and bool(prof.get("online", false)) and not games.is_empty()
+		var why := "" if can_play else ("Só podes jogar com amigos." if rel != "friends" else ("%s está offline." % _name() if not prof.get("online", false) else "Sem jogos disponíveis."))
+		var g := UI.button("Jogar um jogo" if can_play else "Jogar um jogo · " + why.trim_suffix("."), func(): _go("games"), "ghost", "gamepad", can_play, why)
 		box.add_child(g)
 	box.add_child(UI.label("A jogar desde %s · %d amigo%s" % [str(prof.get("since", "?")), int(prof.get("friends_count", 0)), "" if int(prof.get("friends_count", 0)) == 1 else "s"], 12, UIStyle.FAINT))
 	# zona de risco, separada e com confirmação
@@ -272,6 +275,17 @@ func _render_places() -> void:
 		box.add_child(_option("pin", str(places[bid]), "", func():
 			_send("invite", {"kind": "place", "place": b_id})
 			_go("main")))
+
+func _render_games() -> void:
+	_sub_header("Jogar com %s" % _name())
+	var games: Dictionary = GameState.social.get("games", {})
+	for gid in games:
+		var g_id: String = gid
+		var g: Dictionary = games[gid]
+		box.add_child(_option("gamepad", str(g.get("name", gid)), str(g.get("desc", "")), func():
+			_send("invite", {"kind": "game", "game": g_id})
+			_go("main")))
+	box.add_child(UI.label("O convite expira em 2 minutos. A partida começa quando %s aceitar." % _name(), 12, UIStyle.FAINT, "regular", true))
 
 func _render_gift_menu() -> void:
 	_sub_header("Presente para %s" % _name())

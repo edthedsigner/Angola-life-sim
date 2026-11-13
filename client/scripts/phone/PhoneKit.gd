@@ -124,6 +124,7 @@ const APP_LOOK := {
 	"governo": ["E5333A", "8E0F14", "gov"],
 	"definicoes": ["B5B9C0", "6E737B", "gear"],
 	"telefone": ["5BE36A", "1DB940", "phone"],
+	"jogos": ["FF7A93", "D62A5B", "gamepad"],
 }
 static var _icon_cache := {}
 static func app_icon(app: String, px: int) -> ImageTexture:
