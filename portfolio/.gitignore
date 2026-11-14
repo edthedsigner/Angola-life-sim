@@ -1,3 +1,4 @@
 shots/
 .taste-skill/chrome-*/
 .taste-skill/*.log
+.taste-skill/gate/
