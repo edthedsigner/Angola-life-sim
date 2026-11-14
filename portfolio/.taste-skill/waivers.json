@@ -1,0 +1,6 @@
+[
+  {"check": "no-visual", "target": "section.hero.hero--split", "reason": "The hero's picture is the build log, a live HTML status panel of real commits: the site's signature element, which the checker does not count as a visual."},
+  {"check": "no-visual", "target": "section#services", "reason": "The brief rules out generic illustrations and stock photography, and the client has no service photographs; the services are set as a typographic list."},
+  {"check": "copy-headings", "target": "article.card.card--open", "reason": "Card headings are the real names of the client's projects (TudoMix, ImobGest, B Studio, Cluck Dash), given in the brief."},
+  {"check": "one-heading", "target": "h2#services-h", "reason": "The project cards keep h3 names for screen readers; the last card's name and the next h2 share a screen briefly while scrolling."}
+]

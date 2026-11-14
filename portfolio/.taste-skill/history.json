@@ -1,0 +1,20 @@
+{
+ "palettes": [
+  "white-link-blue"
+ ],
+ "types": [
+  "newsreader"
+ ],
+ "dealt": [
+  "newsreader",
+  "red-hat",
+  "figtree"
+ ],
+ "moments": [
+  {
+   "id": "word-highlight",
+   "at": "2026-11-14T13:04:25.493Z",
+   "seed": "42f9238c"
+  }
+ ]
+}

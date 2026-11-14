@@ -1,0 +1,11 @@
+{
+ "page": "index.html",
+ "url": null,
+ "root": null,
+ "kind": "service",
+ "category": "independent web development for businesses",
+ "primary": "Start a project",
+ "rounds": 3,
+ "start": "2026-11-14T13:04:04.685Z",
+ "by": "gate.mjs --start"
+}

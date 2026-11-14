@@ -1,0 +1,270 @@
+{
+ "start": "2026-11-14T13:04:04.685Z",
+ "round": 1,
+ "idle": 0,
+ "errors": 0,
+ "status": "pass",
+ "history": [
+  {
+   "at": "2026-11-14T13:16:09.853Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 11,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-14T13:18:16.979Z",
+   "mode": "manual",
+   "status": "pass",
+   "fails": 0,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": "index.html",
+  "url": null,
+  "root": null,
+  "kind": "service",
+  "category": "independent web development for businesses",
+  "primary": "Start a project",
+  "rounds": 3,
+  "start": "2026-11-14T13:04:04.685Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "roundKey": "52c7bf6b6c2626b4:da39a3ee",
+ "roundFree": false,
+ "idleFree": false,
+ "blockKey": null,
+ "fp": "30277de8da5ec088",
+ "page": "index.html",
+ "found": {
+  "fails": [
+   {
+    "check": "no-visual",
+    "where": "main#top > section.hero.hero--split \"Websites and web apps for businesses\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "main#top > section.hero.hero--split \"Websites and web apps for businesses\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "section#services \"Five kinds of work. Each one designed, b\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "section#services \"Five kinds of work. Each one designed, b\""
+    ]
+   },
+   {
+    "check": "copy-headings",
+    "where": "div.group:nth-of-type(2) > div.grid.work-row:nth-of-type(1) > article.card.card--open:nth-of-type(1) > h3 \"TudoMix\"",
+    "msg": "\"TudoMix\" names no product, part, place or section (6 headings like it; at most one brand line per page) (and 5 more like it: \"ImobGest\", \"B Studio\", \"Cluck Dash\", \"Five kinds of work. Each\", ...)",
+    "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "copy-headings"
+    ],
+    "wheres": [
+     "div.group:nth-of-type(2) > div.grid.work-row:nth-of-type(1) > article.card.card--open:nth-of-type(1) > h3 \"TudoMix\""
+    ]
+   },
+   {
+    "check": "one-heading",
+    "where": "h2#services-h \"Five kinds of work. Each one designed, b\"",
+    "msg": "headings of two sections show whole on one screen at 9 of 91 scroll positions (9.9%; at scroll 2050, 2100, 2150, 2200px), here with \"B Studio\": at most 3% on a desktop (SR-5)",
+    "fix": "make the sections one screen tall so their headings sit a screen apart and two never share one",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-heading"
+    ],
+    "wheres": [
+     "h2#services-h \"Five kinds of work. Each one designed, b\""
+    ]
+   }
+  ],
+  "warns": [
+   {
+    "check": "scroll-reveal",
+    "where": "section#about > div.wrap > p.mo-wh__text \"I build the whole thing: the screens peo\"",
+    "msg": "starts \"color\" (0.2 s) the moment it is scrolled into view (an IntersectionObserver) on span.mo-w:nth-of-type(1) (inside a dealt moment's section, [data-moment]: an enter moment is expected on every kind; its still is judged under reduced motion)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-family",
+    "where": "header.nav.nav--centre",
+    "msg": "the nav's links and actions use 2 type families (ui-monospace, Hanken Grotesk)",
+    "fix": "keep one nav on every screen: the same bar, fill, links and type",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "header.nav.nav--centre > div.wrap.nav__bar > div.nav__brand > a.nav__logo \"edthedsigner\"",
+    "msg": "\"edthedsigner\" opens a section headed \"Websites and web apps for businesses\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.wrap.nav__bar > nav.nav__links > div.nav__item:nth-of-type(2) > a.nav__link \"Services\"",
+    "msg": "\"Services\" opens a section headed \"Five kinds of work. Each one designed, built and s\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.wrap.nav__bar > nav.nav__links > div.nav__item:nth-of-type(3) > a.nav__link \"Projects\"",
+    "msg": "\"Projects\" opens a section headed \"Angola Life Simulator. Multiplayer game, in the br\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-current",
+    "where": "header.nav.nav--centre",
+    "msg": "the nav stays on screen with 3 links to the page's sections, but never marks the one you are in (no link changes as the page scrolls)",
+    "fix": "mark the link of the section on screen (a colour, a weight or a line under it) as the visitor scrolls",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "action-repeat",
+    "where": "header.nav.nav--centre > div.wrap.nav__bar:nth-of-type(1) > div.nav__actions:nth-of-type(2) > a.btn.btn--primary:nth-of-type(1) \"start a project\"",
+    "msg": "\"start a project\" shows 2 times on the first screen at 1440px (nav, hero): the nav's button and the hero's; nothing else on the screen may repeat it",
+    "fix": "show the action once a screen besides the nav's button: the hero's, the close's or the phone bar's, never all at once",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   }
+  ],
+  "crashed": [],
+  "seconds": {
+   "consistency": 82,
+   "layout": 4
+  }
+ },
+ "open": [],
+ "waived": [
+  {
+   "check": "no-visual",
+   "where": "main#top > section.hero.hero--split \"Websites and web apps for businesses\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "main#top > section.hero.hero--split \"Websites and web apps for businesses\""
+   ],
+   "reason": "The hero's picture is the build log, a live HTML status panel of real commits: the site's signature element, which the checker does not count as a visual."
+  },
+  {
+   "check": "no-visual",
+   "where": "section#services \"Five kinds of work. Each one designed, b\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "section#services \"Five kinds of work. Each one designed, b\""
+   ],
+   "reason": "The brief rules out generic illustrations and stock photography, and the client has no service photographs; the services are set as a typographic list."
+  },
+  {
+   "check": "copy-headings",
+   "where": "div.group:nth-of-type(2) > div.grid.work-row:nth-of-type(1) > article.card.card--open:nth-of-type(1) > h3 \"TudoMix\"",
+   "msg": "\"TudoMix\" names no product, part, place or section (6 headings like it; at most one brand line per page) (and 5 more like it: \"ImobGest\", \"B Studio\", \"Cluck Dash\", \"Five kinds of work. Each\", ...)",
+   "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "copy-headings"
+   ],
+   "wheres": [
+    "div.group:nth-of-type(2) > div.grid.work-row:nth-of-type(1) > article.card.card--open:nth-of-type(1) > h3 \"TudoMix\""
+   ],
+   "reason": "Card headings are the real names of the client's projects (TudoMix, ImobGest, B Studio, Cluck Dash), given in the brief."
+  },
+  {
+   "check": "one-heading",
+   "where": "h2#services-h \"Five kinds of work. Each one designed, b\"",
+   "msg": "headings of two sections show whole on one screen at 9 of 91 scroll positions (9.9%; at scroll 2050, 2100, 2150, 2200px), here with \"B Studio\": at most 3% on a desktop (SR-5)",
+   "fix": "make the sections one screen tall so their headings sit a screen apart and two never share one",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-heading"
+   ],
+   "wheres": [
+    "h2#services-h \"Five kinds of work. Each one designed, b\""
+   ],
+   "reason": "The project cards keep h3 names for screen readers; the last card's name and the next h2 share a screen briefly while scrolling."
+  }
+ ],
+ "warnCount": 7,
+ "at": "2026-11-14T13:18:16.979Z"
+}
