@@ -1,0 +1,169 @@
+{
+ "_doc": "Real administrative geography of Angola (Lei n.º 14/24). Contains only records this project can cite (docs/GEOGRAPHY.md). It is NOT the playable world: playable locations are in playable.json and reference these ids. Internal ids (adm.*) never change; official_code holds the official code (Lei n.º 8/25) once verified and is null until then. Lists are partial: see 'complete' flags.",
+ "country": {
+  "id": "adm.ao", "name": "Angola", "official_code": null, "status": "verified",
+  "division": {"provinces": 21, "municipalities": 326, "comunas": 378, "law": "Lei n.º 14/24, de 5 de Setembro", "in_force": "2025-01-01"},
+  "provinces_complete": false,
+  "notes": "Only provinces with a cited source are recorded (selected playable provinces plus new provinces named in the sources). The remaining provinces must be added from a source that lists them (Lei 14/24 annex). Installation of the new provinces is gradual and continues after the 2027 elections; land-right concessions in the new provinces were suspended during the transition.",
+  "sources": [
+   {"source": "src.angolex.lei_14_24", "supports": ["existence", "count"], "confirms": "Lei n.º 14/24, de 5 de Setembro: Angola is constituted by 21 provinces, 326 municipalities and 378 comunas."},
+   {"source": "src.verangola.provincias_21", "supports": ["count"], "confirms": "Parliament approved the division into 21 provinces (August 2024); entry into force planned for January 2025."},
+   {"source": "src.lexao.dp_268_24", "supports": ["count"], "confirms": "Decreto Presidencial n.º 268/24 approves the action plan and timetable for implementing the new division."},
+   {"source": "src.expansao.apos_2027", "supports": ["existence"], "confirms": "Effective installation of the new division extends beyond the 2027 elections."},
+   {"source": "src.verangola.fundiarios", "supports": ["existence"], "confirms": "In December 2024 the government suspended the granting of land rights in the three new provinces during the administrative transition."}
+  ]
+ },
+ "provinces": [
+  {"id": "adm.ao.lua", "name": "Luanda", "country": "adm.ao", "official_code": null, "status": "verified", "municipalities_complete": false,
+   "reported_municipality_counts": [{"value": 16, "source": "src.novojornal.luanda_16_admins"}, {"value": 15, "source": "src.angop.luanda_449"}],
+   "sources": [
+    {"source": "src.verangola.equilibrio", "supports": ["existence"], "confirms": "Icolo e Bengo arises from the division of Luanda province; Luanda remains a province."},
+    {"source": "src.novojornal.luanda_16_admins", "supports": ["existence", "count"], "confirms": "Administrators were appointed for the 16 municipalities of Luanda after the new division came into force."},
+    {"source": "src.angop.luanda_449", "supports": ["existence", "count"], "confirms": "Lists the current municipalities of Luanda province (15 names: Cacuaco, Cazenga, Viana, Belas, Kilamba Kiaxi, Sambizanga, Rangel, Kilamba, Talatona, Camama, Maianga, Hoji Ya Henda, Ingombota, Samba, Mulenvos)."}
+   ]},
+  {"id": "adm.ao.icb", "name": "Icolo e Bengo", "country": "adm.ao", "official_code": null, "status": "verified", "capital": "adm.ao.icb.catete", "municipalities_complete": true,
+   "reported_municipality_counts": [{"value": 7, "source": "src.wikipedia.icolo_e_bengo"}],
+   "sources": [
+    {"source": "src.wikipedia.icolo_e_bengo", "supports": ["existence", "count"], "confirms": "Province created on 5 September 2024 from Luanda province; seat Catete; seven municipalities: Bom Jesus, Cabiri, Cabo Ledo, Calumbo, Catete, Quiçama, Sequele."},
+    {"source": "src.angop.icb_governador", "supports": ["existence"], "confirms": "The first governor of Icolo e Bengo took office (December 2024)."},
+    {"source": "src.verangola.equilibrio", "supports": ["existence"], "confirms": "Icolo e Bengo is one of the new provinces, arising from the division of Luanda."}
+   ]},
+  {"id": "adm.ao.bgu", "name": "Benguela", "country": "adm.ao", "official_code": null, "status": "verified", "municipalities_complete": false,
+   "reported_municipality_counts": [{"value": 23, "source": "src.angop.benguela_23"}],
+   "sources": [
+    {"source": "src.angop.benguela_23", "supports": ["existence", "count"], "confirms": "Benguela province went from 10 to 23 municipalities under the new division, in force 1 January 2025; names the 13 new ones."},
+    {"source": "src.benguela_gov.provincia", "supports": ["existence"], "confirms": "Provincial government portal lists the original municipalities: Baía Farta, Balombo, Bocoio, Caimbambo, Catumbela, Chongorói, Cubal, Ganda, Lobito and Benguela."}
+   ]},
+  {"id": "adm.ao.hui", "name": "Huíla", "country": "adm.ao", "official_code": null, "status": "verified", "capital": "adm.ao.hui.lubango", "municipalities_complete": false,
+   "reported_municipality_counts": [{"value": 21, "source": "src.angop.huila_9"}, {"value": 23, "source": "src.angop.huila_9"}],
+   "count_note": "Search excerpts disagreed (14 to 21, or 23 including the nine new municipalities). Unresolved.",
+   "sources": [
+    {"source": "src.angop.huila_9", "supports": ["existence", "count"], "confirms": "Since 1 January 2025 Huíla has nine new municipalities (Hoque, Galangue, Palanca, Capelongo, Capunda Cavilongo, Viti Vivali, Chicungo, Dongo, Chituto), formerly comunas of existing municipalities."},
+    {"source": "src.wikipedia.lubango", "supports": ["existence"], "confirms": "Lubango is the capital of Huíla province."}
+   ]},
+  {"id": "adm.ao.hua", "name": "Huambo", "country": "adm.ao", "official_code": null, "status": "verified", "municipalities_complete": false,
+   "reported_municipality_counts": [{"value": 17, "source": "src.angop.huambo_6"}],
+   "sources": [
+    {"source": "src.angop.huambo_6", "supports": ["existence", "count"], "confirms": "Six comunas (Alto-Hama, Bimbe, Cuima, Chilata, Galanga, Sambo) became municipalities, carved from Bailundo, Caála, Chicala-Cholohanga, Londuimbali and Longonjo; the province has 17 municipalities."},
+    {"source": "src.governo.huambo", "supports": ["existence", "count"], "confirms": "Government portal page for Huambo province lists 17 municipalities."}
+   ]},
+  {"id": "adm.ao.nam", "name": "Namibe", "country": "adm.ao", "official_code": null, "status": "verified", "capital": "adm.ao.nam.mocamedes", "municipalities_complete": false,
+   "reported_municipality_counts": [{"value": 9, "source": "src.ine.censo2024_namibe"}],
+   "sources": [
+    {"source": "src.ine.censo2024_namibe", "supports": ["existence", "count"], "confirms": "After Lei n.º 14/24 the province has 9 municipalities and 11 comunas (previously 5 municipalities and 16 comunas)."},
+    {"source": "src.ptwikipedia.subdivisoes", "supports": ["existence"], "confirms": "Lists Moçâmedes (capital) and Tômbwa among Namibe's municipalities."}
+   ]},
+  {"id": "adm.ao.cab", "name": "Cabinda", "country": "adm.ao", "official_code": null, "status": "verified", "municipalities_complete": true,
+   "reported_municipality_counts": [{"value": 10, "source": "src.cabinda_gov.administradores"}],
+   "sources": [
+    {"source": "src.cabinda_gov.administradores", "supports": ["existence", "count"], "confirms": "Cabinda went from four to ten municipalities: Cabinda, Cacongo, Buco-Zau, Belize, Miconje, Massabi, Necuto, Tando-Zinze, Liambo, Ngoio (list as quoted in search excerpts of the provincial government's 2025 news)."}
+   ]},
+  {"id": "adm.ao.mal", "name": "Malanje", "country": "adm.ao", "official_code": null, "status": "verified", "municipalities_complete": false,
+   "reported_municipality_counts": [{"value": 27, "source": "src.angop.malanje_13"}],
+   "count_note": "27 = 14 previous + 13 new (ANGOP reports 13 new municipalities from 1 January 2025).",
+   "sources": [
+    {"source": "src.angop.malanje_13", "supports": ["existence", "count"], "confirms": "Malanje province officially has 13 new municipalities from 1 January 2025 under the new division."},
+    {"source": "src.angop.malanje_administradores", "supports": ["existence"], "confirms": "The governor appointed administrators for 11 of the 13 new municipalities."}
+   ]},
+  {"id": "adm.ao.cuando", "name": "Cuando", "country": "adm.ao", "official_code": null, "status": "verified", "municipalities_complete": false, "reported_municipality_counts": [],
+   "sources": [
+    {"source": "src.verangola.equilibrio", "supports": ["existence"], "confirms": "Cuando arises from the division of the former Cuando Cubango province."}
+   ]},
+  {"id": "adm.ao.mxl", "name": "Moxico Leste", "name_status": "disputed", "alternative_names": ["Cassai-Zambeze"], "country": "adm.ao", "official_code": null, "status": "verified", "municipalities_complete": false, "reported_municipality_counts": [],
+   "sources": [
+    {"source": "src.wikipedia.moxico_leste", "supports": ["existence"], "confirms": "A province named Moxico Leste was created from the division of Moxico."},
+    {"source": "src.verangola.equilibrio", "supports": ["existence"], "confirms": "A new province arises from the division of Moxico; one Ver Angola article names it 'Cassai Zambeze'."}
+   ]}
+ ],
+ "municipalities": [
+  {"id": "adm.ao.lua.maianga", "name": "Maianga", "province": "adm.ao.lua", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.novojornal.luanda_distritos", "supports": ["existence", "parent"], "confirms": "From 1 January 2025 the urban districts of Rangel, Samba, Maianga, Ingombota and Sambizanga became municipalities of Luanda."},
+   {"source": "src.angop.luanda_449", "supports": ["existence", "parent"], "confirms": "Maianga is listed among the municipalities of Luanda province."}]},
+  {"id": "adm.ao.lua.ingombota", "name": "Ingombota", "province": "adm.ao.lua", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.novojornal.luanda_distritos", "supports": ["existence", "parent"], "confirms": "Ingombota became a municipality of Luanda from 1 January 2025."},
+   {"source": "src.angop.luanda_449", "supports": ["existence", "parent"], "confirms": "Ingombota is listed among the municipalities of Luanda province."}]},
+  {"id": "adm.ao.lua.kilamba", "name": "Kilamba", "province": "adm.ao.lua", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.novojornal.luanda_distritos", "supports": ["existence", "parent"], "confirms": "The Centralidade do Kilamba is among the new municipalities of Luanda."},
+   {"source": "src.angop.luanda_449", "supports": ["existence", "parent"], "confirms": "Kilamba (distinct from Kilamba Kiaxi) is listed among the municipalities of Luanda province."}]},
+  {"id": "adm.ao.lua.talatona", "name": "Talatona", "province": "adm.ao.lua", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.angop.luanda_449", "supports": ["existence", "parent"], "confirms": "Talatona is listed among the municipalities of Luanda province. (One search summary claimed this article omits Talatona; the quoted list includes it.)"},
+   {"source": "src.wikipedia.talatona", "supports": ["existence", "parent"], "confirms": "Talatona is a municipality of Luanda province (communes Talatona and Benfica); page not dated after the reform."}]},
+  {"id": "adm.ao.lua.cazenga", "name": "Cazenga", "province": "adm.ao.lua", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.angop.luanda_449", "supports": ["existence", "parent"], "confirms": "Cazenga is listed among the municipalities of Luanda province."}]},
+  {"id": "adm.ao.icb.catete", "name": "Catete", "province": "adm.ao.icb", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.wikipedia.icolo_e_bengo", "supports": ["existence", "parent"], "confirms": "Catete is one of the seven municipalities and the seat of Icolo e Bengo."},
+   {"source": "src.opais.icb_administradores", "supports": ["existence", "parent"], "confirms": "Catete is named among the municipal administrative seats of Icolo e Bengo."}]},
+  {"id": "adm.ao.icb.sequele", "name": "Sequele", "province": "adm.ao.icb", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.wikipedia.icolo_e_bengo", "supports": ["existence", "parent"], "confirms": "Sequele is one of the seven municipalities of Icolo e Bengo."},
+   {"source": "src.angop.icb_zango_sequele", "supports": ["parent"], "confirms": "The territory of Icolo e Bengo includes Sequele (and its centralidade)."}]},
+  {"id": "adm.ao.icb.calumbo", "name": "Calumbo", "province": "adm.ao.icb", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.wikipedia.icolo_e_bengo", "supports": ["existence", "parent"], "confirms": "Calumbo is one of the seven municipalities of Icolo e Bengo."},
+   {"source": "src.citypopulation.icolo_e_bengo", "supports": ["existence"], "confirms": "Calumbo is the most populous municipality (Censo 2024: 652,270, including Zango)."}]},
+  {"id": "adm.ao.icb.cabo_ledo", "name": "Cabo Ledo", "province": "adm.ao.icb", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.wikipedia.icolo_e_bengo", "supports": ["existence", "parent"], "confirms": "Cabo Ledo is one of the seven municipalities of Icolo e Bengo."},
+   {"source": "src.citypopulation.icolo_e_bengo", "supports": ["existence"], "confirms": "Cabo Ledo municipality: 23,089 residents (Censo 2024)."}]},
+  {"id": "adm.ao.icb.bom_jesus", "name": "Bom Jesus", "province": "adm.ao.icb", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.wikipedia.icolo_e_bengo", "supports": ["existence", "parent"], "confirms": "Bom Jesus is one of the seven municipalities of Icolo e Bengo."},
+   {"source": "src.opais.icb_administradores", "supports": ["existence", "parent"], "confirms": "Bom Jesus is named among the municipal administrative seats of Icolo e Bengo."}]},
+  {"id": "adm.ao.bgu.lobito", "name": "Lobito", "province": "adm.ao.bgu", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.benguela_gov.provincia", "supports": ["existence", "parent"], "confirms": "Lobito is listed among Benguela's municipalities."},
+   {"source": "src.oguardiao.benguela_23", "supports": ["existence"], "confirms": "The new municipality Egipto-Praia was formed from a comuna of Lobito; Lobito remains a municipality."}]},
+  {"id": "adm.ao.bgu.benguela", "name": "Benguela", "province": "adm.ao.bgu", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.benguela_gov.provincia", "supports": ["existence", "parent"], "confirms": "Benguela is listed among Benguela's municipalities."}]},
+  {"id": "adm.ao.bgu.catumbela", "name": "Catumbela", "province": "adm.ao.bgu", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.benguela_gov.provincia", "supports": ["existence", "parent"], "confirms": "Catumbela is listed among Benguela's municipalities."},
+   {"source": "src.oguardiao.benguela_23", "supports": ["existence"], "confirms": "The new municipality Biópio was formed from a comuna of Catumbela; Catumbela remains a municipality."}]},
+  {"id": "adm.ao.bgu.baia_farta", "name": "Baía Farta", "province": "adm.ao.bgu", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.benguela_gov.provincia", "supports": ["existence", "parent"], "confirms": "Baía Farta is listed among Benguela's municipalities."},
+   {"source": "src.oguardiao.benguela_23", "supports": ["existence"], "confirms": "The new municipality Dombe Grande was formed from a comuna of Baía Farta; Baía Farta remains a municipality."}]},
+  {"id": "adm.ao.hui.lubango", "name": "Lubango", "province": "adm.ao.hui", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.wikipedia.lubango", "supports": ["existence", "parent"], "confirms": "Lubango (formerly Sá da Bandeira) is a municipality in Angola and the capital of Huíla province."},
+   {"source": "src.angop.huila_9", "supports": ["existence", "parent"], "confirms": "The new municipality Hoque was formerly a comuna of Lubango."}]},
+  {"id": "adm.ao.hui.humpata", "name": "Humpata", "province": "adm.ao.hui", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.angop.huila_9", "supports": ["existence", "parent"], "confirms": "The new municipality Palanca was formerly a comuna of Humpata (a municipality of Huíla)."}]},
+  {"id": "adm.ao.hua.huambo", "name": "Huambo", "province": "adm.ao.hua", "official_code": null, "status": "unverified",
+   "status_note": "The city of Huambo is verified, but no source read in this session explicitly states that a municipality named Huambo exists after the reform. The new municipalities came from Bailundo, Caála, Chicala-Cholohanga, Londuimbali and Longonjo (not from a Huambo municipality).",
+   "sources": [
+   {"source": "src.angop.huambo_6", "supports": [], "confirms": "Lists the municipalities the six new ones were carved from; a Huambo municipality is not among them."}]},
+  {"id": "adm.ao.hua.caala", "name": "Caála", "province": "adm.ao.hua", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.angop.huambo_6", "supports": ["existence", "parent"], "confirms": "Caála is a municipality of Huambo; the new municipality Cuima was carved from it."},
+   {"source": "src.governo.huambo", "supports": ["existence", "parent"], "confirms": "Caála appears in the government's table of Huambo municipalities (comunas Caála, Catata, Calenga)."}]},
+  {"id": "adm.ao.nam.mocamedes", "name": "Moçâmedes", "province": "adm.ao.nam", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.ptwikipedia.subdivisoes", "supports": ["existence", "parent"], "confirms": "Moçâmedes is a municipality and the capital of Namibe."},
+   {"source": "src.governo.namibe", "supports": ["existence", "parent"], "confirms": "Government portal lists Moçâmedes as a municipality of Namibe (with comunas Moçâmedes, Lucira, Bentiaba, Forte Santa Rita)."}]},
+  {"id": "adm.ao.nam.tombwa", "name": "Tômbwa", "name_status": "disputed", "alternative_names": ["Tômbua"], "province": "adm.ao.nam", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.ptwikipedia.subdivisoes", "supports": ["existence", "parent"], "confirms": "Tômbwa is a municipality of Namibe."},
+   {"source": "src.governo.namibe", "supports": ["existence", "parent", "name"], "confirms": "Government portal lists the municipality as 'Tômbua' (comunas Baía dos Tigres, Iona, Tômbua; may predate the reform)."}]},
+  {"id": "adm.ao.cab.cabinda", "name": "Cabinda", "province": "adm.ao.cab", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.cabinda_gov.administradores", "supports": ["existence", "parent"], "confirms": "Cabinda is one of the ten municipalities of Cabinda province."}]},
+  {"id": "adm.ao.cab.cacongo", "name": "Cacongo", "province": "adm.ao.cab", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.cabinda_gov.administradores", "supports": ["existence", "parent"], "confirms": "Cacongo is one of the ten municipalities of Cabinda province."}]},
+  {"id": "adm.ao.cab.buco_zau", "name": "Buco-Zau", "province": "adm.ao.cab", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.cabinda_gov.administradores", "supports": ["existence", "parent"], "confirms": "Buco-Zau is one of the ten municipalities of Cabinda province."}]},
+  {"id": "adm.ao.cab.tando_zinze", "name": "Tando-Zinze", "province": "adm.ao.cab", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.cabinda_gov.administradores", "supports": ["existence", "parent"], "confirms": "Tando-Zinze is one of the ten municipalities of Cabinda province (former comuna, elevated in 2025)."},
+   {"source": "src.cabinda_gov.tando_zinze", "supports": ["existence", "parent"], "confirms": "The population of Tando-Zinze received its first municipal administrator (February 2025)."}]},
+  {"id": "adm.ao.mal.malanje", "name": "Malanje", "province": "adm.ao.mal", "official_code": null, "status": "unverified",
+   "status_note": "The city of Malanje is verified, but no source read in this session states the post-reform municipality of Malanje or whether any city areas moved to new municipalities.",
+   "sources": [
+   {"source": "src.wikipedia.malanje", "supports": [], "confirms": "Malanje is the capital city of Malanje province (city, not the post-reform municipality)."}]},
+  {"id": "adm.ao.mal.calandula", "name": "Calandula", "province": "adm.ao.mal", "official_code": null, "status": "verified", "sources": [
+   {"source": "src.angop.malanje_administradores", "supports": ["existence", "parent"], "confirms": "Calandula appears with an appointed municipal administrator in Malanje province."},
+   {"source": "src.wikipedia.malanje", "supports": ["existence"], "confirms": "Calandula is one of the municipalities of Malanje province; the Calandula falls are near the city (pre-reform list)."}]}
+ ],
+ "comunas": [
+  {"id": "adm.ao.nam.mocamedes.forte_santa_rita", "name": "Forte Santa Rita", "municipality": "adm.ao.nam.mocamedes", "official_code": null, "status": "unverified",
+   "status_note": "Listed as a comuna of Moçâmedes by the government portal, whose data may predate the 2025 reform (Namibe now has 11 comunas). Current status needs confirmation.",
+   "sources": [
+   {"source": "src.governo.namibe", "supports": ["existence", "parent"], "confirms": "Forte Santa Rita is listed as a comuna of the municipality of Moçâmedes."}]},
+  {"id": "adm.ao.cab.cacongo.landana", "name": "Lândana", "municipality": "adm.ao.cab.cacongo", "official_code": null, "status": "unverified",
+   "status_note": "Listed as a comuna of Cacongo by the government portal, which may be out of date (several new municipalities shown without administrators). Current status needs confirmation.",
+   "sources": [
+   {"source": "src.governo.cabinda", "supports": ["existence", "parent"], "confirms": "Cacongo has the comunas Dinge and Lândana."}]}
+ ],
+ "pending_proposals": [
+  {"id": "prop.malanje_split", "summary": "An adjustment report describes splitting Malanje into Malanje Norte (capital Calandula; Calandula, Cacuso, Massango, Marimba, Quela, Cahombo, Kunda dya Baze, Kiwaba Nzoji) and Malanje Sul.",
+   "status": "not_in_force", "note": "Not reflected in the 21-province law; recorded only so it is not mistaken for current geography.",
+   "sources": [{"source": "src.istoe.malanje_ajustamento", "supports": [], "confirms": "Reports a DPA adjustment document describing Malanje Norte and Malanje Sul; does not show a published law."}]}
+ ]
+}
