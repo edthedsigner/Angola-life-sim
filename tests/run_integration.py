@@ -69,6 +69,8 @@ def start_server(data_dir):
 
 async def main():
     global STORE_SPEC
+    import test_geo                      # dados de geografia (marco 1): validação e casos inválidos, sem servidor
+    test_geo.run(check)
     tmp = Path(tempfile.mkdtemp()); shutil.copytree(ROOT / "server_python", tmp / "sp", ignore=shutil.ignore_patterns("data", "__pycache__")); sp = tmp / "sp"
     STORE_SPEC = STORAGE.replace("{tmp}", str(tmp)) if STORAGE else f"file:{sp / 'data'}"
     st0 = storagemod.open_store(STORE_SPEC); st0.write({n: "{}" for n in storagemod.DOCS})      # começa vazio (também numa BD partilhada)

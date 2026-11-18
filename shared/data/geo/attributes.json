@@ -1,0 +1,2326 @@
+{
+ "_doc": "Gameplay attributes per playable location, kept separate from geography. Milestone 1 stores neutral placeholders (value 1.0 = no effect, basis 'placeholder'); nothing in the game reads them yet. Milestone 5 replaces them with values whose basis is 'sourced' (with source ids), 'estimate' or 'fictional'.",
+ "attributes": {
+  "population_density": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "urbanization": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "infrastructure": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "land_availability": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "price_index_residential": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "price_index_commercial": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "price_index_rent": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "employment": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "business": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "agriculture": {
+   "scale": "multiplier relative to a neutral 1.0"
+  },
+  "tourism": {
+   "scale": "multiplier relative to a neutral 1.0"
+  }
+ },
+ "bases": [
+  "placeholder",
+  "sourced",
+  "estimate",
+  "fictional"
+ ],
+ "values": {
+  "loc.lua.maianga": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.lua.kilamba": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.lua.talatona": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.lua.cazenga": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.lua.ilha": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.icb.catete": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.icb.sequele": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.icb.zango": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.icb.cabo_ledo": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.icb.bom_jesus": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.bgu.restinga": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.bgu.compao": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.bgu.benfica": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.bgu.catumbela": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.bgu.baia_farta": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hui.mitcha": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hui.mukanka": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hui.tchavola": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hui.cristo_rei": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hui.humpata": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hua.cidade_alta": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hua.cidade_baixa": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hua.benfica": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hua.kalundo": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.hua.caala": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.nam.centro": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.nam.cinco_abril": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.nam.forte_santa_rita": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.nam.praia_amelia": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.nam.tombwa": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.cab.cidade": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.cab.lombo_lombo": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.cab.landana": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.cab.buco_zau": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.cab.tando_zinze": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.mal.maxinde": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.mal.carreira_tiro": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.mal.cangambo": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.mal.catepa": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  },
+  "loc.mal.calandula": {
+   "population_density": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "urbanization": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "infrastructure": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "land_availability": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_residential": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_commercial": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "price_index_rent": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "employment": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "business": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "agriculture": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   },
+   "tourism": {
+    "value": 1.0,
+    "basis": "placeholder",
+    "sources": []
+   }
+  }
+ }
+}

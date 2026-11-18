@@ -1,0 +1,9 @@
+{
+ "_doc": "Map representations of playable locations. A map is a game artefact, not geography: 'representation' says whether its layout depicts real streets or is invented. A playable location without a map is not enterable yet. Milestone 1 only records the existing map; it does not change how the game loads it.",
+ "representations": ["fictional", "real_based"],
+ "maps": [
+  {"id": "map.lua.maianga.01", "location": "loc.lua.maianga", "representation": "fictional",
+   "layout_source": "shared/data/world.json",
+   "description": "The current game world: an invented street with four invented buildings (Mercearia Girassol, Casa Mussulo, Escritório Atlântico, Restaurante Maianga), labelled 'Rua · Maianga'. It does not reproduce any real street, building or landmark of Maianga. Building names are game names, not real businesses."}
+ ]
+}
